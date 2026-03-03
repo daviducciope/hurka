@@ -211,7 +211,6 @@
 
     <div class="relative z-10 mx-auto grid w-full max-w-[1180px] items-center gap-10 md:grid-cols-[minmax(0,.95fr)_minmax(0,1.05fr)] md:gap-[clamp(2.5rem,4vw,4.75rem)]">
       <div class="relative md:pr-6">
-        <div class="pointer-events-none absolute right-[-2rem] top-[52%] hidden h-[2px] w-[clamp(72px,9vw,118px)] bg-[linear-gradient(90deg,rgba(250,224,74,.85),rgba(250,224,74,0))] opacity-80 shadow-[0_0_18px_rgba(250,224,74,.3)] md:block"></div>
 
         <h1 class="mb-5 text-balance font-display text-[clamp(3.2rem,7vw,6rem)] font-extrabold uppercase leading-[.9] tracking-[-.02em] text-white">
           Soluzioni<span class="block text-brand-yellow">integrate.</span>Risultati<span class="block text-white">immediati.</span>
@@ -229,36 +228,46 @@
           </a>
         </div>
 
-        <div class="mt-8 max-w-[42rem] max-md:mb-4">
+        <div class="mt-8 max-w-[44rem] max-md:mb-4">
           <div class="mb-4 inline-flex items-center gap-3 text-sm font-semibold tracking-[.24em] text-white/65">
             <span class="h-px w-12 bg-brand-yellow/45"></span>
             SETTORI
           </div>
-          <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-3.5">
-            <div class="rounded-[22px] border border-white/10 bg-white/[.045] p-4 shadow-[0_16px_32px_rgba(0,0,0,.18)] backdrop-blur-sm">
-              <div class="flex items-center gap-3">
-                <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_20px_rgba(250,224,74,.24)]">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <div class="grid gap-2.5 sm:grid-cols-3">
+
+            <!-- Card: Luce & Gas -->
+            <div class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[.05] px-3 py-3.5 shadow-[0_8px_28px_rgba(0,0,0,.28)] backdrop-blur-md transition duration-200 hover:-translate-y-0.5 hover:border-brand-yellow/30 hover:bg-[linear-gradient(135deg,rgba(250,224,74,.09),rgba(250,224,74,.03))]">
+              <div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-brand-yellow opacity-80"></div>
+              <div class="flex items-center gap-2.5">
+                <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-yellow text-brand-navy shadow-[0_0_14px_rgba(250,224,74,.30)]">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 </span>
-                <span class="font-display text-[1.08rem] font-bold uppercase leading-none tracking-[.04em] text-white">Luce &amp; Gas</span>
+                <span class="whitespace-nowrap font-display text-[.88rem] font-bold uppercase leading-none tracking-[.03em] text-white">Luce &amp; Gas</span>
               </div>
             </div>
-            <div class="rounded-[22px] border border-white/10 bg-white/[.045] p-4 shadow-[0_16px_32px_rgba(0,0,0,.18)] backdrop-blur-sm">
-              <div class="flex items-center gap-3">
-                <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_20px_rgba(250,224,74,.24)]">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M6 3h12"/><path d="M5 11h14"/><rect x="6" y="11" width="12" height="9" rx="1.5"/><path d="M9 15h.01"/><path d="M12 15h.01"/><path d="M15 15h.01"/></svg>
+
+            <!-- Card: Efficientamento -->
+            <div class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[.05] px-3 py-3.5 shadow-[0_8px_28px_rgba(0,0,0,.28)] backdrop-blur-md transition duration-200 hover:-translate-y-0.5 hover:border-brand-yellow/30 hover:bg-[linear-gradient(135deg,rgba(250,224,74,.09),rgba(250,224,74,.03))]">
+              <div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-brand-yellow opacity-80"></div>
+              <div class="flex items-center gap-2.5">
+                <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-yellow text-brand-navy shadow-[0_0_14px_rgba(250,224,74,.30)]">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 </span>
-                <span class="font-display text-[1.08rem] font-bold uppercase leading-none tracking-[.04em] text-white">Efficientamento</span>
+                <span class="whitespace-nowrap font-display text-[.88rem] font-bold uppercase leading-none tracking-[.03em] text-white">Efficientamento</span>
               </div>
             </div>
-            <div class="rounded-[22px] border border-white/10 bg-white/[.045] p-4 shadow-[0_16px_32px_rgba(0,0,0,.18)] backdrop-blur-sm">
-              <div class="flex items-center gap-3">
-                <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_20px_rgba(250,224,74,.24)]">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h.01"/><path d="M15 8h.01"/><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M9 16h.01"/><path d="M15 16h.01"/><path d="M11 21v-4h2v4"/></svg>
+
+            <!-- Card: Condomini -->
+            <div class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[.05] px-3 py-3.5 shadow-[0_8px_28px_rgba(0,0,0,.28)] backdrop-blur-md transition duration-200 hover:-translate-y-0.5 hover:border-brand-yellow/30 hover:bg-[linear-gradient(135deg,rgba(250,224,74,.09),rgba(250,224,74,.03))]">
+              <div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-brand-yellow opacity-80"></div>
+              <div class="flex items-center gap-2.5">
+                <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-yellow text-brand-navy shadow-[0_0_14px_rgba(250,224,74,.30)]">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h.01"/><path d="M15 8h.01"/><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M9 16h.01"/><path d="M15 16h.01"/><path d="M11 21v-4h2v4"/></svg>
                 </span>
-                <span class="font-display text-[1.08rem] font-bold uppercase leading-none tracking-[.04em] text-white">Condomini</span>
+                <span class="whitespace-nowrap font-display text-[.88rem] font-bold uppercase leading-none tracking-[.03em] text-white">Condomini</span>
               </div>
             </div>
+
           </div>
         </div>
       </div>
