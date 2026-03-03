@@ -205,7 +205,7 @@
   <!-- =========================
        HERO (manifesto-first + wow logo panel)
   ========================== -->
-  <section id="hero" class="relative flex min-h-screen items-center overflow-hidden bg-[radial-gradient(circle_at_78%_28%,rgba(250,224,74,.12),transparent_18%),radial-gradient(circle_at_18%_18%,rgba(255,255,255,.04),transparent_26%),linear-gradient(120deg,#0a1425_0%,#132648_48%,#0b1528_100%)] px-[5vw] pt-[70px]">
+  <section id="hero" class="relative flex min-h-screen items-center overflow-hidden bg-[radial-gradient(circle_at_78%_28%,rgba(250,224,74,.12),transparent_18%),radial-gradient(circle_at_18%_18%,rgba(255,255,255,.04),transparent_26%),linear-gradient(120deg,#0a1425_0%,#132648_48%,#0b1528_100%)] px-[5vw] pb-12 pt-[70px] sm:pb-14 md:pb-10">
     <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(250,224,74,0)_0%,rgba(250,224,74,.05)_58%,rgba(250,224,74,.11)_100%)]"></div>
     <div class="pointer-events-none absolute inset-x-0 bottom-0 h-[6px] bg-[linear-gradient(90deg,rgba(250,224,74,0)_0%,#fae04a_18%,#fae04a_82%,rgba(250,224,74,0)_100%)]"></div>
 
@@ -223,12 +223,43 @@
         </p>
 
         <div class="flex flex-wrap items-center gap-[.9rem] max-md:flex-col max-md:items-center">
-          <a href="#servizi" class="inline-block rounded bg-brand-yellow px-8 py-3 font-display text-[1.05rem] font-bold uppercase tracking-[.08em] text-brand-navy transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,.2)]">
-            Scopri i servizi
-          </a>
+          
           <a href="#contatti" class="inline-block rounded border-2 border-white/35 bg-transparent px-8 py-3 font-display text-[1.05rem] font-bold uppercase tracking-[.08em] text-white transition hover:-translate-y-0.5 hover:border-brand-yellow hover:text-brand-yellow hover:shadow-[0_8px_24px_rgba(0,0,0,.2)]">
             Contattaci
           </a>
+        </div>
+
+        <div class="mt-8 max-w-[42rem] max-md:mb-4">
+          <div class="mb-4 inline-flex items-center gap-3 text-sm font-semibold tracking-[.24em] text-white/65">
+            <span class="h-px w-12 bg-brand-yellow/45"></span>
+            SETTORI
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-3.5">
+            <div class="rounded-[22px] border border-white/10 bg-white/[.045] p-4 shadow-[0_16px_32px_rgba(0,0,0,.18)] backdrop-blur-sm">
+              <div class="flex items-center gap-3">
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_20px_rgba(250,224,74,.24)]">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </span>
+                <span class="font-display text-[1.08rem] font-bold uppercase leading-none tracking-[.04em] text-white">Luce &amp; Gas</span>
+              </div>
+            </div>
+            <div class="rounded-[22px] border border-white/10 bg-white/[.045] p-4 shadow-[0_16px_32px_rgba(0,0,0,.18)] backdrop-blur-sm">
+              <div class="flex items-center gap-3">
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_20px_rgba(250,224,74,.24)]">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M6 3h12"/><path d="M5 11h14"/><rect x="6" y="11" width="12" height="9" rx="1.5"/><path d="M9 15h.01"/><path d="M12 15h.01"/><path d="M15 15h.01"/></svg>
+                </span>
+                <span class="font-display text-[1.08rem] font-bold uppercase leading-none tracking-[.04em] text-white">Efficientamento</span>
+              </div>
+            </div>
+            <div class="rounded-[22px] border border-white/10 bg-white/[.045] p-4 shadow-[0_16px_32px_rgba(0,0,0,.18)] backdrop-blur-sm">
+              <div class="flex items-center gap-3">
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_20px_rgba(250,224,74,.24)]">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h.01"/><path d="M15 8h.01"/><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M9 16h.01"/><path d="M15 16h.01"/><path d="M11 21v-4h2v4"/></svg>
+                </span>
+                <span class="font-display text-[1.08rem] font-bold uppercase leading-none tracking-[.04em] text-white">Condomini</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -279,8 +310,9 @@
   <div class="relative overflow-hidden border-t border-black/10 bg-[#d9d8d6] text-brand-navy">
     <div class="pointer-events-none absolute inset-y-0 left-[-6%] w-[42vw] bg-[linear-gradient(100deg,#f1da00_0%,#f1da00_70%,transparent_70%)] opacity-95"></div>
     <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(255,255,255,.28),transparent_20%),radial-gradient(circle_at_82%_22%,rgba(250,224,74,.22),transparent_22%),linear-gradient(135deg,rgba(32,56,99,.06)_1px,transparent_1px)] [background-size:auto,auto,30px_30px] opacity-70"></div>
-    <div class="pointer-events-none absolute inset-y-[-6%] right-[-14%] hidden w-[42vw] lg:block">
-      <svg viewBox="0 0 120 520" class="absolute right-[10%] top-[-2%] h-[104%] w-auto opacity-[.28]" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <div class="pointer-events-none absolute inset-y-[-6%] right-[2%] hidden w-[34vw] lg:block">
+      <div class="absolute inset-y-[13%] right-[16%] w-[18%] bg-[radial-gradient(circle,rgba(250,224,74,.24)_0%,rgba(250,224,74,.10)_35%,transparent_72%)] blur-3xl"></div>
+      <svg viewBox="0 0 120 520" class="absolute right-[0] top-[-1%] h-[101%] w-auto opacity-[.34] [filter:drop-shadow(0_0_12px_rgba(250,224,74,.22))]" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path fill="#fae04a" d="M72.98,149.38c10.43-33.04,23.11-65.26,34.07-98.14-15.58-.69-23.34-.4-38.57,1.37-5.59,8.99-10.38,17.79-14.41,26.4,9.07-1.88,18.43-3.3,28.53-4.21-9.36,10.83-16.99,21.49-22.8,31.67.05.04.09.08.14.13,5.4-.71,11.05-1.29,17.12-1.72.03.05.07.09.1.14-13.81,14.43-22.18,28.5-28.16,41.18,9.39,1.03,13.69,1.73,23.98,3.22Z"/>
         <path fill="#fae04a" d="M63.02,163.92c-3.31-5-8.25-7.96-14.42-9.04-5.98-1.05-11.34,0-15.46,2.57-4.06,2.54-5.54,5.81-4.83,10.29.7,4.41,3.22,8.85,7.13,13.9,4.07,4.97,8.37,8.89,12.98,11.31,4.6,2.41,8.29,2.64,11.58.24,3.24-2.36,5.27-6.68,6.15-12.52.91-6.08.18-11.77-3.1-16.75Z"/>
         <path fill="#fae04a" d="M51.64,118.98c-4.35.66-8.51,1.39-12.84,2.22.95-7.78,2.18-15.68,3.85-23.94-6.85,1.55-13.58,3.29-20.6,5.28-.08-.4-.17-.75-.22-1.11-.53-3.88-.99-7.78-1.46-11.74-.39-3.43-.82-6.89-1.15-10.39-.45-5.03-.8-10.13-1.06-15.33-7.85,2.7-11.7,4.23-19.27,7.6,8.42,24.34,18.43,48.13,25.56,72.93,10.37.33,14.69.71,23.32,1.63.97-8.82,2.2-17.82,3.86-27.14Z"/>
@@ -291,7 +323,7 @@
       <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div class="grid gap-10 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:items-end">
           <div class="max-w-2xl">
-            <div class="inline-flex items-center gap-3 text-xs font-semibold tracking-[.28em] text-brand-teal/90">
+            <div class="inline-flex items-center gap-3 text-sm font-semibold tracking-[.24em] text-brand-teal/90 sm:text-[.95rem]">
               <span class="h-px w-12 bg-brand-teal/50"></span>
               COSA FACCIAMO
             </div>
@@ -306,10 +338,13 @@
           <div class="rounded-[28px] border border-brand-navy/10 bg-white/50 p-6 backdrop-blur-sm shadow-[0_18px_40px_rgba(32,56,99,.08)]">
             <p class="font-display text-[1.8rem] font-extrabold uppercase leading-[.95] text-brand-navy">
               Una linea retta
-              <span class="block text-brand-yellow">verso il risultato.</span>
+              <span class="mt-1 inline-flex rounded-full bg-brand-navy px-3 py-1 text-[.82em] text-brand-yellow shadow-[0_10px_24px_rgba(32,56,99,.14)]">verso il risultato.</span>
             </p>
             <p class="mt-3 max-w-md text-sm leading-6 text-brand-teal/80">
-              Lo stesso manifesto del brand entra nella sezione: segno netto, energia e direzione unica verso il risparmio.
+              <span class="font-semibold text-brand-navy">Energia</span>, <span class="font-semibold text-brand-navy">fotovoltaico</span> e
+              <span class="font-semibold text-brand-navy">servizi ai condomini</span>: un unico metodo per ridurre
+              <span class="font-semibold text-brand-navy">complessità</span>, <span class="font-semibold text-brand-navy">costi</span> e
+              <span class="font-semibold text-brand-navy">tempi</span>.
             </p>
           </div>
         </div>
@@ -320,16 +355,18 @@
             <div class="flex items-start justify-between gap-4">
               <div>
                 <h3 class="font-display text-2xl font-extrabold uppercase text-brand-navy">Luce &amp; Gas</h3>
-                <p class="mt-1 text-sm text-brand-teal/75">Taglio sprechi + gestione pratiche.</p>
+                <p class="mt-1 text-sm text-brand-teal/75"><span class="font-semibold text-brand-navy">Taglio sprechi</span> + <span class="font-semibold text-brand-navy">gestione pratiche</span>.</p>
               </div>
-              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy font-bold shadow-[0_0_24px_rgba(250,224,74,.18)]">⚡</span>
+              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_24px_rgba(250,224,74,.18)]">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </span>
             </div>
             <ul class="mt-6 space-y-2 text-sm text-brand-teal/85">
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Consulenza consumi</li>
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Certificazione risparmio</li>
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Contrattualizzazione forniture</li>
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Nuovi allacciamenti • Volture • Subentri</li>
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Aumenti di potenza • Mediazione distributore</li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Consulenza</span> consumi</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Certificazione</span> risparmio</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Contrattualizzazione</span> forniture</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Nuovi allacciamenti</span> • Volture • Subentri</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Aumenti di potenza</span> • Mediazione distributore</span></li>
             </ul>
           </article>
 
@@ -338,15 +375,17 @@
             <div class="flex items-start justify-between gap-4">
               <div>
                 <h3 class="font-display text-2xl font-extrabold uppercase text-brand-navy">Efficientamento Energetico</h3>
-                <p class="mt-1 text-sm text-brand-teal/75">Dalla progettazione al post-installazione.</p>
+                <p class="mt-1 text-sm text-brand-teal/75">Dalla <span class="font-semibold text-brand-navy">progettazione</span> al <span class="font-semibold text-brand-navy">post-installazione</span>.</p>
               </div>
-              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy font-bold shadow-[0_0_24px_rgba(250,224,74,.18)]">☀</span>
+              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_24px_rgba(250,224,74,.18)]">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M6 3h12"/><path d="M5 11h14"/><rect x="6" y="11" width="12" height="9" rx="1.5"/><path d="M9 15h.01"/><path d="M12 15h.01"/><path d="M15 15h.01"/></svg>
+              </span>
             </div>
             <ul class="mt-6 space-y-2 text-sm text-brand-teal/85">
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Impianti fotovoltaici</li>
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Progettazione e installazione</li>
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Pratiche GSE e Terna</li>
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Pulizia e manutenzione fotovoltaico</li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Impianti</span> fotovoltaici</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Progettazione</span> e installazione</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Pratiche</span> GSE e Terna</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Pulizia</span> e manutenzione fotovoltaico</span></li>
             </ul>
           </article>
 
@@ -355,14 +394,16 @@
             <div class="flex items-start justify-between gap-4">
               <div>
                 <h3 class="font-display text-2xl font-extrabold uppercase text-brand-navy">Servizi ai Condomini</h3>
-                <p class="mt-1 text-sm text-brand-teal/75">Gestione tecnica + compliance.</p>
+                <p class="mt-1 text-sm text-brand-teal/75"><span class="font-semibold text-brand-navy">Gestione tecnica</span> + <span class="font-semibold text-brand-navy">compliance</span>.</p>
               </div>
-              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy font-bold shadow-[0_0_24px_rgba(250,224,74,.18)]">🏢</span>
+              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_24px_rgba(250,224,74,.18)]">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h.01"/><path d="M15 8h.01"/><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M9 16h.01"/><path d="M15 16h.01"/><path d="M11 21v-4h2v4"/></svg>
+              </span>
             </div>
             <ul class="mt-6 space-y-2 text-sm text-brand-teal/85">
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Gestione Privacy GDPR</li>
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Certificazioni messe a terra</li>
-              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Derattizzazione</li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Gestione Privacy</span> GDPR</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Certificazioni</span> messe a terra</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Derattizzazione</span></span></li>
             </ul>
           </article>
         </div>
@@ -373,28 +414,31 @@
       <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <div class="grid gap-10 lg:grid-cols-[minmax(0,.95fr)_minmax(0,1.05fr)]">
           <div>
-            <div class="inline-flex items-center gap-3 text-xs font-semibold tracking-[.28em] text-brand-teal/90">
+            <div class="inline-flex items-center gap-3 text-sm font-semibold tracking-[.24em] text-brand-teal/90 sm:text-[.95rem]">
               <span class="h-px w-12 bg-brand-teal/50"></span>
               CHI SIAMO
             </div>
             <h2 class="mt-5 font-display text-5xl font-extrabold uppercase leading-[0.95] text-brand-navy">
               Un team giovane,<br />
               ma con le idee<br />
-              <span class="text-brand-yellow">chiarissime.</span>
+              <span class="text-brand-teal">chiarissime.</span>
             </h2>
           </div>
 
           <div class="space-y-4 rounded-[28px] border border-brand-navy/10 bg-white/55 p-7 text-brand-teal/85 backdrop-blur-sm shadow-[0_18px_36px_rgba(32,56,99,.07)]">
             <p>
-              Siamo nati per trasformare il labirinto dei contratti energetici e della transizione ecologica
-              in <span class="font-semibold text-brand-navy">una linea retta verso il risparmio.</span>
+              Siamo nati per trasformare il <span class="font-semibold text-brand-navy">labirinto dei contratti energetici</span> e della
+              <span class="font-semibold text-brand-navy">transizione ecologica</span> in
+              <span class="font-semibold text-brand-navy">una linea retta verso il risparmio.</span>
             </p>
             <p>
-              Dalla gestione dei mandati luce e gas per i grandi condomini, alla progettazione di soluzioni rinnovabili per la Pubblica Amministrazione —
+              Dalla <span class="font-semibold text-brand-navy">gestione dei mandati luce e gas</span> per i grandi condomini, alla
+              <span class="font-semibold text-brand-navy">progettazione di soluzioni rinnovabili</span> per la Pubblica Amministrazione —
               il nostro metodo è la <span class="font-semibold text-brand-navy">Consulenza Integrata.</span>
             </p>
             <p>
-              Non siamo semplici intermediari: siamo il vostro <span class="font-semibold text-brand-navy">ufficio tecnico esterno.</span>
+              Non siamo semplici <span class="font-semibold text-brand-navy">intermediari</span>: siamo il vostro
+              <span class="font-semibold text-brand-navy">ufficio tecnico esterno.</span>
             </p>
           </div>
         </div>
@@ -406,8 +450,9 @@
                 Perché <span class="text-brand-yellow">HURKA!</span>
               </div>
               <p class="mt-3 max-w-3xl text-brand-teal/80">
-                Perché è quello che dicono i nostri clienti quando vedono la semplificazione dei loro processi e il taglio dei costi in bolletta.
-                Il nome non è un caso: è la reazione che vogliamo provocare, ogni volta.
+                Perché è quello che dicono i nostri clienti quando vedono la <span class="font-semibold text-brand-navy">semplificazione dei loro processi</span>
+                e il <span class="font-semibold text-brand-navy">taglio dei costi in bolletta</span>. Il nome non è un caso: è la
+                <span class="font-semibold text-brand-navy">reazione</span> che vogliamo provocare, ogni volta.
               </p>
               <p class="mt-5 text-brand-teal/85">
                 <span class="font-semibold text-brand-navy">Non perdiamo tempo.</span> Non aggiungiamo burocrazia.
@@ -437,17 +482,18 @@
 
         <div class="mt-10 grid gap-6 lg:grid-cols-3">
           <div class="rounded-[28px] border border-brand-navy/10 bg-white/55 p-7 shadow-[0_18px_36px_rgba(32,56,99,.07)]">
-            <div class="text-xs font-semibold tracking-[.28em] text-brand-teal/90">MISSION</div>
-            <p class="mt-3 text-brand-teal/85">Risolvere la complessità energetica con intuizioni brillanti.</p>
+            <div class="font-display text-lg font-extrabold uppercase tracking-[.18em] text-brand-teal/95 sm:text-xl">MISSION</div>
+            <p class="mt-3 text-brand-teal/85"><span class="font-semibold text-brand-navy">Risolvere</span> la complessità energetica con <span class="font-semibold text-brand-navy">intuizioni brillanti</span>.</p>
           </div>
           <div class="rounded-[28px] border border-brand-navy/10 bg-white/55 p-7 shadow-[0_18px_36px_rgba(32,56,99,.07)]">
-            <div class="text-xs font-semibold tracking-[.28em] text-brand-teal/90">VISION</div>
-            <p class="mt-3 text-brand-teal/85">Rendere l’efficienza energetica un’esperienza entusiasmante, non una seccatura burocratica.</p>
+            <div class="font-display text-lg font-extrabold uppercase tracking-[.18em] text-brand-teal/95 sm:text-xl">VISION</div>
+            <p class="mt-3 text-brand-teal/85">Rendere l’<span class="font-semibold text-brand-navy">efficienza energetica</span> un’<span class="font-semibold text-brand-navy">esperienza entusiasmante</span>, non una seccatura burocratica.</p>
           </div>
           <div class="rounded-[28px] border border-brand-navy/10 bg-white/55 p-7 shadow-[0_18px_36px_rgba(32,56,99,.07)]">
-            <div class="text-xs font-semibold tracking-[.28em] text-brand-teal/90">CAMPAGNA</div>
+            <div class="font-display text-lg font-extrabold uppercase tracking-[.18em] text-brand-teal/95 sm:text-xl">CAMPAGNA</div>
             <p class="mt-3 text-brand-teal/85">
-              “Il nostro nome è un’esclamazione perché il nostro obiettivo è stupirvi con la velocità delle soluzioni.”
+              “Il nostro nome è un’<span class="font-semibold text-brand-navy">esclamazione</span> perché il nostro obiettivo è
+              <span class="font-semibold text-brand-navy">stupirvi</span> con la <span class="font-semibold text-brand-navy">velocità delle soluzioni</span>.”
             </p>
           </div>
         </div>
@@ -458,43 +504,57 @@
   <!-- =========================
        CONTATTI (conversion section)
   ========================== -->
-  <section id="contatti" class="border-t border-white/10 bg-gradient-to-b from-black/40 to-brand-ink">
-    <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <div class="grid gap-10 lg:grid-cols-2">
-        <!-- left -->
-        <div>
-          <div class="text-xs font-semibold tracking-widest text-brand-yellow/90">CONTATTI</div>
-          <h2 class="mt-3 font-display text-5xl font-extrabold leading-[0.95]">
+  <section id="contatti" class="relative overflow-hidden border-t border-black/10 bg-[#d9d8d6] text-brand-navy">
+    <div class="pointer-events-none absolute inset-y-0 right-[-6%] w-[42vw] bg-[linear-gradient(100deg,transparent_0%,transparent_30%,#f1da00_30%,#f1da00_100%)] opacity-95"></div>
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,255,255,.22),transparent_16%),linear-gradient(135deg,rgba(32,56,99,.06)_1px,transparent_1px)] [background-size:auto,28px_28px] opacity-70"></div>
+    <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+      <div class="relative grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,.95fr)] lg:items-start">
+        <div class="relative z-10">
+          <div class="inline-flex items-center gap-3 text-sm font-semibold tracking-[.24em] text-brand-teal/90 sm:text-[.95rem]">
+            <span class="h-px w-12 bg-brand-teal/50"></span>
+            CONTATTI
+          </div>
+          <h2 class="mt-5 font-display text-5xl font-extrabold uppercase leading-[0.95] text-brand-navy sm:text-6xl">
             Dicci cosa<br />
             ti serve.<br />
             <span class="text-brand-yellow">Subito.</span>
           </h2>
-          <p class="mt-5 max-w-xl text-white/75">
+          <p class="mt-5 max-w-xl text-brand-teal/85">
             Ogni giorno gestiamo situazioni complesse per condomini, aziende e pubbliche amministrazioni.
-            La tua richiesta non è un disturbo — è il motivo per cui esistiamo.
+            La tua richiesta non è un disturbo: è il motivo per cui esistiamo.
           </p>
 
-          <ul class="mt-7 space-y-2 text-sm text-white/75">
-            <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Risposta garantita entro 24 ore lavorative</li>
-            <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Prima consulenza sempre gratuita</li>
-            <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span>Nessun vincolo, nessuna firma al buio</li>
-          </ul>
+          <div class="mt-8 max-w-xl rounded-[28px] border border-brand-navy/10 bg-white/55 p-7 shadow-[0_18px_36px_rgba(32,56,99,.07)]">
+            <p class="font-display text-[1.8rem] font-extrabold uppercase leading-[.95] text-brand-navy">
+              Nessun vincolo.
+              <span class="mt-1 inline-flex rounded-full bg-brand-navy px-3 py-1 text-[.82em] text-brand-yellow shadow-[0_10px_24px_rgba(32,56,99,.14)]">Nessuna firma al buio.</span>
+            </p>
+            <ul class="mt-5 space-y-3 text-sm text-brand-teal/85">
+              <li class="flex gap-3"><span class="mt-1.5 h-2 w-2 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Risposta garantita</span> entro 24 ore lavorative</span></li>
+              <li class="flex gap-3"><span class="mt-1.5 h-2 w-2 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Prima consulenza</span> sempre gratuita</span></li>
+              <li class="flex gap-3"><span class="mt-1.5 h-2 w-2 rounded-full bg-brand-yellow"></span><span>Un <span class="font-semibold text-brand-navy">ufficio tecnico esterno</span>, non un altro intermediario</span></li>
+            </ul>
 
-          <a href="mailto:info@hurka.it" class="mt-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10">
-            info@hurka.it
-            <span class="text-brand-yellow">→</span>
-          </a>
+            <a href="mailto:info@hurka.it" class="mt-6 inline-flex items-center gap-2 rounded-full border border-brand-navy/15 bg-brand-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-teal">
+              info@hurka.it
+              <span class="text-brand-yellow">→</span>
+            </a>
+          </div>
         </div>
 
-        <!-- right: form -->
-        <div class="rounded-3xl border border-white/10 bg-white/5 p-7">
-          <h3 class="font-display text-2xl font-extrabold">Richiedi consulenza gratuita</h3>
-          <p class="mt-2 text-sm text-white/60">Compila in 30 secondi. Ti rispondiamo entro 24h lavorative.</p>
+        <div class="relative z-10 rounded-[32px] border border-white/10 bg-[#0b1528] p-7 shadow-[0_28px_60px_rgba(0,0,0,.22)] lg:p-8">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h3 class="font-display text-2xl font-extrabold uppercase text-white">Richiedi consulenza gratuita</h3>
+              <p class="mt-2 text-sm text-white/60">Compila in 30 secondi. Ti rispondiamo entro 24h lavorative.</p>
+            </div>
+            <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy font-bold shadow-[0_0_24px_rgba(250,224,74,.2)]">→</span>
+          </div>
 
           <form class="mt-6 space-y-4">
             <div>
               <label class="text-sm text-white/70">Di cosa hai bisogno?</label>
-              <select class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-brand-yellow/50">
+              <select class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-brand-yellow/50">
                 <option>⚡ Luce &amp; Gas</option>
                 <option>☀ Fotovoltaico</option>
                 <option>🏢 Condomini</option>
@@ -505,25 +565,25 @@
             <div class="grid gap-4 sm:grid-cols-2">
               <div>
                 <label class="text-sm text-white/70">Nome</label>
-                <input type="text" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-brand-yellow/50" placeholder="Il tuo nome" />
+                <input type="text" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-brand-yellow/50" placeholder="Il tuo nome" />
               </div>
               <div>
                 <label class="text-sm text-white/70">Email</label>
-                <input type="email" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-brand-yellow/50" placeholder="nome@email.it" />
+                <input type="email" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-brand-yellow/50" placeholder="nome@email.it" />
               </div>
             </div>
 
             <div>
               <label class="text-sm text-white/70">Telefono <span class="text-white/40">(opzionale)</span></label>
-              <input type="tel" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-brand-yellow/50" placeholder="+39 ..." />
+              <input type="tel" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-brand-yellow/50" placeholder="+39 ..." />
             </div>
 
             <div>
               <label class="text-sm text-white/70">La tua richiesta</label>
-              <textarea rows="5" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-brand-yellow/50" placeholder="Spiegaci cosa vuoi ottimizzare o risolvere..."></textarea>
+              <textarea rows="5" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-brand-yellow/50" placeholder="Spiegaci cosa vuoi ottimizzare o risolvere..."></textarea>
             </div>
 
-            <button type="submit" class="w-full rounded-full bg-brand-yellow px-6 py-3 font-semibold text-brand-navy hover:brightness-95 shadow-soft">
+            <button type="submit" class="w-full rounded-full bg-brand-yellow px-6 py-3 font-semibold text-brand-navy transition hover:brightness-95 shadow-soft">
               Invia la richiesta
             </button>
 
@@ -532,8 +592,17 @@
               I tuoi dati non vengono ceduti a terzi.
             </p>
 
-            <div class="pt-2 text-center font-display text-lg font-extrabold text-white/80">
-              HURKA! 🎉
+            <div class="flex justify-center pt-2">
+              <svg viewBox="35 320 515 155" class="block h-auto w-full max-w-[150px]" xmlns="http://www.w3.org/2000/svg" aria-label="HURKA!">
+                <path fill="#ffffff" d="M138.67,453.46c-9.69,1.34-19.44,2.94-29.2,5,.4-15.45.85-30.83,1.3-45.92-5.57.1-11.15.31-16.74.65.53,16.12,1.06,32.37,1.47,48.55-9.76,2.53-19.51,5.61-29.2,9.43-4.63-43.68-15.52-89.39-16.09-138,14.23,2.83,28.22,6.28,42.24,9.7.02,13.43.3,27.19.68,41.16,6.17.36,12.31.83,18.45,1.38.37-12.91.71-25.51.92-37.66,14.01,3.37,28,6.57,42.09,9.59-2.21,29.79-11.13,61.56-15.93,96.13Z"/>
+                <path fill="#ffffff" d="M197.64,367.48h23.49v61.52c0,5.15-.81,9.32-2.42,12.51-1.58,3.34-4.21,6.37-7.89,9.07-4.96,3.61-10.99,5.41-18.08,5.41-8.04,0-14.78-1.99-20.23-5.97-6.91-5.07-10.37-13.18-10.37-24.34v-58.2h23.49v56.11c0,3.79.46,6.48,1.38,8.06.92,1.58,2.47,2.37,4.65,2.37s3.81-.73,4.68-2.2c.86-1.54,1.3-4.26,1.3-8.17v-56.17Z"/>
+                <path fill="#ffffff" d="M300.93,454.46h-25.41l-11.61-30.98c-.11-.53-.31-1.22-.59-2.08-.28-.86-.63-1.9-1.04-3.1l.17,5.75v30.42h-23.38v-86.98h24.06c10.59,0,18.51,2.08,23.77,6.25,6.68,5.33,10.03,12.92,10.03,22.76,0,10.52-4.49,17.78-13.46,21.8l17.46,36.17ZM262.57,407.76h1.58c2.7,0,4.96-1.03,6.76-3.1,1.8-2.06,2.7-4.69,2.7-7.89,0-6.5-3.4-9.75-10.2-9.75h-.85v20.73Z"/>
+                <path fill="#ffffff" d="M378.3,454.46h-25.35l-15.61-40.11.62,40.11h-23.49v-86.98h23.49l-.62,37.29,13.86-37.29h24.79l-18.76,41.97,21.07,45.01Z"/>
+                <path fill="#ffffff" d="M453.48,454.46h-24.28l-1.75-11.04h-15.83l-1.91,11.04h-24.28l20.9-86.98h28.73l18.42,86.98ZM424.69,424.77l-1.52-10.14s-.11-.54-.23-1.52c-.08-.82-.47-4.09-1.18-9.8-.08-.64-.17-1.51-.28-2.62-.11-1.11-.26-2.51-.45-4.2l-.73-8.23c-.08.79-.18,1.67-.31,2.65-.13.98-.27,2.05-.42,3.21-.26,2.33-.45,3.94-.56,4.84s-.19,1.45-.23,1.63l-1.63,10.54-2.37,13.63h9.92Z"/>
+                <path fill="#fae04a" d="M510,420.19c9.04-28.63,20.02-56.54,29.52-85.02-13.48-.6-20.19-.35-33.38,1.19-4.84,7.8-8.98,15.41-12.47,22.87,7.85-1.63,15.95-2.86,24.69-3.65-8.1,9.38-14.71,18.6-19.74,27.42.04.04.08.07.12.11,4.67-.61,9.56-1.12,14.81-1.49.03.04.06.08.09.12-11.95,12.49-19.2,24.68-24.37,35.65,8.12.9,11.85,1.49,20.7,2.79Z"/>
+                <path fill="#fae04a" d="M501.41,432.76c-2.86-4.33-7.13-6.89-12.46-7.83-5.17-.91-9.8,0-13.36,2.22-3.51,2.19-4.79,5.03-4.18,8.91.6,3.81,2.78,7.66,6.16,12.03,3.52,4.3,7.23,7.7,11.21,9.79,3.98,2.08,7.16,2.28,10.01.2,2.8-2.04,4.56-5.78,5.32-10.84.79-5.26.16-10.19-2.68-14.49Z"/>
+                <path fill="#fae04a" d="M491.58,393.84c-3.76.57-7.35,1.2-11.1,1.92.82-6.73,1.89-13.57,3.33-20.7-5.92,1.34-11.74,2.85-17.82,4.57-.07-.35-.15-.65-.19-.96-.46-3.35-.86-6.73-1.26-10.15-.34-2.97-.71-5.96-.99-8.99-.39-4.35-.7-8.77-.92-13.27-6.79,2.34-10.13,3.66-16.68,6.57,7.28,21.06,15.95,41.59,22.11,63.04,8.98.29,12.71.61,20.18,1.41.84-7.63,1.9-15.41,3.34-23.45Z"/>
+              </svg>
             </div>
           </form>
         </div>
@@ -544,23 +613,81 @@
   <!-- =========================
        FOOTER
   ========================== -->
-  <footer class="border-t border-white/10 bg-brand-ink">
-    <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div class="inline-flex rounded-lg bg-white px-3 py-2">
-            <img src="lg_hurka.svg" alt="HURKA!" class="h-8 w-auto" />
-          </div>
-          <div class="mt-3 text-sm text-white/60">Soluzioni integrate, risultati immediati.</div>
-          <div class="mt-3 text-xs text-white/45">hurka.it • hurka.consulting • info@hurka.it</div>
+  <footer class="bg-[#060e1c]">
+    <div class="mx-auto grid max-w-[1100px] gap-12 border-b border-white/10 px-[5vw] py-14 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+      <div class="order-4 md:order-none">
+        <div class="inline-flex w-full max-w-[205px] items-center rounded-md bg-white px-3 py-2">
+          <svg viewBox="35 318 515 205" class="block h-auto w-full" xmlns="http://www.w3.org/2000/svg" aria-label="HURKA!">
+            <image href="lg_hurka.svg" x="0" y="0" width="595.28" height="841.89"/>
+          </svg>
         </div>
-
-        <div class="flex flex-wrap gap-4 text-sm text-white/70">
-          <a href="privacy.html" class="hover:text-white">Privacy</a>
-          <a href="cookie.html" class="hover:text-white">Cookie</a>
-          <a href="note-legali.html" class="hover:text-white">Note legali</a>
+        <p class="mt-5 max-w-[230px] text-sm leading-[1.65] text-white/35">
+          Il tuo ufficio tecnico esterno per energia, fotovoltaico e servizi ai condomini.
+          Soluzioni integrate, risultati immediati.
+        </p>
+        <div class="mt-7 flex gap-2.5">
+          <a href="#" class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 transition hover:border-brand-yellow hover:bg-brand-yellow/10" aria-label="LinkedIn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="#" class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 transition hover:border-brand-yellow hover:bg-brand-yellow/10" aria-label="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="mailto:info@hurka.it" class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 transition hover:border-brand-yellow hover:bg-brand-yellow/10" aria-label="Email">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
         </div>
       </div>
+
+      <div class="order-1 md:order-none">
+        <div class="mb-5 font-display text-[.72rem] font-bold uppercase tracking-[.22em] text-brand-yellow">Servizi</div>
+        <ul class="space-y-3 text-sm text-white/45">
+          <li><a href="#servizi" class="transition hover:text-white">Luce &amp; Gas</a></li>
+          <li><a href="#servizi" class="transition hover:text-white">Efficientamento Energetico</a></li>
+          <li><a href="#servizi" class="transition hover:text-white">Impianti Fotovoltaici</a></li>
+          <li><a href="#servizi" class="transition hover:text-white">Pratiche GSE e Terna</a></li>
+          <li><a href="#servizi" class="transition hover:text-white">Servizi ai Condomini</a></li>
+        </ul>
+      </div>
+
+      <div class="order-2 md:order-none">
+        <div class="mb-5 font-display text-[.72rem] font-bold uppercase tracking-[.22em] text-brand-yellow">Azienda</div>
+        <ul class="space-y-3 text-sm text-white/45">
+          <li><a href="#chi-siamo" class="transition hover:text-white">Chi siamo</a></li>
+          <li><a href="#chi-siamo" class="transition hover:text-white">Mission &amp; Vision</a></li>
+          <li><a href="#contatti" class="transition hover:text-white">Lavora con noi</a></li>
+          <li><a href="https://hurka.consulting" target="_blank" rel="noopener" class="transition hover:text-white">hurka.consulting</a></li>
+        </ul>
+      </div>
+
+      <div class="order-3 md:order-none">
+        <div class="mb-5 font-display text-[.72rem] font-bold uppercase tracking-[.22em] text-brand-yellow">Contatti</div>
+        <div class="space-y-4 text-sm text-white/45">
+          <div class="flex items-start gap-3">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(250,224,74,.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <a href="mailto:info@hurka.it" class="transition hover:text-brand-yellow">info@hurka.it</a>
+          </div>
+          <div class="flex items-start gap-3">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(250,224,74,.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <a href="mailto:info@hurka.consulting" class="transition hover:text-brand-yellow">info@hurka.consulting</a>
+          </div>
+          <div class="flex items-start gap-3">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(250,224,74,.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span><a href="https://hurka.it" target="_blank" rel="noopener" class="transition hover:text-brand-yellow">hurka.it</a> · <a href="https://hurka.consulting" target="_blank" rel="noopener" class="transition hover:text-brand-yellow">hurka.consulting</a></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mx-auto flex max-w-[1100px] flex-col gap-4 px-[5vw] py-6 text-[.78rem] text-white/25 lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-6">
+        <span>© 2025 HURKA! Consulenza Integrata — Tutti i diritti riservati</span>
+        <a href="https://stacomunicazionedesign.it" target="_blank" rel="noopener" class="text-white/35 transition hover:text-white/60">Powered by Stà Comunicazione &amp; Design</a>
+      </div>
+      <nav class="flex flex-wrap gap-6">
+        <a href="#" class="transition hover:text-white/55">Privacy Policy</a>
+        <a href="#" class="transition hover:text-white/55">Cookie Policy</a>
+        <a href="#" class="transition hover:text-white/55">Note legali</a>
+      </nav>
     </div>
   </footer>
 
