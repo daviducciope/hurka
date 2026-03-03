@@ -146,8 +146,62 @@
       50%{ transform: translateY(-3px); }
     }
 
+    .flow-card{
+      position: relative;
+      overflow: hidden;
+      transform: translateY(26px);
+      opacity: 0;
+      transition: transform .7s cubic-bezier(.22,1,.36,1), opacity .7s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+
+    .flow-card::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(135deg, rgba(250,224,74,.12), transparent 34%);
+      opacity:0;
+      transition: opacity .3s ease;
+      pointer-events:none;
+    }
+
+    .flow-card.is-visible{
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .flow-card:hover{
+      border-color: rgba(250,224,74,.38);
+      box-shadow: 0 28px 54px rgba(32,56,99,.16);
+      transform: translateY(-4px);
+    }
+
+    .flow-card:hover::after{ opacity:1; }
+
+    .flow-card .flow-icon{
+      transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease;
+    }
+
+    .flow-card:hover .flow-icon{
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 0 28px rgba(250,224,74,.26);
+    }
+
+    .flow-step{
+      display:inline-flex;
+      min-width: 2rem;
+      font-family: "Barlow Condensed", ui-sans-serif, system-ui;
+      font-weight: 800;
+      letter-spacing: .08em;
+      color:#203863;
+    }
+
     @media (prefers-reduced-motion: reduce){
       .motion-safe-anim { animation: none !important; }
+      .flow-card{
+        transform:none !important;
+        opacity:1 !important;
+        transition:none !important;
+      }
     }
   </style>
 </head>
@@ -351,14 +405,15 @@
             </p>
             <p class="mt-3 max-w-md text-sm leading-6 text-brand-teal/80">
               <span class="font-semibold text-brand-navy">Energia</span>, <span class="font-semibold text-brand-navy">fotovoltaico</span> e
-              <span class="font-semibold text-brand-navy">servizi ai condomini</span>: un unico metodo per ridurre
+              <span class="font-semibold text-brand-navy">servizi ai condomini</span>, fino alla <span class="font-semibold text-brand-navy">consulenza per PA</span>:
+              un unico metodo per ridurre
               <span class="font-semibold text-brand-navy">complessità</span>, <span class="font-semibold text-brand-navy">costi</span> e
               <span class="font-semibold text-brand-navy">tempi</span>.
             </p>
           </div>
         </div>
 
-        <div class="mt-10 grid gap-6 lg:grid-cols-3">
+        <div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <article class="group relative overflow-hidden rounded-[28px] border border-brand-navy/10 bg-white/70 p-7 shadow-[0_18px_36px_rgba(32,56,99,.08)] transition duration-300 hover:-translate-y-1 hover:border-brand-yellow/30 hover:bg-white/90">
             <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand-navy"></div>
             <div class="flex items-start justify-between gap-4">
@@ -415,6 +470,43 @@
               <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Derattizzazione</span></span></li>
             </ul>
           </article>
+
+          <article class="group relative overflow-hidden rounded-[28px] border border-brand-navy/10 bg-white/70 p-7 shadow-[0_18px_36px_rgba(32,56,99,.08)] transition duration-300 hover:-translate-y-1 hover:border-brand-yellow/30 hover:bg-white/90">
+            <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand-navy"></div>
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 class="font-display text-2xl font-extrabold uppercase text-brand-navy">Consulenza Strategica per PA</h3>
+                <p class="mt-1 text-sm text-brand-teal/75"><span class="font-semibold text-brand-navy">Monitoraggio energetico</span> + <span class="font-semibold text-brand-navy">supporto operativo</span>.</p>
+              </div>
+              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_24px_rgba(250,224,74,.18)]">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 10h6"/><path d="M9 14h6"/><path d="M10 21v-4h4v4"/></svg>
+              </span>
+            </div>
+            <ul class="mt-6 space-y-2 text-sm text-brand-teal/85">
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Analisi</span> del mercato luce e gas</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Supporto</span> per enti pubblici e capitolati</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Verifica</span> anomalie di fatturazione</span></li>
+              <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-brand-yellow"></span><span><span class="font-semibold text-brand-navy">Ottimizzazione</span> dei costi energetici pubblici</span></li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="mt-10 flex flex-col items-start justify-between gap-5 rounded-[28px] border border-brand-navy/10 bg-brand-navy px-6 py-6 text-white shadow-[0_24px_40px_rgba(32,56,99,.18)] sm:flex-row sm:items-center">
+          <div class="max-w-2xl">
+            <p class="font-display text-[1.55rem] font-extrabold uppercase leading-[.95] text-white sm:text-[1.8rem]">
+              Non sai da dove partire?
+              <span class="mt-1 inline-flex rounded-full bg-brand-yellow px-3 py-1 text-[.72em] text-brand-navy">Partiamo noi.</span>
+            </p>
+            <p class="mt-3 text-sm leading-6 text-white/75">
+              Inviaci il tuo caso: <span class="font-semibold text-white">bollette</span>, <span class="font-semibold text-white">impianto</span>,
+              <span class="font-semibold text-white">condominio</span> o <span class="font-semibold text-white">PA</span>.
+              Ti ricontattiamo con una <span class="font-semibold text-white">prima valutazione tecnica</span> e ti diciamo subito dove c'e margine di intervento.
+            </p>
+          </div>
+          <a href="#contatti" class="inline-flex items-center gap-2 rounded-full bg-brand-yellow px-6 py-3 font-display text-[.95rem] font-bold uppercase tracking-[.08em] text-brand-navy transition hover:-translate-y-px hover:brightness-95">
+            Richiedi una valutazione
+            <span>→</span>
+          </a>
         </div>
       </div>
     </section>
@@ -436,18 +528,22 @@
 
           <div class="space-y-4 rounded-[28px] border border-brand-navy/10 bg-white/55 p-7 text-brand-teal/85 backdrop-blur-sm shadow-[0_18px_36px_rgba(32,56,99,.07)]">
             <p>
-              Siamo nati per trasformare il <span class="font-semibold text-brand-navy">labirinto dei contratti energetici</span> e della
-              <span class="font-semibold text-brand-navy">transizione ecologica</span> in
-              <span class="font-semibold text-brand-navy">una linea retta verso il risparmio.</span>
+              Affianchiamo <span class="font-semibold text-brand-navy">aziende, condomini e Pubbliche Amministrazioni</span> con un approccio
+              tecnico che unisce <span class="font-semibold text-brand-navy">monitoraggio energetico</span>, lettura dei consumi e scelta delle
+              soluzioni piu efficaci.
             </p>
             <p>
-              Dalla <span class="font-semibold text-brand-navy">gestione dei mandati luce e gas</span> per i grandi condomini, alla
-              <span class="font-semibold text-brand-navy">progettazione di soluzioni rinnovabili</span> per la Pubblica Amministrazione —
-              il nostro metodo è la <span class="font-semibold text-brand-navy">Consulenza Integrata.</span>
+              Il nostro lavoro parte da un principio semplice: operare nell'<span class="font-semibold text-brand-navy">interesse reale del cliente</span>,
+              con valutazioni indipendenti, confronto tra offerte, verifica delle fatture e controllo continuo dei margini di miglioramento.
             </p>
             <p>
-              Non siamo semplici <span class="font-semibold text-brand-navy">intermediari</span>: siamo il vostro
-              <span class="font-semibold text-brand-navy">ufficio tecnico esterno.</span>
+              Dalla <span class="font-semibold text-brand-navy">gestione luce e gas</span> alla <span class="font-semibold text-brand-navy">progettazione di soluzioni rinnovabili</span>,
+              fino ai servizi dedicati agli <span class="font-semibold text-brand-navy">enti pubblici</span>, il nostro metodo resta la
+              <span class="font-semibold text-brand-navy">Consulenza Integrata</span>.
+            </p>
+            <p>
+              Non siamo semplici intermediari: siamo il vostro <span class="font-semibold text-brand-navy">ufficio tecnico esterno</span>,
+              con un approccio strutturato, misurabile e orientato al risultato.
             </p>
           </div>
         </div>
@@ -511,6 +607,128 @@
   </div>
 
   <!-- =========================
+       CTA FLOW
+  ========================== -->
+  <section class="relative overflow-hidden border-t border-black/10 bg-[#d9d8d6] text-brand-navy">
+    <div class="pointer-events-none absolute inset-y-0 left-[-6%] w-[42vw] bg-[linear-gradient(100deg,#f1da00_0%,#f1da00_70%,transparent_70%)] opacity-95"></div>
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(255,255,255,.22),transparent_18%),linear-gradient(135deg,rgba(32,56,99,.05)_1px,transparent_1px)] [background-size:auto,28px_28px] opacity-70"></div>
+    <div class="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:items-end">
+        <div class="max-w-2xl">
+          <div class="inline-flex items-center gap-3 text-sm font-semibold tracking-[.24em] text-brand-teal/90 sm:text-[.95rem]">
+            <span class="h-px w-12 bg-brand-teal/50"></span>
+            IL METODO <span class="font-extrabold text-brand-navy text-3xl">HURKA!</span>
+          </div>
+          <h2 class="mt-5 font-display text-5xl font-black uppercase tracking-tight text-brand-navy sm:text-6xl">
+            Portaci il problema.
+            <span class="block text-brand-teal">Noi lo <span class="font-extrabold text-brand-navy">risolviamo</span>.</span>
+          </h2>
+          <p class="mt-4 max-w-xl text-brand-teal/80">
+            Bollette, impianti, scadenze, procedure: ogni richiesta parte da un punto critico.
+            Il nostro lavoro e <span class="font-semibold text-brand-navy">leggerlo bene</span>, <span class="font-semibold text-brand-navy">tagliare il rumore</span> e portarlo a soluzione.
+          </p>
+        </div>
+
+        <div class="rounded-[28px] border border-brand-navy/10 bg-white/55 p-6 shadow-[0_18px_40px_rgba(32,56,99,.08)] backdrop-blur-sm">
+          <p class="font-display text-[1.85rem] font-extrabold uppercase leading-[.95] text-brand-navy">
+            Niente giri lunghi.
+            <span class="mt-1 inline-flex rounded-full bg-brand-navy px-3 py-1 text-[.8em] text-brand-yellow shadow-[0_10px_24px_rgba(32,56,99,.14)]">Solo problem solving.</span>
+          </p>
+          <p class="mt-3 max-w-md text-sm leading-6 text-brand-teal/80">
+            Se il <span class="font-semibold text-brand-navy">risparmio</span> non e reale, se il
+            <span class="font-semibold text-brand-navy">vantaggio</span> non si misura o se la
+            <span class="font-semibold text-brand-navy">procedura</span> non regge, te lo diciamo subito.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <article class="flow-card rounded-[28px] border border-brand-navy/12 bg-[linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.72))] p-7 shadow-[0_18px_36px_rgba(32,56,99,.08)]" style="transition-delay:.02s">
+          <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand-yellow"></div>
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-display text-[1.7rem] font-extrabold uppercase leading-[.95] text-brand-navy">Luce &amp; Gas</h3>
+            <span class="flow-icon inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_24px_rgba(250,224,74,.18)]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </span>
+          </div>
+          <p class="mt-4 text-sm leading-6 text-brand-teal/80"><span class="font-semibold text-brand-navy">Bollette opache</span>. <span class="font-semibold text-brand-navy">Costi alti</span>. Contratti poco chiari.</p>
+          <ol class="mt-5 space-y-3 text-sm text-brand-teal/85">
+            <li class="flex gap-3"><span class="flow-step">01</span><span><span class="font-semibold text-brand-navy">Compariamo</span> bollette e consumi.</span></li>
+            <li class="flex gap-3"><span class="flow-step">02</span><span><span class="font-semibold text-brand-navy">Misuriamo</span> il risparmio reale.</span></li>
+            <li class="flex gap-3"><span class="flow-step">03</span><span><span class="font-semibold text-brand-navy">Agiamo</span> solo se conviene davvero.</span></li>
+          </ol>
+        </article>
+
+        <article class="flow-card rounded-[28px] border border-brand-navy/12 bg-[linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.72))] p-7 shadow-[0_18px_36px_rgba(32,56,99,.08)]" style="transition-delay:.1s">
+          <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand-yellow"></div>
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-display text-[1.7rem] font-extrabold uppercase leading-[.95] text-brand-navy">Fotovoltaico</h3>
+            <span class="flow-icon inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_24px_rgba(250,224,74,.18)]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M6 3h12"/><path d="M5 11h14"/><rect x="6" y="11" width="12" height="9" rx="1.5"/><path d="M9 15h.01"/><path d="M12 15h.01"/><path d="M15 15h.01"/></svg>
+            </span>
+          </div>
+          <p class="mt-4 text-sm leading-6 text-brand-teal/80"><span class="font-semibold text-brand-navy">Ritorno incerto</span>. Dubbi su resa, progetto e sostenibilita.</p>
+          <ol class="mt-5 space-y-3 text-sm text-brand-teal/85">
+            <li class="flex gap-3"><span class="flow-step">01</span><span><span class="font-semibold text-brand-navy">Analizziamo</span> consumi e superfici.</span></li>
+            <li class="flex gap-3"><span class="flow-step">02</span><span><span class="font-semibold text-brand-navy">Progettiamo</span> la soluzione giusta.</span></li>
+            <li class="flex gap-3"><span class="flow-step">03</span><span><span class="font-semibold text-brand-navy">Seguiamo</span> pratica, posa e resa.</span></li>
+          </ol>
+        </article>
+
+        <article class="flow-card rounded-[28px] border border-brand-navy/12 bg-[linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.72))] p-7 shadow-[0_18px_36px_rgba(32,56,99,.08)]" style="transition-delay:.18s">
+          <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand-yellow"></div>
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-display text-[1.7rem] font-extrabold uppercase leading-[.95] text-brand-navy">Condomini</h3>
+            <span class="flow-icon inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_24px_rgba(250,224,74,.18)]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h.01"/><path d="M15 8h.01"/><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M9 16h.01"/><path d="M15 16h.01"/><path d="M11 21v-4h2v4"/></svg>
+            </span>
+          </div>
+          <p class="mt-4 text-sm leading-6 text-brand-teal/80"><span class="font-semibold text-brand-navy">Scadenze sparse</span>. <span class="font-semibold text-brand-navy">Urgenze tecniche</span>. Troppe pratiche aperte.</p>
+          <ol class="mt-5 space-y-3 text-sm text-brand-teal/85">
+            <li class="flex gap-3"><span class="flow-step">01</span><span><span class="font-semibold text-brand-navy">Mappiamo</span> criticita e obblighi.</span></li>
+            <li class="flex gap-3"><span class="flow-step">02</span><span><span class="font-semibold text-brand-navy">Prioritizziamo</span> cio che sblocca subito.</span></li>
+            <li class="flex gap-3"><span class="flow-step">03</span><span><span class="font-semibold text-brand-navy">Chiudiamo</span> il problema operativamente.</span></li>
+          </ol>
+        </article>
+
+        <article class="flow-card rounded-[28px] border border-brand-navy/12 bg-[linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.72))] p-7 shadow-[0_18px_36px_rgba(32,56,99,.08)]" style="transition-delay:.26s">
+          <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand-yellow"></div>
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-display text-[1.7rem] font-extrabold uppercase leading-[.95] text-brand-navy">PA</h3>
+            <span class="flow-icon inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_24px_rgba(250,224,74,.18)]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 10h6"/><path d="M9 14h6"/><path d="M10 21v-4h4v4"/></svg>
+            </span>
+          </div>
+          <p class="mt-4 text-sm leading-6 text-brand-teal/80"><span class="font-semibold text-brand-navy">Decisioni da motivare</span>. Vincoli, dati e procedure da sostenere.</p>
+          <ol class="mt-5 space-y-3 text-sm text-brand-teal/85">
+            <li class="flex gap-3"><span class="flow-step">01</span><span><span class="font-semibold text-brand-navy">Leggiamo</span> dati, offerte e vincoli.</span></li>
+            <li class="flex gap-3"><span class="flow-step">02</span><span><span class="font-semibold text-brand-navy">Costruiamo</span> uno scenario difendibile.</span></li>
+            <li class="flex gap-3"><span class="flow-step">03</span><span><span class="font-semibold text-brand-navy">Supportiamo</span> il percorso fino all'esecuzione.</span></li>
+          </ol>
+        </article>
+      </div>
+
+      <div class="mt-10 flex flex-col items-start justify-between gap-5 rounded-[28px] border border-brand-navy/10 bg-brand-navy px-6 py-6 text-white shadow-[0_24px_40px_rgba(32,56,99,.18)] sm:flex-row sm:items-center">
+        <div class="max-w-2xl">
+          <p class="font-display text-[1.55rem] font-extrabold uppercase leading-[.95] text-white sm:text-[1.8rem]">
+            Hai un problema da risolvere?
+            <span class="mt-1 inline-flex rounded-full bg-brand-yellow px-3 py-1 text-[.72em] text-brand-navy">Partiamo da li.</span>
+          </p>
+          <p class="mt-3 text-sm leading-6 text-white/75">
+            Scrivici e ti ricontattiamo con una <span class="font-semibold text-white">prima lettura tecnica</span> del caso.
+            Se c'e un <span class="font-semibold text-white">margine reale di miglioramento</span>, costruiamo il percorso.
+            Se non c'e, te lo diciamo subito.
+          </p>
+        </div>
+        <a href="#contatti" class="inline-flex items-center gap-2 rounded-full bg-brand-yellow px-6 py-3 font-display text-[.95rem] font-bold uppercase tracking-[.08em] text-brand-navy transition hover:-translate-y-px hover:brightness-95">
+          Richiedi un contatto
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================
        CONTATTI (conversion section)
   ========================== -->
   <section id="contatti" class="relative overflow-hidden border-t border-black/10 bg-[#d9d8d6] text-brand-navy">
@@ -544,10 +762,7 @@
               <li class="flex gap-3"><span class="mt-1.5 h-2 w-2 rounded-full bg-brand-yellow"></span><span>Un <span class="font-semibold text-brand-navy">ufficio tecnico esterno</span>, non un altro intermediario</span></li>
             </ul>
 
-            <a href="mailto:info@hurka.it" class="mt-6 inline-flex items-center gap-2 rounded-full border border-brand-navy/15 bg-brand-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-teal">
-              info@hurka.it
-              <span class="text-brand-yellow">→</span>
-            </a>
+            
           </div>
         </div>
 
@@ -739,6 +954,27 @@
       links.forEach(function(link) {
         link.addEventListener('click', function() { setOpen(false); });
       });
+    })();
+
+    (function() {
+      const cards = document.querySelectorAll('.flow-card');
+      if (!cards.length) return;
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) {
+        cards.forEach(function(card) { card.classList.add('is-visible'); });
+        return;
+      }
+
+      const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+
+      cards.forEach(function(card) { observer.observe(card); });
     })();
   </script>
 </body>
