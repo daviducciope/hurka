@@ -172,6 +172,43 @@
        (Tailwind resta il principale)
   ========================== -->
   <style>
+    html { font-size: 17px; }
+
+    .text-xs{
+      font-size: .84rem !important;
+      line-height: 1.25rem !important;
+    }
+
+    .text-sm{
+      font-size: 1.02rem !important;
+      line-height: 1.55rem !important;
+    }
+
+    @media (max-width: 640px){
+      html { font-size: 16px; }
+    }
+
+    /* Readability boost only for body sections (not hero/footer) */
+    #servizi p.text-sm,
+    #chi-siamo p.text-sm,
+    #metodo-hurka p.text-sm,
+    #contatti p.text-sm,
+    #servizi ul.text-sm,
+    #chi-siamo ul.text-sm,
+    #metodo-hurka ul.text-sm,
+    #contatti ul.text-sm{
+      font-size: 1.1rem !important;
+      line-height: 1.72rem !important;
+    }
+
+    #servizi p:not(.font-display):not([class*="text-["]),
+    #chi-siamo p:not(.font-display):not([class*="text-["]),
+    #metodo-hurka p:not(.font-display):not([class*="text-["]),
+    #contatti p:not(.font-display):not([class*="text-["]){
+      font-size: 1.1rem;
+      line-height: 1.74;
+    }
+
     #site-nav::after{
       content:"";
       position:absolute;
