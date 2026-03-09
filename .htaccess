@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Forza HTTPS e dominio canonico senza www; include dominio secondario
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} ^www\.hurka\.it$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^wearehurka\.it$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^www\.wearehurka\.it$ [NC]
+RewriteRule ^ https://hurka.it%{REQUEST_URI} [L,R=301]
+
+# Evita duplicati tipo /index.html
+RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
+RewriteRule ^(.*/)?index\.html$ https://hurka.it/$1 [L,R=301]

@@ -2,18 +2,36 @@
 <html lang="it">
 <head>
   <!-- =========================
-       META / SEO BASE
+       META / SEO OTTIMIZZATA
   ========================== -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HURKA! — Consulenza Integrata</title>
-  <meta name="description" content="Soluzioni integrate, risultati immediati. Consulenza luce & gas, fotovoltaico, efficientamento e servizi per condomini." />
+  <title>HURKA! | Consulenza Luce e Gas, Fotovoltaico, Energia e Condomini</title>
+  <meta name="description" content="HURKA! offre consulenza integrata per luce e gas, efficientamento energetico, impianti fotovoltaici, servizi ai condomini e supporto tecnico per aziende e PA." />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
   <meta name="theme-color" content="#203863" />
   <meta name="application-name" content="HURKA!" />
   <meta name="apple-mobile-web-app-title" content="HURKA!" />
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any" />
-  <link rel="shortcut icon" href="favicon.svg" />
-  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#fae04a" />
+  <link rel="canonical" href="https://hurka.it/" />
+  <link rel="alternate" hreflang="it-IT" href="https://hurka.it/" />
+  <link rel="alternate" hreflang="x-default" href="https://hurka.it/" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
+  <link rel="shortcut icon" href="/favicon.svg" />
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#fae04a" />
+
+  <!-- Open Graph -->
+  <meta property="og:locale" content="it_IT" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="HURKA!" />
+  <meta property="og:title" content="HURKA! | Consulenza Luce e Gas, Fotovoltaico, Energia e Condomini" />
+  <meta property="og:description" content="Consulenza integrata per energia, fotovoltaico, servizi ai condomini e supporto tecnico per aziende e PA." />
+  <meta property="og:url" content="https://hurka.it/" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="HURKA! | Consulenza Luce e Gas, Fotovoltaico, Energia e Condomini" />
+  <meta name="twitter:description" content="Consulenza integrata per energia, fotovoltaico, servizi ai condomini e supporto tecnico per aziende e PA." />
 
   <!-- =========================
        FONT (manifesto vibe: Barlow Condensed)
@@ -21,6 +39,104 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://hurka.it/#website",
+        "url": "https://hurka.it/",
+        "name": "HURKA!",
+        "alternateName": "HURKA! Consulenza Integrata",
+        "inLanguage": "it-IT",
+        "publisher": {
+          "@id": "https://hurka.it/#organization"
+        }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://hurka.it/#webpage",
+        "url": "https://hurka.it/",
+        "name": "HURKA! - Consulenza Integrata",
+        "isPartOf": {
+          "@id": "https://hurka.it/#website"
+        },
+        "about": {
+          "@id": "https://hurka.it/#organization"
+        },
+        "description": "Consulenza integrata per luce e gas, efficientamento energetico, fotovoltaico, servizi ai condomini e supporto tecnico per aziende e PA.",
+        "inLanguage": "it-IT"
+      },
+      {
+        "@type": ["Organization", "ProfessionalService"],
+        "@id": "https://hurka.it/#organization",
+        "name": "HURKA! Consulenza Integrata",
+        "alternateName": "HURKA!",
+        "url": "https://hurka.it/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://hurka.it/favicon.svg"
+        },
+        "email": "info@hurka.it",
+        "description": "Consulenza integrata per luce e gas, efficientamento energetico, impianti fotovoltaici, servizi ai condomini e consulenza strategica per pubbliche amministrazioni.",
+        "slogan": "Soluzioni integrate, risultati immediati.",
+        "knowsAbout": [
+          "Luce e gas",
+          "Efficientamento energetico",
+          "Impianti fotovoltaici",
+          "Pratiche GSE",
+          "Pratiche Terna",
+          "Servizi ai condomini",
+          "Monitoraggio energetico",
+          "Consulenza per pubbliche amministrazioni"
+        ],
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "email": "info@hurka.it",
+            "availableLanguage": ["it-IT"]
+          },
+          {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "email": "info@hurka.consulting",
+            "availableLanguage": ["it-IT"]
+          }
+        ],
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Servizi HURKA!",
+          "itemListElement": [
+            {
+              "@type": "Service",
+              "name": "Consulenza Luce e Gas",
+              "description": "Analisi consumi, certificazione risparmio, contrattualizzazione forniture, volture, subentri e aumenti di potenza."
+            },
+            {
+              "@type": "Service",
+              "name": "Efficientamento Energetico",
+              "description": "Progettazione, installazione, pratiche GSE e Terna, pulizia e manutenzione di impianti fotovoltaici."
+            },
+            {
+              "@type": "Service",
+              "name": "Servizi ai Condomini",
+              "description": "Gestione privacy GDPR, certificazioni messe a terra, derattizzazione e supporto tecnico operativo."
+            },
+            {
+              "@type": "Service",
+              "name": "Consulenza Strategica per PA",
+              "description": "Analisi del mercato luce e gas, verifica anomalie di fatturazione, supporto tecnico e ottimizzazione dei costi energetici pubblici."
+            }
+          ]
+        }
+      }
+    ]
+  }
+  </script>
 
   <!-- =========================
        TAILWIND CDN + CONFIG BRAND
@@ -918,9 +1034,9 @@
         <a href="https://stacomunicazionedesign.it" target="_blank" rel="noopener" class="text-white/35 transition hover:text-white/60">Powered by Stà Comunicazione &amp; Design</a>
       </div>
       <nav class="flex flex-wrap gap-6">
-        <a href="#" class="transition hover:text-white/55">Privacy Policy</a>
-        <a href="#" class="transition hover:text-white/55">Cookie Policy</a>
-        <a href="#" class="transition hover:text-white/55">Note legali</a>
+        <a href="privacy.html" class="transition hover:text-white/55">Privacy Policy</a>
+        <a href="cookie-policy.html" class="transition hover:text-white/55">Cookie Policy</a>
+        <a href="note-legali.html" class="transition hover:text-white/55">Note legali</a>
       </nav>
     </div>
   </footer>
