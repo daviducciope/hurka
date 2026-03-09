@@ -1009,11 +1009,7 @@
           </div>
           <p class="mt-1.5 text-xs text-white/60">Cerchiamo profili tecnici e commerciali per crescere insieme.</p>
         </button>
-        <ul class="mt-4 space-y-3 text-sm text-white/45">
-          <li><a href="#chi-siamo" class="transition hover:text-white">Chi siamo</a></li>
-          <li><a href="#chi-siamo" class="transition hover:text-white">Mission &amp; Vision</a></li>
-        </ul>
-      </div>
+             </div>
       
       <div class="order-3 md:order-none">
         <div class="mb-5 font-display text-[.72rem] font-bold uppercase tracking-[.22em] text-brand-yellow">Contatti</div>
@@ -1057,49 +1053,28 @@
           </div>
           <button type="button" data-career-close class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 text-white/75 transition hover:border-brand-yellow hover:text-brand-yellow" aria-label="Chiudi modale">✕</button>
         </div>
-
-        <form id="career-form" class="space-y-4">
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label class="text-sm text-white/70">Nome e cognome *</label>
-              <input id="career-name" required class="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-brand-yellow/50" placeholder="Mario Rossi" />
-            </div>
-            <div>
-              <label class="text-sm text-white/70">Email *</label>
-              <input id="career-email" type="email" required class="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-brand-yellow/50" placeholder="nome@email.it" />
-            </div>
+        <div class="space-y-4 text-sm leading-6 text-white/75">
+          <p>
+            In HURKA! lavoriamo su <span class="font-semibold text-white">luce e gas</span>, <span class="font-semibold text-white">fotovoltaico</span>,
+            <span class="font-semibold text-white">servizi ai condomini</span> e <span class="font-semibold text-white">supporto tecnico per PA</span>.
+          </p>
+          <p>
+            Cerchiamo profili <span class="font-semibold text-white">tecnici</span>, <span class="font-semibold text-white">commerciali</span> e
+            <span class="font-semibold text-white">operativi</span> capaci di leggere problemi reali, proporre soluzioni concrete e seguire il cliente fino al risultato.
+          </p>
+          <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div class="mb-2 font-display text-[.78rem] font-bold uppercase tracking-[.16em] text-brand-yellow">Cosa valorizziamo</div>
+            <ul class="space-y-1.5 text-white/70">
+              <li>Approccio pratico e orientamento al cliente</li>
+              <li>Autonomia operativa e responsabilita</li>
+              <li>Formazione e crescita continua</li>
+            </ul>
           </div>
-
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label class="text-sm text-white/70">Telefono *</label>
-              <input id="career-phone" required class="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-brand-yellow/50" placeholder="+39 ..." />
-            </div>
-            <div>
-              <label class="text-sm text-white/70">Area di interesse *</label>
-              <select id="career-role" required class="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-brand-yellow/50">
-                <option value="">Seleziona area</option>
-                <option>Consulenza Luce &amp; Gas</option>
-                <option>Fotovoltaico / Efficientamento</option>
-                <option>Servizi ai Condomini</option>
-                <option>Supporto PA</option>
-                <option>Amministrazione / Back office</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="text-sm text-white/70">Perche sei adatto/a a HURKA? *</label>
-            <textarea id="career-note" rows="4" required class="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-brand-yellow/50" placeholder="Esperienza, risultati ottenuti, disponibilita e competenze chiave..."></textarea>
-          </div>
-
-          <div id="career-feedback" class="hidden rounded-xl border px-4 py-3 text-sm font-medium"></div>
-
-          <button id="career-submit" type="submit" class="w-full rounded-full bg-brand-yellow px-6 py-3 font-display text-[.95rem] font-extrabold uppercase tracking-[.08em] text-brand-navy transition hover:brightness-95">
-            Invia candidatura
-          </button>
-          <p class="text-xs text-white/50">La candidatura viene preparata come email verso <span class="text-white/70">info@hurka.it</span>.</p>
-        </form>
+          <a href="#contatti" data-career-close class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-yellow px-6 py-3 font-display text-[.95rem] font-extrabold uppercase tracking-[.08em] text-brand-navy transition hover:brightness-95">
+            Candidati dalla sezione contatti
+            <span>→</span>
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -1170,12 +1145,8 @@
       const openBtn = document.getElementById('career-open');
       const modal = document.getElementById('career-modal');
       const closeBtns = document.querySelectorAll('[data-career-close]');
-      const form = document.getElementById('career-form');
-      const feedback = document.getElementById('career-feedback');
-      const submitBtn = document.getElementById('career-submit');
-      const API_URL = 'https://9aetggpf1b.execute-api.eu-central-1.amazonaws.com/contact';
 
-      if (!openBtn || !modal || !form || !feedback || !submitBtn) return;
+      if (!openBtn || !modal) return;
 
       function setOpen(open) {
         modal.classList.toggle('hidden', !open);
@@ -1198,59 +1169,6 @@
 
       window.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') setOpen(false);
-      });
-
-      function showCareerFeedback(msg, isError) {
-        feedback.textContent = msg;
-        feedback.className = 'rounded-xl px-4 py-3 text-sm font-medium ' +
-          (isError ? 'bg-red-500/20 text-red-200 border border-red-400/30' : 'bg-green-500/20 text-green-200 border border-green-400/30');
-        feedback.classList.remove('hidden');
-      }
-
-      form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Invio candidatura...';
-        feedback.classList.add('hidden');
-
-        const payload = {
-          nome: document.getElementById('career-name').value.trim(),
-          email: document.getElementById('career-email').value.trim(),
-          telefono: document.getElementById('career-phone').value.trim(),
-          area: document.getElementById('career-role').value,
-          messaggio: document.getElementById('career-note').value.trim(),
-        };
-
-        const contactPayload = {
-          servizio: 'Candidatura - ' + payload.area,
-          nome: payload.nome,
-          email: payload.email,
-          telefono: payload.telefono,
-          messaggio:
-            'Nuova candidatura da hurka.it\n' +
-            'Area: ' + payload.area + '\n\n' +
-            'Presentazione:\n' + payload.messaggio
-        };
-
-        try {
-          const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(contactPayload),
-          });
-          const data = await res.json();
-          if (res.ok) {
-            showCareerFeedback('✓ ' + (data.message || 'Candidatura inviata con successo.'), false);
-            form.reset();
-          } else {
-            showCareerFeedback(data.error || 'Errore nell\'invio candidatura. Riprova.', true);
-          }
-        } catch (err) {
-          showCareerFeedback('Errore di connessione. Controlla la rete e riprova.', true);
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Invia candidatura';
-        }
       });
     })();
 
