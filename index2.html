@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HURKA! — Consulenza Integrata</title>
+  <meta name="theme-color" content="#203863" />
+  <meta name="application-name" content="HURKA!" />
+  <meta name="apple-mobile-web-app-title" content="HURKA!" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any" />
+  <link rel="shortcut icon" href="favicon.svg" />
+  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#fae04a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:  #203863;
+      --yellow: #fae04a;
+      --teal:  #304f4f;
+      --white: #ffffff;
+      --light: #f5f7fa;
+      --text:  #1a1a2e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ─── */
+    #site-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 70px;
+      transition: background .35s ease, box-shadow .35s ease;
+    }
+
+    #site-nav::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, var(--yellow) 25%, var(--yellow) 75%, transparent 100%);
+      opacity: 0;
+      transition: opacity .35s;
+      pointer-events: none;
+    }
+
+    #site-nav.scrolled::after { opacity: .45; }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5vw;
+      height: 100%;
+    }
+
+    #site-nav.scrolled {
+      background: rgba(6,14,28,.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 6px 36px rgba(0,0,0,.45);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .nav-logo svg { display: block; }
+
+    /* Logo in pill bianca per sfondi scuri (footer) */
+    .logo-pill {
+      background: #ffffff;
+      border-radius: 6px;
+      padding: 5px 10px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .logo-pill svg { display: block; }
+
+    /* ─── Desktop links ─── */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: .15rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: .95rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.62);
+      text-decoration: none;
+      padding: .5rem 1rem;
+      position: relative;
+      transition: color .2s;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 3px; left: 1rem; right: 1rem;
+      height: 2px;
+      background: var(--yellow);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .25s cubic-bezier(.4,0,.2,1);
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--white); }
+
+    .nav-links a:hover::after,
+    .nav-links a.active::after { transform: scaleX(1); }
+
+    /* ─── CTA button ─── */
+    .nav-cta {
+      background: var(--yellow) !important;
+      color: var(--navy) !important;
+      padding: .48rem 1.3rem !important;
+      border-radius: 3px !important;
+      font-weight: 700 !important;
+      letter-spacing: .08em !important;
+      display: inline-flex !important;
+      align-items: center;
+      gap: .4rem;
+      transition: background .2s, transform .15s, box-shadow .2s !important;
+    }
+
+    .nav-cta::after { display: none !important; }
+
+    .nav-cta:hover {
+      background: #ffe800 !important;
+      color: var(--navy) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 18px rgba(250,224,74,.35);
+    }
+
+    /* ─── Hamburger ─── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 6px;
+      width: 40px;
+      height: 40px;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--white);
+      border-radius: 1px;
+      transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .25s, width .3s;
+      transform-origin: center;
+    }
+
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+    /* ─── Mobile menu ─── */
+    .nav-mobile {
+      position: fixed;
+      top: 70px; left: 0; right: 0;
+      background: rgba(6,14,28,.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(250,224,74,.1);
+      padding: .8rem 5vw 2rem;
+      z-index: 99;
+      transform: translateY(-8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .3s;
+    }
+
+    .nav-mobile.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .nav-mobile ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-mobile li { border-bottom: 1px solid rgba(255,255,255,.05); }
+
+    .nav-mobile a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 2.2rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.72);
+      text-decoration: none;
+      display: block;
+      padding: .6rem 0;
+      transition: color .2s, padding-left .22s;
+    }
+
+    .nav-mobile a:hover { color: var(--yellow); padding-left: .4rem; }
+
+    .nav-mobile-cta {
+      display: inline-flex !important;
+      align-items: center;
+      gap: .55rem;
+      margin-top: 1.6rem;
+      background: var(--yellow);
+      color: var(--navy) !important;
+      padding: .82rem 2rem !important;
+      border-radius: 4px;
+      font-weight: 800 !important;
+      font-size: 1.05rem !important;
+      transition: background .2s, transform .15s;
+    }
+
+    .nav-mobile-cta:hover { background: #ffe800; transform: translateY(-1px); padding-left: 2rem !important; }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 78% 28%, rgba(250,224,74,.12), transparent 18%),
+        radial-gradient(circle at 18% 18%, rgba(255,255,255,.04), transparent 26%),
+        linear-gradient(120deg, #0a1425 0%, #132648 48%, #0b1528 100%);
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 0 5vw;
+      padding-top: 70px;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(250,224,74,0) 0%, rgba(250,224,74,.05) 58%, rgba(250,224,74,.11) 100%);
+      pointer-events: none;
+    }
+
+    #hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, rgba(250,224,74,0) 0%, var(--yellow) 18%, var(--yellow) 82%, rgba(250,224,74,0) 100%);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+      align-items: center;
+      gap: clamp(2.5rem, 4vw, 4.75rem);
+    }
+
+    .hero-text {
+      position: relative;
+      padding-right: clamp(.5rem, 2vw, 1.5rem);
+    }
+
+    .hero-text::after {
+      content: '';
+      position: absolute;
+      top: 52%;
+      right: -2rem;
+      width: clamp(72px, 9vw, 118px);
+      height: 2px;
+      background: linear-gradient(90deg, rgba(250,224,74,.85), rgba(250,224,74,0));
+      box-shadow: 0 0 18px rgba(250,224,74,.3);
+      opacity: .8;
+    }
+
+    .hero-text h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(3.2rem, 7vw, 6rem);
+      font-weight: 800;
+      line-height: .9;
+      letter-spacing: -.02em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 1.35rem;
+      text-wrap: balance;
+    }
+
+    .hero-text h1 span {
+      color: var(--yellow);
+      display: block;
+    }
+
+    .hero-tagline {
+      max-width: 36rem;
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      font-weight: 300;
+      color: rgba(255,255,255,.76);
+      margin-bottom: 2.15rem;
+      line-height: 1.62;
+    }
+
+    .hero-tagline strong {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .hero-text .btns {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .9rem;
+    }
+
+    .btn {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: .75rem 2rem;
+      border-radius: 4px;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+
+    .btn-primary {
+      background: var(--yellow);
+      color: var(--navy);
+    }
+
+    .btn-outline {
+      border: 2px solid rgba(255,255,255,.35);
+      color: var(--white);
+      margin-left: 0;
+    }
+
+    .btn-outline:hover { border-color: var(--yellow); color: var(--yellow); }
+
+    .hero-logo-wrap {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100%;
+    }
+
+    .hero-logo-panel {
+      position: relative;
+      width: min(100%, 560px);
+      min-height: 460px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(2rem, 5vw, 3rem);
+      border-radius: 30px;
+      overflow: hidden;
+      isolation: isolate;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(circle at 72% 38%, rgba(250,224,74,.22), transparent 0 24%),
+        radial-gradient(circle at 24% 24%, rgba(255,255,255,.08), transparent 0 22%),
+        linear-gradient(145deg, rgba(255,255,255,.06), rgba(255,255,255,.02) 30%, rgba(3,8,18,.46) 100%),
+        linear-gradient(135deg, #162846 0%, #0d172a 55%, #07101d 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        inset 0 0 0 1px rgba(255,255,255,.02),
+        0 28px 80px rgba(0,0,0,.45),
+        0 0 0 1px rgba(250,224,74,.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .hero-logo-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(118deg, transparent 18%, rgba(255,255,255,.08) 34%, transparent 48%),
+        repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0 1px, transparent 1px 20px);
+      mix-blend-mode: screen;
+      opacity: .28;
+      animation: heroSheen 5.4s ease-in-out infinite;
+    }
+
+    .hero-logo-panel::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 76% 34%, rgba(250,224,74,.28), transparent 0 16%),
+        radial-gradient(circle at 72% 42%, rgba(250,224,74,.12), transparent 0 28%),
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.02), transparent 0 70%);
+      filter: blur(10px);
+      opacity: .9;
+      animation: heroGlowPulse 4.4s ease-in-out infinite;
+    }
+
+    .hero-logo-noise,
+    .hero-logo-beam,
+    .hero-logo-rim {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .hero-logo-noise {
+      opacity: .12;
+      background-image:
+        radial-gradient(rgba(255,255,255,.45) .5px, transparent .6px),
+        radial-gradient(rgba(250,224,74,.32) .5px, transparent .6px);
+      background-position: 0 0, 12px 10px;
+      background-size: 18px 18px, 22px 22px;
+      mix-blend-mode: soft-light;
+    }
+
+    .hero-logo-beam {
+      inset: -18% auto -18% 44%;
+      width: 34%;
+      transform: rotate(18deg);
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.12) 50%, rgba(255,255,255,0) 100%);
+      filter: blur(10px);
+      opacity: .35;
+      animation: heroBeamShift 6.2s ease-in-out infinite;
+    }
+
+    .hero-logo-rim {
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,.04);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.02),
+        inset -1px 0 0 rgba(250,224,74,.14),
+        inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .hero-logo-svg {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 470px;
+      filter:
+        drop-shadow(0 24px 55px rgba(0,0,0,.42))
+        drop-shadow(0 0 28px rgba(250,224,74,.12));
+      transform-origin: 58% 50%;
+      animation: heroLogoFloat 4.8s ease-in-out infinite;
+    }
+
+    @keyframes heroGlowPulse {
+      0%, 100% { opacity: .72; transform: scale(.98); }
+      50% { opacity: 1; transform: scale(1.04); }
+    }
+
+    @keyframes heroLogoFloat {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(0, -2px, 0); }
+    }
+
+    @keyframes heroSheen {
+      0%, 100% { transform: translateX(-8%); opacity: .16; }
+      50% { transform: translateX(4%); opacity: .32; }
+    }
+
+    @keyframes heroBeamShift {
+      0%, 100% { transform: rotate(18deg) translateX(-8px); opacity: .22; }
+      50% { transform: rotate(18deg) translateX(12px); opacity: .42; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-logo-panel::before,
+      .hero-logo-panel::after,
+      .hero-logo-beam,
+      .hero-logo-svg {
+        animation: none;
+      }
+    }
+
+    /* ─── INTRO STRIP ─── */
+    .strip {
+      background: var(--yellow);
+      padding: 1.4rem 5vw;
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .strip-item {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .strip-item svg { flex-shrink: 0; }
+
+    /* ─── SECTION COMMON ─── */
+    section { padding: 5rem 5vw; }
+
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: .5rem;
+    }
+
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--navy);
+      line-height: 1.05;
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: #555;
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 3rem;
+    }
+
+    /* ─── SERVIZI ─── */
+    #servizi { background: var(--light); }
+
+    .servizi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(0,0,0,.12); }
+
+    .card-header {
+      padding: 1.6rem 1.8rem 1.3rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-icon.yellow { background: var(--yellow); }
+    .card-icon.navy   { background: var(--navy); }
+    .card-icon.teal   { background: var(--teal); }
+
+    .card-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      color: var(--navy);
+      line-height: 1.1;
+    }
+
+    .card-divider {
+      height: 3px;
+      margin: 0 1.8rem;
+    }
+
+    .card-divider.yellow { background: var(--yellow); }
+    .card-divider.navy   { background: var(--navy); }
+    .card-divider.teal   { background: var(--teal); }
+
+    .card-list {
+      list-style: none;
+      padding: 1.2rem 1.8rem 1.8rem;
+    }
+
+    .card-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: .6rem;
+      font-size: .95rem;
+      color: #444;
+      padding: .45rem 0;
+      border-bottom: 1px solid #f0f0f0;
+      line-height: 1.4;
+    }
+
+    .card-list li:last-child { border-bottom: none; }
+
+    .bullet {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-top: .35rem;
+      flex-shrink: 0;
+    }
+
+    .bullet.yellow { background: var(--yellow); }
+    .bullet.navy   { background: var(--navy); }
+    .bullet.teal   { background: var(--teal); }
+
+    /* ─── CHI SIAMO ─── */
+    #chi-siamo {
+      background: var(--navy);
+      color: var(--white);
+      padding: 6rem 5vw 0;
+      overflow: hidden;
+    }
+
+    #chi-siamo .section-label { color: var(--yellow); }
+
+    /* Intro grid: grande citazione a sinistra + corpo a destra */
+    .cs-intro {
+      max-width: 1100px;
+      margin: 0 auto 5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .cs-big-quote {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2.2rem, 3.8vw, 3.2rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 1.05;
+      color: var(--white);
+    }
+
+    .cs-big-quote em {
+      color: var(--yellow);
+      font-style: normal;
+      display: block;
+    }
+
+    .cs-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      padding-top: .5rem;
+    }
+
+    .cs-body p {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,.7);
+      line-height: 1.65;
+    }
+
+    .cs-body p strong {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    /* Blocco giallo "Perché HURKA!" */
+    .cs-perche {
+      background: var(--yellow);
+      margin: 0 -5vw;
+      padding: 4rem 5vw;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .cs-perche-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      text-transform: uppercase;
+      color: var(--navy);
+      line-height: .95;
+      white-space: nowrap;
+    }
+
+    .cs-perche-label span {
+      display: block;
+      font-size: .45em;
+      letter-spacing: .18em;
+      font-weight: 600;
+      color: rgba(32,56,99,.6);
+      margin-bottom: .2em;
+    }
+
+    .cs-perche-text {
+      font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+      color: var(--navy);
+      line-height: 1.65;
+      max-width: 680px;
+    }
+
+    /* Dichiarazione bold centrale */
+    .cs-statement {
+      max-width: 1100px;
+      margin: 5rem auto;
+      padding: 0;
+    }
+
+    .cs-statement p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+      font-weight: 700;
+      color: rgba(255,255,255,.55);
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .cs-statement p strong {
+      color: var(--white);
+    }
+
+    /* Triple verbs */
+    .cs-verbs {
+      background: var(--teal);
+      margin: 0 -5vw;
+      padding: 3.5rem 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+
+    .cs-verb {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2rem, 4.5vw, 4rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--white);
+      letter-spacing: .02em;
+      padding: 0 2rem;
+      position: relative;
+    }
+
+    .cs-verb + .cs-verb::before {
+      content: '·';
+      position: absolute;
+      left: -.15em;
+      color: var(--yellow);
+    }
+
+    /* Mission + Vision */
+    .cs-mv-grid {
+      max-width: 1100px;
+      margin: 5rem auto 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .cs-mv-card {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      padding: 2.2rem 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .25s, background .25s;
+    }
+
+    .cs-mv-card:hover {
+      border-color: rgba(250,224,74,.4);
+      background: rgba(250,224,74,.04);
+    }
+
+    .cs-mv-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px;
+      height: 100%;
+    }
+
+    .cs-mv-card.mission::before { background: var(--yellow); }
+    .cs-mv-card.vision::before  { background: var(--teal); }
+
+    .cs-mv-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      margin-bottom: .8rem;
+    }
+
+    .cs-mv-card.mission .cs-mv-tag { color: var(--yellow); }
+    .cs-mv-card.vision  .cs-mv-tag { color: #7ab8b8; }
+
+    .cs-mv-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+
+    /* Campaign quote */
+    .cs-campaign {
+      max-width: 1100px;
+      margin: 5rem auto 0;
+      padding: 4rem 0 6rem;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .cs-campaign-quote {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      font-weight: 700;
+      color: var(--yellow);
+      line-height: 1.2;
+      text-transform: uppercase;
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .cs-campaign-quote::before {
+      content: '"';
+      position: absolute;
+      left: 0;
+      top: -.1em;
+      font-size: 2em;
+      line-height: 1;
+      color: rgba(250,224,74,.3);
+      font-family: Georgia, serif;
+    }
+
+    /* Responsive chi siamo */
+    @media (max-width: 768px) {
+      .cs-intro { grid-template-columns: 1fr; gap: 2rem; }
+      .cs-perche { grid-template-columns: 1fr; gap: 1.5rem; }
+      .cs-perche-label { white-space: normal; }
+      .cs-mv-grid { grid-template-columns: 1fr; }
+      .cs-verb { font-size: clamp(1.6rem, 7vw, 3rem); padding: 0 1rem; }
+    }
+
+    /* ══════════════════════════════════════════
+       CONTATTI — form epico
+    ══════════════════════════════════════════ */
+    #contatti {
+      background: #0a1628;
+      position: relative;
+      overflow: hidden;
+      padding: 8rem 5vw;
+    }
+
+    /* watermark decorativo */
+    #contatti::before {
+      content: 'HURKA!';
+      position: absolute;
+      right: -2%;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: clamp(10rem, 22vw, 22rem);
+      text-transform: uppercase;
+      color: rgba(250,224,74,.03);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .contact-grid {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    /* ─── Left copy ─── */
+    .contact-left .section-label { color: var(--yellow); }
+
+    .contact-headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(3rem, 5.5vw, 5.5rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--white);
+      line-height: .92;
+      margin: .6rem 0 1.8rem;
+    }
+
+    .contact-headline span { color: var(--yellow); }
+
+    .contact-desc {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,.6);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    .trust-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .9rem;
+      margin-bottom: 3rem;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      font-size: .95rem;
+      color: rgba(255,255,255,.7);
+    }
+
+    .trust-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(250,224,74,.12);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .contact-email-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      color: var(--yellow);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      border-bottom: 1px solid rgba(250,224,74,.3);
+      padding-bottom: 2px;
+      transition: border-color .2s;
+    }
+
+    .contact-email-link:hover { border-color: var(--yellow); }
+
+    /* ─── Form card ─── */
+    .form-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px;
+      padding: 2.8rem;
+    }
+
+    .form-card-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: rgba(255,255,255,.45);
+      margin-bottom: 1.8rem;
+    }
+
+    /* Topic chips */
+    .topic-label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+      margin-bottom: .7rem;
+    }
+
+    .topic-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .topic-chip input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+
+    .topic-chip label {
+      display: block;
+      padding: .4rem 1rem;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 100px;
+      font-size: .85rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.55);
+      cursor: pointer;
+      transition: all .18s;
+      user-select: none;
+    }
+
+    .topic-chip label:hover {
+      border-color: rgba(250,224,74,.5);
+      color: rgba(255,255,255,.9);
+    }
+
+    .topic-chip input:checked + label {
+      background: var(--yellow);
+      border-color: var(--yellow);
+      color: var(--navy);
+      font-weight: 700;
+    }
+
+    /* Fields */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      margin-bottom: 1rem;
+    }
+
+    .field-label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+    }
+
+    .field-input {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: .82rem 1rem;
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-size: .96rem;
+      width: 100%;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      outline: none;
+    }
+
+    .field-input::placeholder { color: rgba(255,255,255,.2); }
+
+    .field-input:focus {
+      border-color: var(--yellow);
+      background: rgba(250,224,74,.05);
+      box-shadow: 0 0 0 3px rgba(250,224,74,.1);
+    }
+
+    textarea.field-input {
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.55;
+    }
+
+    /* Submit CTA */
+    .form-submit {
+      width: 100%;
+      margin-top: .5rem;
+      padding: 1.05rem 2rem;
+      background: var(--yellow);
+      color: var(--navy);
+      border: none;
+      border-radius: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .2s, background .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+    }
+
+    .form-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 36px rgba(250,224,74,.35);
+      background: #ffe800;
+    }
+
+    .form-submit:active { transform: translateY(0); }
+
+    .form-submit svg { transition: transform .2s; }
+    .form-submit:hover svg { transform: translateX(4px); }
+
+    .form-privacy {
+      font-size: .72rem;
+      color: rgba(255,255,255,.25);
+      text-align: center;
+      margin-top: .9rem;
+      line-height: 1.5;
+    }
+
+    /* Success state */
+    #form-success {
+      display: none;
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
+    #form-success.visible { display: block; }
+
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      background: var(--yellow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+
+    .success-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: .6rem;
+    }
+
+    .success-sub {
+      font-size: .95rem;
+      color: rgba(255,255,255,.55);
+      line-height: 1.6;
+    }
+
+    /* ══════════════════════════════════════════
+       FOOTER — epico
+    ══════════════════════════════════════════ */
+    footer {
+      background: #060e1c;
+    }
+
+    .footer-main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 5vw 3.5rem;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 3rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .footer-brand-col {}
+
+    .footer-logo-wrap .logo-pill {
+      padding: 6px 12px;
+      margin-bottom: 1.2rem;
+      display: inline-flex;
+    }
+
+    .footer-tagline {
+      font-size: .88rem;
+      color: rgba(255,255,255,.35);
+      line-height: 1.65;
+      max-width: 230px;
+      margin-bottom: 1.8rem;
+    }
+
+    .footer-social {
+      display: flex;
+      gap: .6rem;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: border-color .2s, background .2s;
+    }
+
+    .social-btn:hover {
+      border-color: var(--yellow);
+      background: rgba(250,224,74,.08);
+    }
+
+    .footer-col-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 1.3rem;
+    }
+
+    .footer-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .7rem;
+    }
+
+    .footer-nav-list a {
+      font-size: .88rem;
+      color: rgba(255,255,255,.45);
+      text-decoration: none;
+      transition: color .2s;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .footer-nav-list a::before {
+      content: '–';
+      color: rgba(250,224,74,.4);
+      font-size: .75em;
+    }
+
+    .footer-nav-list a:hover { color: var(--white); }
+
+    .footer-contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: .65rem;
+      margin-bottom: .9rem;
+    }
+
+    .footer-contact-item svg { flex-shrink: 0; margin-top: 2px; }
+
+    .footer-contact-item a,
+    .footer-contact-item span {
+      font-size: .88rem;
+      color: rgba(255,255,255,.45);
+      text-decoration: none;
+      transition: color .2s;
+      line-height: 1.5;
+    }
+
+    .footer-contact-item a:hover { color: var(--yellow); }
+
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+
+    .footer-copy {
+      font-size: .78rem;
+      color: rgba(255,255,255,.25);
+    }
+
+    .footer-legal {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-legal a {
+      font-size: .78rem;
+      color: rgba(255,255,255,.25);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .footer-legal a:hover { color: rgba(255,255,255,.55); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .footer-main { grid-template-columns: 1fr 1fr; }
+      .footer-brand-col { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 768px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; }
+      .hero-text { padding-right: 0; }
+      .hero-text::after,
+      .hero-logo-wrap::before,
+      .hero-logo-wrap::after { display: none; }
+      .hero-logo-wrap { order: -1; }
+      .hero-logo-panel {
+        min-height: 320px;
+        padding: 1.75rem 1.25rem;
+        border-radius: 24px;
+      }
+      .hero-logo-svg { max-width: 280px; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .hero-text .btns { display: flex; flex-direction: column; align-items: center; }
+      .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .field-row { grid-template-columns: 1fr; }
+      .form-card { padding: 1.8rem; }
+      .footer-main { grid-template-columns: 1fr; gap: 2.5rem; padding: 3.5rem 5vw 2.5rem; }
+      .footer-brand-col { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ NAV ═══════════════════════════════ -->
+<nav id="site-nav">
+  <div class="nav-inner">
+
+    <a href="#hero" class="nav-logo" aria-label="HURKA! — torna all'inizio">
+      <!-- Logo inline adattato per sfondo scuro: wordmark bianco, bolt giallo -->
+      <svg viewBox="35 320 515 155" height="34" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path fill="#ffffff" d="M138.67,453.46c-9.69,1.34-19.44,2.94-29.2,5,.4-15.45.85-30.83,1.3-45.92-5.57.1-11.15.31-16.74.65.53,16.12,1.06,32.37,1.47,48.55-9.76,2.53-19.51,5.61-29.2,9.43-4.63-43.68-15.52-89.39-16.09-138,14.23,2.83,28.22,6.28,42.24,9.7.02,13.43.3,27.19.68,41.16,6.17.36,12.31.83,18.45,1.38.37-12.91.71-25.51.92-37.66,14.01,3.37,28,6.57,42.09,9.59-2.21,29.79-11.13,61.56-15.93,96.13Z"/>
+        <path fill="#ffffff" d="M197.64,367.48h23.49v61.52c0,5.15-.81,9.32-2.42,12.51-1.58,3.34-4.21,6.37-7.89,9.07-4.96,3.61-10.99,5.41-18.08,5.41-8.04,0-14.78-1.99-20.23-5.97-6.91-5.07-10.37-13.18-10.37-24.34v-58.2h23.49v56.11c0,3.79.46,6.48,1.38,8.06.92,1.58,2.47,2.37,4.65,2.37s3.81-.73,4.68-2.2c.86-1.54,1.3-4.26,1.3-8.17v-56.17Z"/>
+        <path fill="#ffffff" d="M300.93,454.46h-25.41l-11.61-30.98c-.11-.53-.31-1.22-.59-2.08-.28-.86-.63-1.9-1.04-3.1l.17,5.75v30.42h-23.38v-86.98h24.06c10.59,0,18.51,2.08,23.77,6.25,6.68,5.33,10.03,12.92,10.03,22.76,0,10.52-4.49,17.78-13.46,21.8l17.46,36.17ZM262.57,407.76h1.58c2.7,0,4.96-1.03,6.76-3.1,1.8-2.06,2.7-4.69,2.7-7.89,0-6.5-3.4-9.75-10.2-9.75h-.85v20.73Z"/>
+        <path fill="#ffffff" d="M378.3,454.46h-25.35l-15.61-40.11.62,40.11h-23.49v-86.98h23.49l-.62,37.29,13.86-37.29h24.79l-18.76,41.97,21.07,45.01Z"/>
+        <path fill="#ffffff" d="M453.48,454.46h-24.28l-1.75-11.04h-15.83l-1.91,11.04h-24.28l20.9-86.98h28.73l18.42,86.98ZM424.69,424.77l-1.52-10.14s-.11-.54-.23-1.52c-.08-.82-.47-4.09-1.18-9.8-.08-.64-.17-1.51-.28-2.62-.11-1.11-.26-2.51-.45-4.2l-.73-8.23c-.08.79-.18,1.67-.31,2.65-.13.98-.27,2.05-.42,3.21-.26,2.33-.45,3.94-.56,4.84s-.19,1.45-.23,1.63l-1.63,10.54-2.37,13.63h9.92Z"/>
+        <path fill="#fae04a" d="M510,420.19c9.04-28.63,20.02-56.54,29.52-85.02-13.48-.6-20.19-.35-33.38,1.19-4.84,7.8-8.98,15.41-12.47,22.87,7.85-1.63,15.95-2.86,24.69-3.65-8.1,9.38-14.71,18.6-19.74,27.42.04.04.08.07.12.11,4.67-.61,9.56-1.12,14.81-1.49.03.04.06.08.09.12-11.95,12.49-19.2,24.68-24.37,35.65,8.12.9,11.85,1.49,20.7,2.79Z"/>
+        <path fill="#fae04a" d="M501.41,432.76c-2.86-4.33-7.13-6.89-12.46-7.83-5.17-.91-9.8,0-13.36,2.22-3.51,2.19-4.79,5.03-4.18,8.91.6,3.81,2.78,7.66,6.16,12.03,3.52,4.3,7.23,7.7,11.21,9.79,3.98,2.08,7.16,2.28,10.01.2,2.8-2.04,4.56-5.78,5.32-10.84.79-5.26.16-10.19-2.68-14.49Z"/>
+        <path fill="#fae04a" d="M491.58,393.84c-3.76.57-7.35,1.2-11.1,1.92.82-6.73,1.89-13.57,3.33-20.7-5.92,1.34-11.74,2.85-17.82,4.57-.07-.35-.15-.65-.19-.96-.46-3.35-.86-6.73-1.26-10.15-.34-2.97-.71-5.96-.99-8.99-.39-4.35-.7-8.77-.92-13.27-6.79,2.34-10.13,3.66-16.68,6.57,7.28,21.06,15.95,41.59,22.11,63.04,8.98.29,12.71.61,20.18,1.41.84-7.63,1.9-15.41,3.34-23.45Z"/>
+      </svg>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#servizi" data-section="servizi">Servizi</a></li>
+      <li><a href="#chi-siamo" data-section="chi-siamo">Chi siamo</a></li>
+      <li>
+        <a href="#contatti" class="nav-cta">
+          Contattaci
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </a>
+      </li>
+    </ul>
+
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Apri menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+  </div>
+</nav>
+
+<!-- Mobile menu (sibling di nav, fuori dal fixed) -->
+<div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+  <ul>
+    <li><a href="#servizi" class="nav-mobile-link">Servizi</a></li>
+    <li><a href="#chi-siamo" class="nav-mobile-link">Chi siamo</a></li>
+  </ul>
+  <a href="#contatti" class="nav-mobile-cta nav-mobile-link">
+    Contattaci
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+  </a>
+</div>
+
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <h1>Soluzioni<span>integrate.</span>Risultati<span style="color:var(--white)">immediati.</span></h1>
+      <p class="hero-tagline">
+        Dalla gestione delle forniture energetiche all'efficienza fotovoltaica,
+        fino ai servizi per condomini — <strong>una sola consulenza per tutto.</strong>
+      </p>
+      <div class="btns">
+        <a href="#servizi" class="btn btn-primary">Scopri i servizi</a>
+        <a href="#contatti" class="btn btn-outline">Contattaci</a>
+      </div>
+    </div>
+    <div class="hero-logo-wrap">
+      <div class="hero-logo-panel">
+        <span class="hero-logo-rim" aria-hidden="true"></span>
+        <span class="hero-logo-noise" aria-hidden="true"></span>
+        <span class="hero-logo-beam" aria-hidden="true"></span>
+      <!--
+        Logo hero: inline SVG con viewBox che copre l'intera area del logo
+        (H: x≈50,y≈333 | URKA: x≈162-454 | bolt: x≈437-540,y≈334 | subtitle: y≈476-509)
+        Colori adattati per sfondo scuro: wordmark → bianco, bolt → giallo originale,
+        subtitle → giallo semi-trasparente
+      -->
+      <svg class="hero-logo-svg" viewBox="35 318 515 205" xmlns="http://www.w3.org/2000/svg">
+        <!-- H -->
+        <path fill="#ffffff" d="M138.67,453.46c-9.69,1.34-19.44,2.94-29.2,5,.4-15.45.85-30.83,1.3-45.92-5.57.1-11.15.31-16.74.65.53,16.12,1.06,32.37,1.47,48.55-9.76,2.53-19.51,5.61-29.2,9.43-4.63-43.68-15.52-89.39-16.09-138,14.23,2.83,28.22,6.28,42.24,9.7.02,13.43.3,27.19.68,41.16,6.17.36,12.31.83,18.45,1.38.37-12.91.71-25.51.92-37.66,14.01,3.37,28,6.57,42.09,9.59-2.21,29.79-11.13,61.56-15.93,96.13Z"/>
+        <!-- U -->
+        <path fill="#ffffff" d="M197.64,367.48h23.49v61.52c0,5.15-.81,9.32-2.42,12.51-1.58,3.34-4.21,6.37-7.89,9.07-4.96,3.61-10.99,5.41-18.08,5.41-8.04,0-14.78-1.99-20.23-5.97-6.91-5.07-10.37-13.18-10.37-24.34v-58.2h23.49v56.11c0,3.79.46,6.48,1.38,8.06.92,1.58,2.47,2.37,4.65,2.37s3.81-.73,4.68-2.2c.86-1.54,1.3-4.26,1.3-8.17v-56.17Z"/>
+        <!-- R -->
+        <path fill="#ffffff" d="M300.93,454.46h-25.41l-11.61-30.98c-.11-.53-.31-1.22-.59-2.08-.28-.86-.63-1.9-1.04-3.1l.17,5.75v30.42h-23.38v-86.98h24.06c10.59,0,18.51,2.08,23.77,6.25,6.68,5.33,10.03,12.92,10.03,22.76,0,10.52-4.49,17.78-13.46,21.8l17.46,36.17ZM262.57,407.76h1.58c2.7,0,4.96-1.03,6.76-3.1,1.8-2.06,2.7-4.69,2.7-7.89,0-6.5-3.4-9.75-10.2-9.75h-.85v20.73Z"/>
+        <!-- K -->
+        <path fill="#ffffff" d="M378.3,454.46h-25.35l-15.61-40.11.62,40.11h-23.49v-86.98h23.49l-.62,37.29,13.86-37.29h24.79l-18.76,41.97,21.07,45.01Z"/>
+        <!-- A -->
+        <path fill="#ffffff" d="M453.48,454.46h-24.28l-1.75-11.04h-15.83l-1.91,11.04h-24.28l20.9-86.98h28.73l18.42,86.98ZM424.69,424.77l-1.52-10.14s-.11-.54-.23-1.52c-.08-.82-.47-4.09-1.18-9.8-.08-.64-.17-1.51-.28-2.62-.11-1.11-.26-2.51-.45-4.2l-.73-8.23c-.08.79-.18,1.67-.31,2.65-.13.98-.27,2.05-.42,3.21-.26,2.33-.45,3.94-.56,4.84s-.19,1.45-.23,1.63l-1.63,10.54-2.37,13.63h9.92Z"/>
+        <!-- Lightning bolt -->
+        <path fill="#fae04a" d="M510,420.19c9.04-28.63,20.02-56.54,29.52-85.02-13.48-.6-20.19-.35-33.38,1.19-4.84,7.8-8.98,15.41-12.47,22.87,7.85-1.63,15.95-2.86,24.69-3.65-8.1,9.38-14.71,18.6-19.74,27.42.04.04.08.07.12.11,4.67-.61,9.56-1.12,14.81-1.49.03.04.06.08.09.12-11.95,12.49-19.2,24.68-24.37,35.65,8.12.9,11.85,1.49,20.7,2.79Z"/>
+        <path fill="#fae04a" d="M501.41,432.76c-2.86-4.33-7.13-6.89-12.46-7.83-5.17-.91-9.8,0-13.36,2.22-3.51,2.19-4.79,5.03-4.18,8.91.6,3.81,2.78,7.66,6.16,12.03,3.52,4.3,7.23,7.7,11.21,9.79,3.98,2.08,7.16,2.28,10.01.2,2.8-2.04,4.56-5.78,5.32-10.84.79-5.26.16-10.19-2.68-14.49Z"/>
+        <path fill="#fae04a" d="M491.58,393.84c-3.76.57-7.35,1.2-11.1,1.92.82-6.73,1.89-13.57,3.33-20.7-5.92,1.34-11.74,2.85-17.82,4.57-.07-.35-.15-.65-.19-.96-.46-3.35-.86-6.73-1.26-10.15-.34-2.97-.71-5.96-.99-8.99-.39-4.35-.7-8.77-.92-13.27-6.79,2.34-10.13,3.66-16.68,6.57,7.28,21.06,15.95,41.59,22.11,63.04,8.98.29,12.71.61,20.18,1.41.84-7.63,1.9-15.41,3.34-23.45Z"/>
+        <!-- Consulenza Integrata (resa in giallo tenue su sfondo scuro) -->
+        <path fill="rgba(250,224,74,.4)" d="M66.09,480.67c-1.93,2.76-2.9,6.97-2.9,12.64,0,10.47,3.96,15.71,11.87,15.71,1.57,0,2.99-.29,4.25-.86v-3.92c-1.21.44-2.25.66-3.11.66-4.94,0-7.41-3.91-7.41-11.73,0-2.17.14-4.06.42-5.65.28-1.59.71-2.91,1.29-3.95s1.32-1.81,2.21-2.31c.89-.5,1.96-.75,3.21-.75.91,0,2.04.27,3.39.8v-3.84c-1.43-.63-2.88-.94-4.35-.94-3.98,0-6.94,1.38-8.87,4.14Z"/>
+        <path fill="rgba(250,224,74,.4)" d="M102.6,479.28c-1.59-1.82-4.02-2.73-7.29-2.73-3.66,0-6.26,1.18-7.79,3.53-1.52,2.34-2.28,6.32-2.28,11.96,0,6.32.77,10.72,2.3,13.19,1.55,2.53,4.23,3.8,8.02,3.8s6.18-1.18,7.72-3.53c1.53-2.35,2.3-6.32,2.3-11.92,0-3.99-.24-7.03-.71-9.11-.47-2.24-1.23-3.97-2.28-5.19ZM99.09,502.74c-.66,1.59-1.87,2.38-3.64,2.38s-3.04-.85-3.69-2.54c-.64-1.79-.96-5-.96-9.64,0-5.03.3-8.38.91-10.05.62-1.65,1.87-2.48,3.75-2.48s3.11.9,3.72,2.71c.61,1.79.91,5.43.91,10.91,0,4.24-.33,7.15-.99,8.72Z"/>
+        <path fill="rgba(250,224,74,.4)" d="M126.32,488.78c0,1.75.1,3.62.3,5.6.2,1.98.51,4.2.94,6.65-1.16-4.05-2.51-7.86-4.02-11.43l-5.24-12.64h-4.91v31.67h5.19l-.28-13.81c0-.4,0-.75-.01-1.07,0-.31-.02-.58-.04-.8l-.28-3.92-.28-3.22c-.02-.18-.04-.39-.08-.65-.03-.25-.08-.56-.13-.91.1.36.19.67.27.94.08.27.13.51.16.7.4,1.53.85,2.99,1.33,4.39.48,1.39.99,2.76,1.53,4.08l5.9,14.26h4.93v-31.67h-5.29v11.82Z"/>
+        <path fill="rgba(250,224,74,.4)" d="M149.59,491.5c-1.16-.94-2.11-1.75-2.85-2.42-.73-.67-1.26-1.22-1.58-1.64-.62-.79-.94-1.74-.94-2.85,0-1.26.44-2.26,1.32-3.02.88-.79,2.01-1.19,3.39-1.19,1.28,0,2.72.47,4.33,1.4v-4.16c-1.7-.72-3.49-1.09-5.36-1.09-2.7,0-4.85.73-6.45,2.19-1.59,1.45-2.38,3.41-2.38,5.89,0,1.83.41,3.35,1.22,4.55.42.62,1.07,1.33,1.95,2.15.88.82,1.98,1.76,3.32,2.83.86.7,1.58,1.33,2.15,1.9.57.57,1.02,1.07,1.34,1.51.62.92.94,1.95.94,3.1,0,1.33-.41,2.38-1.21,3.15-.81.77-1.93,1.16-3.37,1.16-1.54,0-3.24-.55-5.11-1.66v4.23c1.59,1,3.5,1.5,5.74,1.5,2.67,0,4.85-.77,6.55-2.32,1.7-1.59,2.56-3.6,2.56-6.05,0-1.8-.39-3.33-1.16-4.57-.78-1.28-2.24-2.81-4.38-4.57Z"/>
+        <path fill="rgba(250,224,74,.4)" d="M174.96,499.95c0,2.05-.25,3.41-.76,4.08-.49.66-1.5.99-3.04.99s-2.56-.38-3.09-1.13c-.51-.75-.76-2.27-.76-4.55v-22.38h-5.16v22.38c0,3.46.5,5.8,1.49,7.02,1.43,1.78,3.9,2.67,7.41,2.67,3.19,0,5.56-.69,7.11-2.07,1.3-1.22,1.95-3.55,1.95-6.99v-23h-5.16v23Z"/>
+        <polygon fill="rgba(250,224,74,.4)" points="194 476.96 188.73 476.96 188.73 508.63 202.6 508.63 202.6 505.02 194 505.02 194 476.96"/>
+        <polygon fill="rgba(250,224,74,.4)" points="208.48 508.63 222.48 508.63 222.48 505.02 213.75 505.02 213.75 494.21 221.49 494.21 221.49 490.6 213.75 490.6 213.75 480.57 222.48 480.57 222.48 476.96 208.48 476.96 208.48 508.63"/>
+        <path fill="rgba(250,224,74,.4)" d="M242.83,488.78c0,1.75.1,3.62.3,5.6.2,1.98.51,4.2.94,6.65-1.16-4.05-2.51-7.86-4.02-11.43l-5.24-12.64h-4.91v31.67h5.19l-.28-13.81c0-.4,0-.75-.01-1.07s-.02-.58-.04-.8l-.28-3.92-.28-3.22c-.02-.18-.04-.39-.08-.65-.03-.25-.08-.56-.13-.91.1.36.19.67.27.94.08.27.13.51.17.7.4,1.53.85,2.99,1.33,4.39.48,1.39.99,2.76,1.53,4.08l5.9,14.26h4.94v-31.67h-5.29v11.82Z"/>
+        <polygon fill="rgba(250,224,74,.4)" points="255.77 476.96 255.77 480.57 266.22 480.57 254.38 508.63 272.35 508.63 272.35 504.9 261.24 504.9 272.98 476.96 255.77 476.96"/>
+        <path fill="rgba(250,224,74,.4)" d="M284.45,476.96l-8.5,31.67h5.06l1.49-6.17h7.74l1.47,6.17h5.21l-8.38-31.67h-4.1ZM283.24,499.16l.96-4.06c.51-2.19.94-4.26,1.32-6.21.37-1.95.67-3.87.91-5.77.49,3.9,1.12,7.56,1.9,10.99l1.16,5.05h-6.25Z"/>
+        <rect fill="rgba(250,224,74,.4)" x="315.93" y="476.96" width="5.26" height="31.67"/>
+        <path fill="rgba(250,224,74,.4)" d="M342.74,488.78c0,1.75.1,3.62.3,5.6.2,1.98.51,4.2.94,6.65-1.16-4.05-2.51-7.86-4.02-11.43l-5.24-12.64h-4.91v31.67h5.19l-.28-13.81c0-.4,0-.75-.01-1.07,0-.31-.02-.58-.04-.8l-.28-3.92-.28-3.22c-.02-.18-.04-.39-.08-.65-.03-.25-.08-.56-.13-.91.1.36.19.67.27.94.08.27.13.51.16.7.4,1.53.85,2.99,1.33,4.39.48,1.39.99,2.76,1.53,4.08l5.9,14.26h4.93v-31.67h-5.29v11.82Z"/>
+        <polygon fill="rgba(250,224,74,.4)" points="353.53 480.69 359.6 480.69 359.6 508.63 364.76 508.63 364.76 480.69 370.66 480.69 370.66 476.96 353.53 476.96 353.53 480.69"/>
+        <polygon fill="rgba(250,224,74,.4)" points="376.16 508.63 390.16 508.63 390.16 505.02 381.42 505.02 381.42 494.21 389.17 494.21 389.17 490.6 381.42 490.6 381.42 480.57 390.16 480.57 390.16 476.96 376.16 476.96 376.16 508.63"/>
+        <path fill="rgba(250,224,74,.4)" d="M406.94,495.59h4.58v1.5c0,2.85-.35,4.91-1.04,6.19-.67,1.2-1.85,1.81-3.52,1.81-1.82,0-3.06-.85-3.72-2.54s-.99-4.94-.99-9.74.32-8.03.96-9.87c.64-1.75,1.84-2.63,3.59-2.63,1.28,0,2.24.32,2.88.96.32.31.62.76.89,1.32.27.57.52,1.27.73,2.1l4.91-1.66c-.81-2.31-1.94-3.97-3.39-4.98-1.43-1-3.43-1.5-6-1.5-3.36,0-5.84,1.03-7.46,3.1-1.72,2.2-2.58,6.63-2.58,13.27,0,5.81.78,9.95,2.35,12.41,1.59,2.46,4.24,3.69,7.97,3.69s6.07-1.11,7.39-3.32c1.33-2.16,2-6.32,2-12.49v-1.23h-9.57v3.61Z"/>
+        <path fill="rgba(250,224,74,.4)" d="M438.93,490.67c.94-1.37,1.4-3.2,1.4-5.47,0-2.95-.89-5.15-2.66-6.58-1.4-1.11-3.53-1.66-6.4-1.66h-6.93v31.67h5.26v-15.51l7.16,15.51h5.34l-7.19-15.4c1.74-.33,3.08-1.18,4.01-2.55ZM429.6,490.99v-10.52h.89c.83,0,1.54.1,2.14.31.6.21,1.09.53,1.47.96.38.44.66,1,.84,1.7.18.7.27,1.54.27,2.52,0,1.82-.42,3.11-1.26,3.88-.84.77-2.29,1.15-4.33,1.15Z"/>
+        <path fill="rgba(250,224,74,.4)" d="M454.33,476.96l-8.5,31.67h5.06l1.49-6.17h7.74l1.47,6.17h5.21l-8.38-31.67h-4.1ZM453.12,499.16l.96-4.06c.51-2.19.95-4.26,1.32-6.21.37-1.95.67-3.87.91-5.77.49,3.9,1.12,7.56,1.9,10.99l1.16,5.05h-6.25Z"/>
+        <polygon fill="rgba(250,224,74,.4)" points="468.54 480.69 474.62 480.69 474.62 508.63 479.78 508.63 479.78 480.69 485.67 480.69 485.67 476.96 468.54 476.96 468.54 480.69"/>
+        <path fill="rgba(250,224,74,.4)" d="M500.11,476.96h-4.1l-8.5,31.67h5.06l1.49-6.17h7.74l1.47,6.17h5.21l-8.38-31.67ZM494.79,499.16l.96-4.06c.51-2.19.95-4.26,1.32-6.21.37-1.95.67-3.87.91-5.77.49,3.9,1.12,7.56,1.9,10.99l1.16,5.05h-6.25Z"/>
+      </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── STRIP ─── -->
+<div class="strip">
+  <div class="strip-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#203863" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Luce &amp; Gas
+  </div>
+  <div class="strip-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#203863" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    Efficientamento Energetico
+  </div>
+  <div class="strip-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#203863" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Servizi ai Condomini
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SERVIZI ═══════════════════════════════ -->
+<section id="servizi">
+  <div style="max-width:1100px; margin:0 auto;">
+    <div class="section-label">Cosa facciamo</div>
+    <h2 class="section-title">I nostri servizi</h2>
+    <p class="section-sub">
+      Analizziamo, ottimizziamo, risolviamo. Senza burocrazia inutile, senza perdite di tempo.
+    </p>
+  </div>
+
+  <div class="servizi-grid">
+
+    <!-- CARD 1: Luce e Gas -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon yellow">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#203863" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Luce<br>&amp; Gas</div>
+        </div>
+      </div>
+      <div class="card-divider yellow"></div>
+      <ul class="card-list">
+        <li><span class="bullet yellow"></span>Consulenza consumi</li>
+        <li><span class="bullet yellow"></span>Certificazione risparmio</li>
+        <li><span class="bullet yellow"></span>Contrattualizzazione forniture</li>
+        <li><span class="bullet yellow"></span>Nuovi allacciamenti Luce e Gas</li>
+        <li><span class="bullet yellow"></span>Volture e Subentri</li>
+        <li><span class="bullet yellow"></span>Aumenti di potenza</li>
+        <li><span class="bullet yellow"></span>Mediazione con il distributore</li>
+      </ul>
+    </div>
+
+    <!-- CARD 2: Efficientamento Energetico -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon navy">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fae04a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Efficientamento<br>Energetico</div>
+        </div>
+      </div>
+      <div class="card-divider navy"></div>
+      <ul class="card-list">
+        <li><span class="bullet navy"></span>Impianti fotovoltaici</li>
+        <li><span class="bullet navy"></span>Progettazione e installazione fotovoltaico</li>
+        <li><span class="bullet navy"></span>Pratiche GSE e Terna</li>
+        <li><span class="bullet navy"></span>Pulizia e manutenzione fotovoltaici</li>
+      </ul>
+    </div>
+
+    <!-- CARD 3: Servizi ai Condomini -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon teal">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-title">Servizi ai<br>Condomini</div>
+        </div>
+      </div>
+      <div class="card-divider teal"></div>
+      <ul class="card-list">
+        <li><span class="bullet teal"></span>Gestione Privacy GDPR</li>
+        <li><span class="bullet teal"></span>Certificazioni messe a terra</li>
+        <li><span class="bullet teal"></span>Derattizzazione</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ CHI SIAMO ═══════════════════════════════ -->
+<section id="chi-siamo">
+
+  <!-- ── Intro ── -->
+  <div class="cs-intro">
+    <div>
+      <div class="section-label">Chi siamo</div>
+      <h2 class="cs-big-quote">
+        Un team giovane,<br>
+        ma con le idee<br>
+        <em>chiarissime.</em>
+      </h2>
+    </div>
+    <div class="cs-body">
+      <p>
+        Siamo nati per trasformare il labirinto dei contratti energetici e della transizione ecologica
+        in <strong>una linea retta verso il risparmio.</strong>
+      </p>
+      <p>
+        Dalla gestione dei mandati luce e gas per i grandi condomini, alla progettazione di soluzioni
+        rinnovabili per la Pubblica Amministrazione — il nostro metodo è la
+        <strong>Consulenza Integrata.</strong>
+      </p>
+      <p>
+        Non siamo semplici intermediari: siamo il vostro <strong>ufficio tecnico esterno.</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- ── Perché HURKA! ── -->
+  <div class="cs-perche">
+    <div class="cs-perche-label">
+      <span>Perché</span>
+      HURKA!
+    </div>
+    <p class="cs-perche-text">
+      Perché è quello che dicono i nostri clienti quando vedono la semplificazione dei loro processi
+      e il taglio dei costi in bolletta. Il nome non è un caso: è la reazione che vogliamo provocare,
+      ogni volta.
+    </p>
+  </div>
+
+  <!-- ── Statement ── -->
+  <div class="cs-statement">
+    <p>
+      <strong>Non perdiamo tempo.</strong> Non aggiungiamo burocrazia.<br>
+      <strong>Risolviamo</strong> quello che gli altri rimandano.
+    </p>
+  </div>
+
+  <!-- ── Triple verbs ── -->
+  <div class="cs-verbs">
+    <span class="cs-verb">Analizziamo</span>
+    <span class="cs-verb">Ottimizziamo</span>
+    <span class="cs-verb">Risolviamo</span>
+  </div>
+
+  <!-- ── Mission + Vision ── -->
+  <div class="cs-mv-grid">
+    <div class="cs-mv-card mission">
+      <div class="cs-mv-tag">Mission</div>
+      <p class="cs-mv-text">Risolvere la complessità energetica con intuizioni brillanti.</p>
+    </div>
+    <div class="cs-mv-card vision">
+      <div class="cs-mv-tag">Vision</div>
+      <p class="cs-mv-text">Rendere l'efficienza energetica un'esperienza entusiasmante, non una seccatura burocratica.</p>
+    </div>
+  </div>
+
+  <!-- ── Campaign quote ── -->
+  <div class="cs-campaign">
+    <p class="cs-campaign-quote">
+      Il nostro nome è un'esclamazione perché il nostro obiettivo è stupirvi con la velocità delle soluzioni.
+    </p>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════ CONTATTI ═══════════════════════════════ -->
+<section id="contatti">
+  <div class="contact-grid">
+
+    <!-- ── Colonna sinistra: copy ── -->
+    <div class="contact-left">
+      <div class="section-label">Contatti</div>
+      <h2 class="contact-headline">
+        Dicci cosa<br>
+        ti serve.<br>
+        <span>Subito.</span>
+      </h2>
+      <p class="contact-desc">
+        Ogni giorno gestiamo situazioni complesse per condomini, aziende
+        e pubbliche amministrazioni. La tua richiesta non è un disturbo —
+        è il motivo per cui esistiamo.
+      </p>
+
+      <ul class="trust-list">
+        <li class="trust-item">
+          <div class="trust-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fae04a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          Risposta garantita entro 24 ore lavorative
+        </li>
+        <li class="trust-item">
+          <div class="trust-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fae04a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          Prima consulenza sempre gratuita
+        </li>
+        <li class="trust-item">
+          <div class="trust-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fae04a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          Nessun vincolo, nessuna firma al buio
+        </li>
+      </ul>
+
+      <a href="mailto:info@hurka.it" class="contact-email-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        info@hurka.it
+      </a>
+    </div>
+
+    <!-- ── Colonna destra: form ── -->
+    <div class="form-card">
+      <div class="form-card-title">Richiedi consulenza gratuita</div>
+
+      <form id="contact-form" novalidate>
+
+        <!-- Topic chips -->
+        <div class="topic-label">Di cosa hai bisogno?</div>
+        <div class="topic-group">
+          <div class="topic-chip"><input type="radio" name="topic" id="t1" value="luce-gas" checked><label for="t1">⚡ Luce &amp; Gas</label></div>
+          <div class="topic-chip"><input type="radio" name="topic" id="t2" value="fotovoltaico"><label for="t2">☀ Fotovoltaico</label></div>
+          <div class="topic-chip"><input type="radio" name="topic" id="t3" value="condomini"><label for="t3">🏢 Condomini</label></div>
+          <div class="topic-chip"><input type="radio" name="topic" id="t4" value="altro"><label for="t4">Altro</label></div>
+        </div>
+
+        <!-- Nome + Email -->
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="cf-nome">Nome</label>
+            <input class="field-input" type="text" id="cf-nome" name="nome" placeholder="Mario Rossi" required autocomplete="name">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="cf-email">Email</label>
+            <input class="field-input" type="email" id="cf-email" name="email" placeholder="mario@email.it" required autocomplete="email">
+          </div>
+        </div>
+
+        <!-- Telefono (opzionale) -->
+        <div class="field-group">
+          <label class="field-label" for="cf-tel">Telefono <span style="font-weight:400;opacity:.5">(opzionale)</span></label>
+          <input class="field-input" type="tel" id="cf-tel" name="telefono" placeholder="+39 000 000 0000" autocomplete="tel">
+        </div>
+
+        <!-- Messaggio -->
+        <div class="field-group">
+          <label class="field-label" for="cf-msg">La tua richiesta</label>
+          <textarea class="field-input" id="cf-msg" name="messaggio" placeholder="Descrivici la situazione: quanti punti luce, tipo di immobile, attuale fornitore... più dettagli ci dai, più velocemente risolviamo." required></textarea>
+        </div>
+
+        <!-- CTA -->
+        <button type="submit" class="form-submit">
+          Invia la richiesta
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+
+        <p class="form-privacy">Inviando accetti la nostra <a href="#" style="color:inherit;text-decoration:underline">Privacy Policy</a>. I tuoi dati non vengono ceduti a terzi.</p>
+
+      </form>
+
+      <!-- Success state -->
+      <div id="form-success">
+        <div class="success-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#203863" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="success-title">HURKA! 🎉</div>
+        <p class="success-sub">Messaggio ricevuto. Il nostro team ti risponderà<br>entro 24 ore lavorative.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer>
+
+  <div class="footer-main">
+
+    <!-- Brand col -->
+    <div class="footer-brand-col">
+      <div class="footer-logo-wrap">
+        <div class="logo-pill">
+          <svg viewBox="35 318 515 205" height="52" xmlns="http://www.w3.org/2000/svg">
+            <image href="lg_hurka.svg" x="0" y="0" width="595.28" height="841.89"/>
+          </svg>
+        </div>
+      </div>
+      <p class="footer-tagline">
+        Il tuo ufficio tecnico esterno per energia, fotovoltaico e servizi ai condomini.
+        Soluzioni integrate, risultati immediati.
+      </p>
+      <div class="footer-social">
+        <a href="#" class="social-btn" aria-label="LinkedIn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a href="#" class="social-btn" aria-label="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <a href="mailto:info@hurka.it" class="social-btn" aria-label="Email">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Servizi col -->
+    <div>
+      <div class="footer-col-title">Servizi</div>
+      <ul class="footer-nav-list">
+        <li><a href="#servizi">Luce &amp; Gas</a></li>
+        <li><a href="#servizi">Efficientamento Energetico</a></li>
+        <li><a href="#servizi">Impianti Fotovoltaici</a></li>
+        <li><a href="#servizi">Pratiche GSE e Terna</a></li>
+        <li><a href="#servizi">Servizi ai Condomini</a></li>
+      </ul>
+    </div>
+
+    <!-- Azienda col -->
+    <div>
+      <div class="footer-col-title">Azienda</div>
+      <ul class="footer-nav-list">
+        <li><a href="#chi-siamo">Chi siamo</a></li>
+        <li><a href="#chi-siamo">Mission &amp; Vision</a></li>
+        <li><a href="#contatti">Lavora con noi</a></li>
+        <li><a href="https://hurka.consulting" target="_blank" rel="noopener">hurka.consulting</a></li>
+      </ul>
+    </div>
+
+    <!-- Contatti col -->
+    <div>
+      <div class="footer-col-title">Contatti</div>
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(250,224,74,.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <a href="mailto:info@hurka.it">info@hurka.it</a>
+      </div>
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(250,224,74,.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <a href="mailto:info@hurka.consulting">info@hurka.consulting</a>
+      </div>
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(250,224,74,.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span><a href="https://hurka.it" target="_blank" rel="noopener">hurka.it</a> · <a href="https://hurka.consulting" target="_blank" rel="noopener">hurka.consulting</a></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 HURKA! Consulenza Integrata — Tutti i diritti riservati</span>
+    <nav class="footer-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Cookie Policy</a>
+      <a href="#">Note legali</a>
+    </nav>
+  </div>
+
+</footer>
+
+<script>
+  /* ── Nav: scroll state ── */
+  (function() {
+    var nav = document.getElementById('site-nav');
+    function onScroll() {
+      if (window.scrollY > 40) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+
+  /* ── Nav: hamburger + mobile menu ── */
+  (function() {
+    var btn    = document.getElementById('nav-hamburger');
+    var menu   = document.getElementById('nav-mobile');
+    var links  = menu.querySelectorAll('.nav-mobile-link');
+
+    function closeMenu() {
+      btn.classList.remove('open');
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      menu.setAttribute('aria-hidden', 'true');
+    }
+
+    btn.addEventListener('click', function() {
+      var isOpen = menu.classList.contains('open');
+      if (isOpen) {
+        closeMenu();
+      } else {
+        btn.classList.add('open');
+        menu.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        menu.setAttribute('aria-hidden', 'false');
+      }
+    });
+
+    links.forEach(function(link) {
+      link.addEventListener('click', closeMenu);
+    });
+  })();
+
+  /* ── Nav: active section via IntersectionObserver ── */
+  (function() {
+    var navLinks = document.querySelectorAll('.nav-links a[data-section]');
+    var sections = [];
+    navLinks.forEach(function(a) {
+      var el = document.getElementById(a.dataset.section);
+      if (el) sections.push({ el: el, link: a });
+    });
+    if (!sections.length || !window.IntersectionObserver) return;
+
+    var activeLink = null;
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var match = sections.find(function(s) { return s.el === entry.target; });
+        if (!match) return;
+        if (entry.isIntersecting) {
+          if (activeLink) activeLink.classList.remove('active');
+          activeLink = match.link;
+          activeLink.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(function(s) { observer.observe(s.el); });
+  })();
+
+  /* ── Form submit handler ── */
+  document.getElementById('contact-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const btn  = form.querySelector('.form-submit');
+
+    /* Basic validation */
+    const nome  = form.nome.value.trim();
+    const email = form.email.value.trim();
+    const msg   = form.messaggio.value.trim();
+    if (!nome || !email || !msg) {
+      [form.nome, form.email, form.messaggio].forEach(function(el) {
+        if (!el.value.trim()) {
+          el.style.borderColor = '#f87171';
+          el.addEventListener('input', function() { el.style.borderColor = ''; }, { once: true });
+        }
+      });
+      return;
+    }
+
+    /* Simulate send */
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Invio in corso…';
+
+    setTimeout(function() {
+      form.style.display = 'none';
+      document.getElementById('form-success').classList.add('visible');
+    }, 1200);
+  });
+
+</script>
+
+</body>
+</html>
