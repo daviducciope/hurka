@@ -516,10 +516,50 @@
         transition:none !important;
       }
     }
+
+    /* ---- Scroll progress bar ---- */
+    #scroll-progress{
+      position:fixed;
+      top:0;left:0;right:0;
+      height:3px;
+      width:0%;
+      background:linear-gradient(90deg,#fae04a 0%,rgba(250,224,74,.6) 100%);
+      z-index:200;
+      pointer-events:none;
+      transition:width .1s linear;
+    }
+
+    /* ---- Section scroll reveal ---- */
+    .reveal{
+      opacity:0;
+      transform:translateY(26px);
+      transition:opacity .75s ease,transform .75s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.r-d1{ transition-delay:.1s; }
+    .reveal.r-d2{ transition-delay:.2s; }
+    .reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+    /* ---- Hero entrance ---- */
+    @keyframes heroUp{
+      from{ opacity:0; transform:translateY(34px); }
+      to  { opacity:1; transform:translateY(0); }
+    }
+    .hero-anim{
+      opacity:0;
+      animation:heroUp .85s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    /* ---- Reduced motion overrides ---- */
+    @media(prefers-reduced-motion:reduce){
+      #scroll-progress{ display:none; }
+      .reveal{ opacity:1!important; transform:none!important; transition:none!important; }
+      .hero-anim{ opacity:1!important; animation:none!important; }
+    }
   </style>
 </head>
 
 <body class="bg-brand-ink text-white font-body selection:bg-brand-yellow/40 selection:text-white">
+  <div id="scroll-progress"></div>
 
   <!-- =========================
        NAVBAR (sticky, minimal, manifesto vibe)
@@ -644,7 +684,7 @@
               <span class="h-px w-12 bg-brand-teal/50"></span>
               COSA FACCIAMO
             </div>
-            <h2 class="mt-5 font-display text-4xl font-extrabold uppercase tracking-tight text-brand-navy sm:text-5xl">
+            <h2 class="reveal r-d1 mt-5 font-display text-4xl font-extrabold uppercase tracking-tight text-brand-navy sm:text-5xl">
               I nostri servizi
             </h2>
             <p class="mt-4 max-w-xl text-brand-teal/80">
@@ -669,7 +709,7 @@
         </div>
 
         <div class="mt-10 grid gap-6 lg:grid-cols-2">
-          <article class="group relative overflow-hidden rounded-[32px] border border-brand-navy/10 bg-[linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.72))] shadow-[0_24px_54px_rgba(32,56,99,.12)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_60px_rgba(32,56,99,.16)]">
+          <article class="reveal group relative overflow-hidden rounded-[32px] border border-brand-navy/10 bg-[linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.72))] shadow-[0_24px_54px_rgba(32,56,99,.12)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_60px_rgba(32,56,99,.16)]">
             <div class="relative h-[240px] overflow-hidden sm:h-[280px]">
               <div class="absolute inset-0 bg-[url('assets/hero-consulenza-energetica.jpg')] bg-cover bg-center transition duration-500 group-hover:scale-[1.04]"></div>
               <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,15,27,.22)_0%,rgba(8,15,27,.38)_35%,rgba(8,15,27,.82)_100%)]"></div>
@@ -719,7 +759,7 @@
             </div>
           </article>
 
-          <article class="group relative overflow-hidden rounded-[32px] border border-brand-navy/10 bg-[linear-gradient(180deg,rgba(32,56,99,.98),rgba(11,21,40,.98))] text-white shadow-[0_26px_60px_rgba(18,28,46,.20)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_34px_68px_rgba(18,28,46,.28)]">
+          <article class="reveal r-d1 group relative overflow-hidden rounded-[32px] border border-brand-navy/10 bg-[linear-gradient(180deg,rgba(32,56,99,.98),rgba(11,21,40,.98))] text-white shadow-[0_26px_60px_rgba(18,28,46,.20)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_34px_68px_rgba(18,28,46,.28)]">
             <div class="relative h-[240px] overflow-hidden sm:h-[280px]">
               <div class="absolute inset-0 bg-[url('assets/hero-servizi-condomini-pa.jpg')] bg-cover bg-center transition duration-500 group-hover:scale-[1.04]"></div>
               <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,12,22,.18)_0%,rgba(7,12,22,.42)_35%,rgba(7,12,22,.86)_100%)]"></div>
@@ -774,7 +814,7 @@
           </article>
         </div>
 
-        <div class="mt-10 flex flex-col items-start justify-between gap-5 rounded-[28px] border border-brand-navy/10 bg-brand-navy px-6 py-6 text-white shadow-[0_24px_40px_rgba(32,56,99,.18)] sm:flex-row sm:items-center">
+        <div class="reveal mt-10 flex flex-col items-start justify-between gap-5 rounded-[28px] border border-brand-navy/10 bg-brand-navy px-6 py-6 text-white shadow-[0_24px_40px_rgba(32,56,99,.18)] sm:flex-row sm:items-center">
           <div class="max-w-2xl">
             <p class="font-display text-[1.55rem] font-extrabold uppercase leading-[.95] text-white sm:text-[1.8rem]">
               Non sai da dove partire?
@@ -805,7 +845,7 @@
               RISPARMIO
             </div>
 
-            <h2 class="mt-5 font-display text-5xl font-extrabold uppercase leading-[0.95] text-brand-navy sm:text-6xl">
+            <h2 class="reveal r-d1 mt-5 font-display text-5xl font-extrabold uppercase leading-[0.95] text-brand-navy sm:text-6xl">
               La tua bolletta<br />
               costa troppo.<br />
               <span class="inline-flex rounded-full bg-brand-navy px-3 py-1 text-brand-yellow shadow-[0_10px_24px_rgba(32,56,99,.14)]">HURKA!</span> che risparmio.
@@ -833,7 +873,7 @@
         <div class="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,.95fr)]">
 
           <!-- SINISTRA: PRIMA / DOPO -->
-          <div class="rounded-[32px] border border-brand-navy/10 bg-[linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.52)_45%,rgba(250,224,74,.10)_100%)] p-8 shadow-[0_24px_60px_rgba(32,56,99,.12)]">
+          <div class="reveal rounded-[32px] border border-brand-navy/10 bg-[linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.52)_45%,rgba(250,224,74,.10)_100%)] p-8 shadow-[0_24px_60px_rgba(32,56,99,.12)]">
             <div class="flex items-center justify-between gap-4">
               <div class="font-display text-3xl font-extrabold uppercase text-brand-navy">
                 Prima / Dopo
@@ -861,7 +901,7 @@
                   Prima
                 </div>
                 <div class="font-display text-[2.4rem] font-black uppercase leading-[.9] text-brand-navy">
-                  ~180€
+                  ~<span data-counter="180">180</span>€
                   <span class="block text-[.52em] text-brand-teal/70">/ mese</span>
                 </div>
                 <p class="mt-3 text-sm text-brand-teal/80">
@@ -876,7 +916,7 @@
                   Con HURKA!
                 </div>
                 <div class="font-display text-[2.4rem] font-black uppercase leading-[.9] text-white">
-                  ~130€
+                  ~<span data-counter="130">130</span>€
                   <span class="block text-[.52em] text-white/70">/ mese</span>
                 </div>
                 <p class="mt-3 text-sm text-white/75">
@@ -899,7 +939,7 @@
           </div>
 
           <!-- DESTRA: AZIONE + CTA -->
-          <div class="rounded-[32px] border border-white/10 bg-[#0b1528] p-8 text-white shadow-[0_28px_60px_rgba(0,0,0,.22)]">
+          <div class="reveal r-d1 rounded-[32px] border border-white/10 bg-[#0b1528] p-8 text-white shadow-[0_28px_60px_rgba(0,0,0,.22)]">
             <div class="inline-flex items-center gap-2 font-display text-[.72rem] font-bold uppercase tracking-[.2em] text-brand-yellow">
               Azione
               <span class="h-px w-10 bg-brand-yellow/60"></span>
@@ -963,7 +1003,7 @@
             <span class="h-px w-10 bg-white/45"></span>
             IL METODO <span class="font-display text-3xl font-extrabold tracking-[.08em] text-brand-yellow">HURKA!</span>
           </div>
-          <h2 class="mt-5 font-display text-5xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-6xl">
+          <h2 class="reveal r-d1 mt-5 font-display text-5xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-6xl">
             Dal problema<br />
             al risultato.<br />
             <span class="text-brand-yellow">Senza giri lunghi.</span>
@@ -1047,7 +1087,7 @@
         <span class="h-1.5 w-1.5 rounded-full bg-white/35"></span>
       </div>
 
-      <div class="mt-8 flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/[.06] p-6 backdrop-blur-sm lg:flex-row lg:items-center lg:justify-between">
+      <div class="reveal mt-8 flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/[.06] p-6 backdrop-blur-sm lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p class="font-display text-[1.45rem] font-extrabold uppercase leading-[.95] text-white">
             Lo stesso metodo, su problemi diversi.
@@ -1077,7 +1117,7 @@
             <span class="h-px w-12 bg-brand-teal/50"></span>
             CONTATTI
           </div>
-          <h2 class="mt-5 font-display text-5xl font-extrabold uppercase leading-[0.95] text-brand-navy sm:text-6xl">
+          <h2 class="reveal r-d1 mt-5 font-display text-5xl font-extrabold uppercase leading-[0.95] text-brand-navy sm:text-6xl">
             Dicci cosa<br />
             ti serve.<br />
             <span class="text-brand-yellow">Subito.</span>
@@ -1102,7 +1142,7 @@
           </div>
         </div>
 
-        <div class="relative z-10 rounded-[32px] border border-white/10 bg-[#0b1528] p-7 shadow-[0_28px_60px_rgba(0,0,0,.22)] lg:p-8">
+        <div class="reveal r-d1 relative z-10 rounded-[32px] border border-white/10 bg-[#0b1528] p-7 shadow-[0_28px_60px_rgba(0,0,0,.22)] lg:p-8">
           <div class="flex items-start justify-between gap-4">
             <div>
               <h3 class="font-display text-2xl font-extrabold uppercase text-white">Richiedi consulenza gratuita</h3>
@@ -1385,6 +1425,83 @@
       window.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') setOpen(false);
       });
+    })();
+
+    // --- HURKA! Animations ---
+
+    // 1. Scroll progress bar
+    (function(){
+      var bar = document.getElementById('scroll-progress');
+      if (!bar) return;
+      function tick(){
+        var d = document.documentElement;
+        var s = d.scrollTop || document.body.scrollTop;
+        var h = d.scrollHeight - d.clientHeight;
+        bar.style.width = (h > 0 ? Math.min(s / h * 100, 100) : 0) + '%';
+      }
+      window.addEventListener('scroll', tick, { passive: true });
+    })();
+
+    // 2. Hero entrance stagger
+    (function(){
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var h1 = document.querySelector('#hero h1');
+      if (!h1) return;
+      var p    = h1.nextElementSibling;
+      var ctas = p && p.nextElementSibling;
+      var textCol = h1.parentElement;
+      var logoCol = textCol && textCol.nextElementSibling;
+      [[logoCol, 0], [h1, 80], [p, 210], [ctas, 350]].forEach(function(pair){
+        var el = pair[0], delay = pair[1];
+        if (!el) return;
+        el.classList.add('hero-anim');
+        el.style.animationDelay = delay + 'ms';
+      });
+    })();
+
+    // 3. Section scroll reveal
+    (function(){
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var els = document.querySelectorAll('.reveal');
+      if (!els.length) return;
+      if (reduceMotion) {
+        els.forEach(function(el){ el.classList.add('is-visible'); });
+        return;
+      }
+      var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
+      els.forEach(function(el){ obs.observe(el); });
+    })();
+
+    // 4. Number counter
+    (function(){
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var els = document.querySelectorAll('[data-counter]');
+      if (!els.length) return;
+      function run(el){
+        var target = parseInt(el.getAttribute('data-counter'), 10);
+        var dur = 1100;
+        var t0  = performance.now();
+        (function tick(now){
+          var p = Math.min((now - t0) / dur, 1);
+          var e = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(e * target);
+          if (p < 1) requestAnimationFrame(tick);
+        })(t0);
+      }
+      var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if (!entry.isIntersecting) return;
+          run(entry.target);
+          obs.unobserve(entry.target);
+        });
+      }, { threshold: 0.6 });
+      els.forEach(function(el){ obs.observe(el); });
     })();
 
     // Contact form handler
