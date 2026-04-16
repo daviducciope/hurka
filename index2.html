@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script type="text/javascript" src="https://embeds.iubenda.com/widgets/cef9c003-836e-48a0-8064-e2893ed46300.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -62,6 +63,8 @@
       justify-content: space-between;
       padding: 0 5vw;
       height: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
     }
 
     #site-nav.scrolled {
@@ -1266,6 +1269,106 @@
 
     .footer-nav-list a:hover { color: var(--white); }
 
+    .footer-career-card {
+      width: 100%;
+      border: 1px solid rgba(250,224,74,.45);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(250,224,74,.15), rgba(250,224,74,.05));
+      padding: .9rem 1rem;
+      text-align: left;
+      color: inherit;
+      cursor: pointer;
+      transition: transform .18s, border-color .2s, box-shadow .2s;
+    }
+
+    .footer-career-card:hover {
+      transform: translateY(-1px);
+      border-color: var(--yellow);
+      box-shadow: 0 14px 30px rgba(250,224,74,.16);
+    }
+
+    .footer-career-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      margin-top: .35rem;
+    }
+
+    .footer-career-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.12rem;
+      font-weight: 800;
+      line-height: 1.05;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .footer-career-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--yellow);
+      color: var(--navy);
+      transition: transform .18s;
+    }
+
+    .footer-career-card:hover .footer-career-icon { transform: translateX(2px); }
+
+    .footer-career-copy {
+      margin-top: .4rem;
+      font-size: .75rem;
+      line-height: 1.45;
+      color: rgba(255,255,255,.6);
+    }
+
+    .footer-contact-box {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 1rem;
+    }
+
+    .footer-contact-label {
+      margin-bottom: .5rem;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+    }
+
+    .footer-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: .75rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: .03em;
+      color: var(--white);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .footer-phone:hover { color: var(--yellow); }
+
+    .footer-phone-icon {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: rgba(250,224,74,.15);
+      color: var(--yellow);
+      flex-shrink: 0;
+    }
+
     .footer-contact-item {
       display: flex;
       align-items: flex-start;
@@ -1300,7 +1403,18 @@
     .footer-copy {
       font-size: .78rem;
       color: rgba(255,255,255,.25);
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
     }
+
+    .footer-copy a {
+      color: rgba(255,255,255,.35);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .footer-copy a:hover { color: rgba(255,255,255,.6); }
 
     .footer-legal {
       display: flex;
@@ -1367,8 +1481,10 @@
     </a>
 
     <ul class="nav-links">
-      <li><a href="#servizi" data-section="servizi">Servizi</a></li>
+      <li><a href="servizi.html">Servizi</a></li>
       <li><a href="chi-siamo.html">Chi siamo</a></li>
+      <li><a href="/#metodo-hurka">Il metodo</a></li>
+      <li><a href="contatti.html">Contatti</a></li>
       <li>
         <a href="#contatti" class="nav-cta">
           Contattaci
@@ -1389,8 +1505,10 @@
 <!-- Mobile menu (sibling di nav, fuori dal fixed) -->
 <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
   <ul>
-    <li><a href="#servizi" class="nav-mobile-link">Servizi</a></li>
+    <li><a href="servizi.html" class="nav-mobile-link">Servizi</a></li>
     <li><a href="chi-siamo.html" class="nav-mobile-link">Chi siamo</a></li>
+    <li><a href="/#metodo-hurka" class="nav-mobile-link">Il metodo</a></li>
+    <li><a href="contatti.html" class="nav-mobile-link">Contatti</a></li>
   </ul>
   <a href="#contatti" class="nav-mobile-cta nav-mobile-link">
     Contattaci
@@ -1737,7 +1855,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
 
-        <p class="form-privacy">Inviando accetti la nostra <a href="#" style="color:inherit;text-decoration:underline">Privacy Policy</a>. I tuoi dati non vengono ceduti a terzi.</p>
+        <p class="form-privacy">Inviando accetti la nostra <a href="privacy.html" style="color:inherit;text-decoration:underline">Privacy Policy</a>. I tuoi dati non vengono ceduti a terzi.</p>
 
       </form>
 
@@ -1789,39 +1907,37 @@
     <div>
       <div class="footer-col-title">Servizi</div>
       <ul class="footer-nav-list">
-        <li><a href="#servizi">Luce &amp; Gas</a></li>
-        <li><a href="#servizi">Efficientamento Energetico</a></li>
-        <li><a href="#servizi">Impianti Fotovoltaici</a></li>
-        <li><a href="#servizi">Pratiche GSE e Terna</a></li>
-        <li><a href="#servizi">Servizi ai Condomini</a></li>
+        <li><a href="servizi.html">Tutti i servizi</a></li>
+        <li><a href="luce-gas.html">Luce &amp; Gas</a></li>
+        <li><a href="fotovoltaico.html">Impianti Fotovoltaici</a></li>
+        <li><a href="comunita-energetica.html">Comunità Energetica (CER)</a></li>
+        <li><a href="servizi-condomini.html">Servizi ai Condomini</a></li>
       </ul>
     </div>
 
     <!-- Azienda col -->
     <div>
       <div class="footer-col-title">Azienda</div>
-      <ul class="footer-nav-list">
-        <li><a href="chi-siamo.html">Chi siamo</a></li>
-        <li><a href="chi-siamo.html#missione">Mission &amp; Vision</a></li>
-        <li><a href="#contatti">Lavora con noi</a></li>
-        <li><a href="https://hurka.consulting" target="_blank" rel="noopener">hurka.consulting</a></li>
-      </ul>
+      <button type="button" class="footer-career-card" onclick="document.getElementById('contatti')?.scrollIntoView({behavior:'smooth'})">
+        <div class="footer-career-row">
+          <span class="footer-career-title">Lavora con noi</span>
+          <span class="footer-career-icon">→</span>
+        </div>
+        <p class="footer-career-copy">Cerchiamo profili tecnici e commerciali per crescere insieme.</p>
+      </button>
     </div>
 
     <!-- Contatti col -->
     <div>
       <div class="footer-col-title">Contatti</div>
-      <div class="footer-contact-item">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(250,224,74,.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <a href="mailto:info@hurka.it">info@hurka.it</a>
-      </div>
-      <div class="footer-contact-item">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(250,224,74,.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <a href="mailto:info@hurka.consulting">info@hurka.consulting</a>
-      </div>
-      <div class="footer-contact-item">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(250,224,74,.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        <span><a href="https://hurka.it" target="_blank" rel="noopener">hurka.it</a> · <a href="https://hurka.consulting" target="_blank" rel="noopener">hurka.consulting</a></span>
+      <div class="footer-contact-box">
+        <div class="footer-contact-label">Telefono diretto</div>
+        <a href="tel:+393888668837" class="footer-phone">
+          <span class="footer-phone-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.62a2 2 0 0 1-.45 2.11L8 9.73a16 16 0 0 0 6.27 6.27l1.28-1.28a2 2 0 0 1 2.11-.45c.84.29 1.72.5 2.62.62A2 2 0 0 1 22 16.92z"/></svg>
+          </span>
+          +39 388 866 8837
+        </a>
       </div>
     </div>
 
@@ -1829,15 +1945,20 @@
 
   <!-- Bottom bar -->
   <div class="footer-bottom">
-    <span class="footer-copy">© 2025 HURKA! Consulenza Integrata — Tutti i diritti riservati</span>
+    <div class="footer-copy">
+      <span>© 2026 HURKA! Consulenza Integrata — Tutti i diritti riservati</span>
+      <a href="https://stacomunicazionedesign.it" target="_blank" rel="noopener">Powered by Stà Comunicazione &amp; Design</a>
+    </div>
     <nav class="footer-legal">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Cookie Policy</a>
-      <a href="#">Note legali</a>
+      <a href="https://www.iubenda.com/privacy-policy/66746788" class="iubenda-white iubenda-noiframe iubenda-embed" title="Privacy Policy ">Privacy Policy</a>
+      <a href="https://www.iubenda.com/privacy-policy/66746788/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed" title="Cookie Policy ">Cookie Policy</a>
+      <a href="note-legali.html">Note legali</a>
     </nav>
   </div>
 
 </footer>
+
+<script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>
 
 <script>
   /* ── Nav: scroll state ── */

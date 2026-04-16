@@ -57,6 +57,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script type="text/javascript" src="https://embeds.iubenda.com/widgets/cef9c003-836e-48a0-8064-e2893ed46300.js"></script>
 
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -264,6 +265,88 @@
       line-height: 1.74;
     }
 
+    #site-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      z-index: 50;
+      height: 70px;
+    }
+    #site-nav > div {
+      display: flex;
+      height: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding-left: 5vw;
+      padding-right: 5vw;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #site-nav ul {
+      display: none;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    #site-nav > div > a {
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+    #site-nav > div > a svg {
+      display: block;
+      height: 34px;
+      width: auto;
+    }
+    #site-nav > div > a img {
+      display: block;
+      height: 32px;
+      width: auto;
+    }
+    #site-nav ul a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .5rem 1rem;
+      color: rgba(255,255,255,.6);
+      text-decoration: none;
+      font-family: "Barlow Condensed", ui-sans-serif, system-ui;
+      font-size: .95rem;
+      font-weight: 600;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    #site-nav ul li:last-child a {
+      border-radius: 3px;
+      background: #fae04a;
+      color: #203863;
+      padding: .48rem 1.25rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+    #nav-hamburger {
+      display: flex;
+      height: 40px;
+      width: 40px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px;
+    }
+    @media (min-width: 768px) {
+      #site-nav ul {
+        display: flex;
+        align-items: center;
+        gap: .15rem;
+      }
+      #nav-hamburger { display: none; }
+    }
+
     #site-nav::after{
       content:"";
       position:absolute;
@@ -297,6 +380,22 @@
 
     .nav-link-tail:hover::after,
     .nav-link-tail.active::after{ transform:scaleX(1); }
+
+    #nav-mobile {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 70px;
+      z-index: 40;
+    }
+    #nav-mobile:not(.open) {
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+    }
+    @media (min-width: 768px) {
+      #nav-mobile { display: none; }
+    }
 
     .nav-hamburger-line{
       display:block;
@@ -495,10 +594,13 @@
           fino ai servizi per condomini — <strong class="font-semibold text-white">una sola consulenza per tutto.</strong>
         </p>
 
-        <div class="flex flex-wrap items-center gap-[.9rem] max-md:flex-col max-md:items-center">
-          
-          <a href="#contatti" class="inline-block rounded border-2 border-white/35 bg-transparent px-8 py-3 font-display text-[1.05rem] font-bold uppercase tracking-[.08em] text-white transition hover:-translate-y-0.5 hover:border-brand-yellow hover:text-brand-yellow hover:shadow-[0_8px_24px_rgba(0,0,0,.2)]">
-            Contattaci
+        <div class="flex flex-wrap items-center gap-[.9rem] max-md:flex-col max-md:items-stretch">
+          <a href="#" class="inline-flex items-center justify-center gap-2 rounded bg-brand-yellow px-8 py-3 font-display text-[1.05rem] font-bold uppercase tracking-[.08em] text-brand-navy transition hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_8px_24px_rgba(250,224,74,.35)]">
+            Risparmia sulla bolletta
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </a>
+          <a href="#servizi" class="inline-flex items-center justify-center gap-2 rounded border-2 border-white/35 bg-transparent px-8 py-3 font-display text-[1.05rem] font-bold uppercase tracking-[.08em] text-white transition hover:-translate-y-0.5 hover:border-brand-yellow hover:text-brand-yellow hover:shadow-[0_8px_24px_rgba(0,0,0,.2)]">
+            Scopri i servizi
           </a>
         </div>
 
@@ -569,7 +671,7 @@
             </p>
             <p class="mt-3 max-w-md text-sm leading-6 text-brand-teal/80">
               <span class="font-semibold text-brand-navy">Energia</span>, <span class="font-semibold text-brand-navy">fotovoltaico</span>,
-              <span class="font-semibold text-brand-navy">comunita energetiche</span> e <span class="font-semibold text-brand-navy">servizi ai condomini</span>,
+              <span class="font-semibold text-brand-navy">comunità energetiche</span> e <span class="font-semibold text-brand-navy">servizi ai condomini</span>,
               fino alla <span class="font-semibold text-brand-navy">consulenza per PA</span>:
               un unico metodo per ridurre
               <span class="font-semibold text-brand-navy">complessità</span>, <span class="font-semibold text-brand-navy">costi</span> e
@@ -643,7 +745,7 @@
                     Condomini,<br />CER &amp; PA
                   </h3>
                   <p class="mt-3 max-w-[34rem] text-white/72">
-                    Per contesti piu articolati serve una regia tecnica: adempimenti, comunità energetiche, supporto operativo e valutazioni sostenibili nel tempo.
+                    Per contesti più articolati serve una regia tecnica: adempimenti, comunità energetiche, supporto operativo e valutazioni sostenibili nel tempo.
                   </p>
                 </div>
                 <span class="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-yellow text-brand-navy shadow-[0_0_28px_rgba(250,224,74,.22)] sm:inline-flex">
@@ -723,7 +825,7 @@
             <p>
               Affianchiamo <span class="font-semibold text-brand-navy">aziende, condomini e Pubbliche Amministrazioni</span> con un approccio
               tecnico che unisce <span class="font-semibold text-brand-navy">monitoraggio energetico</span>, lettura dei consumi e scelta delle
-              soluzioni piu efficaci.
+              soluzioni più efficaci.
             </p>
             <p>
               Il nostro lavoro parte da un principio semplice: operare nell'<span class="font-semibold text-brand-navy">interesse reale del cliente</span>,
@@ -818,7 +920,7 @@
           </h2>
           <p class="mt-4 max-w-xl text-brand-teal/80">
             Bollette, impianti, scadenze, procedure: ogni richiesta parte da un punto critico.
-            Il nostro lavoro e <span class="font-semibold text-brand-navy">leggerlo bene</span>, <span class="font-semibold text-brand-navy">tagliare il rumore</span> e portarlo a soluzione.
+            Il nostro lavoro è <span class="font-semibold text-brand-navy">leggerlo bene</span>, <span class="font-semibold text-brand-navy">tagliare il rumore</span> e portarlo a soluzione.
           </p>
         </div>
 
@@ -828,7 +930,7 @@
             <span class="mt-1 inline-flex rounded-full bg-brand-navy px-3 py-1 text-[.8em] text-brand-yellow shadow-[0_10px_24px_rgba(32,56,99,.14)]">Solo problem solving.</span>
           </p>
           <p class="mt-3 max-w-md text-sm leading-6 text-brand-teal/80">
-            Se il <span class="font-semibold text-brand-navy">risparmio</span> non e reale, se il
+            Se il <span class="font-semibold text-brand-navy">risparmio</span> non è reale, se il
             <span class="font-semibold text-brand-navy">vantaggio</span> non si misura o se la
             <span class="font-semibold text-brand-navy">procedura</span> non regge, te lo diciamo subito.
           </p>
@@ -860,7 +962,7 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M6 3h12"/><path d="M5 11h14"/><rect x="6" y="11" width="12" height="9" rx="1.5"/><path d="M9 15h.01"/><path d="M12 15h.01"/><path d="M15 15h.01"/></svg>
             </span>
           </div>
-          <p class="mt-4 text-sm leading-6 text-brand-teal/80"><span class="font-semibold text-brand-navy">Ritorno incerto</span>. Dubbi su resa, progetto e sostenibilita.</p>
+          <p class="mt-4 text-sm leading-6 text-brand-teal/80"><span class="font-semibold text-brand-navy">Ritorno incerto</span>. Dubbi su resa, progetto e sostenibilità.</p>
           <ol class="mt-5 space-y-3 text-sm text-brand-teal/85">
             <li class="flex gap-3"><span class="flow-step">01</span><span><span class="font-semibold text-brand-navy">Analizziamo</span> consumi e superfici.</span></li>
             <li class="flex gap-3"><span class="flow-step">02</span><span><span class="font-semibold text-brand-navy">Progettiamo</span> la soluzione giusta.</span></li>
@@ -868,7 +970,7 @@
           </ol>
         </a>
 
-        <article class="flow-card rounded-[28px] border border-brand-navy/12 bg-[linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.72))] p-7 shadow-[0_18px_36px_rgba(32,56,99,.08)]" style="transition-delay:.18s">
+        <a href="servizi-condomini.html" class="flow-card block rounded-[28px] border border-brand-navy/12 bg-[linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.72))] p-7 shadow-[0_18px_36px_rgba(32,56,99,.08)]" style="transition-delay:.18s">
           <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand-yellow"></div>
           <div class="flex items-center justify-between gap-4">
             <h3 class="font-display text-[1.7rem] font-extrabold uppercase leading-[.95] text-brand-navy">Condomini</h3>
@@ -878,11 +980,11 @@
           </div>
           <p class="mt-4 text-sm leading-6 text-brand-teal/80"><span class="font-semibold text-brand-navy">Scadenze sparse</span>. <span class="font-semibold text-brand-navy">Urgenze tecniche</span>. Troppe pratiche aperte.</p>
           <ol class="mt-5 space-y-3 text-sm text-brand-teal/85">
-            <li class="flex gap-3"><span class="flow-step">01</span><span><span class="font-semibold text-brand-navy">Mappiamo</span> criticita e obblighi.</span></li>
-            <li class="flex gap-3"><span class="flow-step">02</span><span><span class="font-semibold text-brand-navy">Prioritizziamo</span> cio che sblocca subito.</span></li>
+            <li class="flex gap-3"><span class="flow-step">01</span><span><span class="font-semibold text-brand-navy">Mappiamo</span> criticità e obblighi.</span></li>
+            <li class="flex gap-3"><span class="flow-step">02</span><span><span class="font-semibold text-brand-navy">Prioritizziamo</span> ciò che sblocca subito.</span></li>
             <li class="flex gap-3"><span class="flow-step">03</span><span><span class="font-semibold text-brand-navy">Chiudiamo</span> il problema operativamente.</span></li>
           </ol>
-        </article>
+        </a>
 
         <a href="consulenza-pa.html" class="flow-card block rounded-[28px] border border-brand-navy/12 bg-[linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.72))] p-7 shadow-[0_18px_36px_rgba(32,56,99,.08)]" style="transition-delay:.26s">
           <div class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand-yellow"></div>
@@ -895,7 +997,7 @@
           <p class="mt-4 text-sm leading-6 text-brand-teal/80"><span class="font-semibold text-brand-navy">Decisioni da motivare</span>. Vincoli, dati e procedure da sostenere.</p>
           <ol class="mt-5 space-y-3 text-sm text-brand-teal/85">
             <li class="flex gap-3"><span class="flow-step">01</span><span><span class="font-semibold text-brand-navy">Leggiamo</span> dati, offerte e vincoli.</span></li>
-            <li class="flex gap-3"><span class="flow-step">02</span><span><span class="font-semibold text-brand-navy">Costruiamo</span> uno percorso sostenibile.</span></li>
+            <li class="flex gap-3"><span class="flow-step">02</span><span><span class="font-semibold text-brand-navy">Costruiamo</span> un percorso sostenibile.</span></li>
             <li class="flex gap-3"><span class="flow-step">03</span><span><span class="font-semibold text-brand-navy">Supportiamo</span> il percorso fino al raggiungimento del risultato.</span></li>
           </ol>
         </a>
@@ -955,7 +1057,7 @@
               <li class="flex gap-3"><span class="mt-1.5 h-2 w-2 rounded-full bg-brand-yellow"></span><span>Un <span class="font-semibold text-brand-navy">ufficio tecnico esterno</span>, non un altro intermediario</span></li>
             </ul>
 
-            
+
           </div>
         </div>
 
@@ -1043,7 +1145,7 @@
         </div>
         <p class="mt-5 max-w-[230px] text-sm leading-[1.65] text-white/35">
           Il tuo ufficio tecnico esterno per energia, fotovoltaico e servizi ai condomini.
-          Soluzioni integrate, risultati immediati. 
+          Soluzioni integrate, risultati immediati.
         </p>
         <div class="mt-7 flex gap-2.5">
           <a href="#" class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 transition hover:border-brand-yellow hover:bg-brand-yellow/10" aria-label="LinkedIn">
@@ -1072,7 +1174,7 @@
       <div class="order-2 md:order-none">
         <div class="mb-5 font-display text-[.72rem] font-bold uppercase tracking-[.22em] text-brand-yellow">Azienda</div>
         <button id="career-open" type="button" class="group w-full rounded-xl border border-brand-yellow/45 bg-[linear-gradient(135deg,rgba(250,224,74,.15),rgba(250,224,74,.05))] px-4 py-3 text-left transition hover:-translate-y-px hover:border-brand-yellow hover:shadow-[0_14px_30px_rgba(250,224,74,.16)]">
-         
+
           <div class="mt-2 flex items-center justify-between gap-3">
             <span class="font-display text-[1.12rem] font-extrabold uppercase leading-[1.05] text-white">Lavora con noi</span>
             <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-yellow text-brand-navy transition group-hover:translate-x-0.5">→</span>
@@ -1080,7 +1182,7 @@
           <p class="mt-1.5 text-xs text-white/60">Cerchiamo profili tecnici e commerciali per crescere insieme.</p>
         </button>
              </div>
-      
+
       <div class="order-3 md:order-none">
         <div class="mb-5 font-display text-[.72rem] font-bold uppercase tracking-[.22em] text-brand-yellow">Contatti</div>
         <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
@@ -1097,16 +1199,18 @@
 
     <div class="mx-auto flex max-w-[1100px] flex-col gap-4 px-[5vw] py-6 text-[.78rem] text-white/25 lg:flex-row lg:items-center lg:justify-between">
       <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-6">
-        <span>© 2025 HURKA! Consulenza Integrata — Tutti i diritti riservati</span>
+        <span>© 2026 HURKA! Consulenza Integrata — Tutti i diritti riservati</span>
         <a href="https://stacomunicazionedesign.it" target="_blank" rel="noopener" class="text-white/35 transition hover:text-white/60">Powered by Stà Comunicazione &amp; Design</a>
       </div>
-      <nav class="flex flex-wrap gap-6">
-        <a href="privacy.html" class="transition hover:text-white/55">Privacy Policy</a>
-        <a href="cookie-policy.html" class="transition hover:text-white/55">Cookie Policy</a>
+      <nav class="flex flex-wrap items-center gap-6 [&_.iubenda-embed]:transition [&_.iubenda-embed]:hover:text-white/55">
+        <a href="https://www.iubenda.com/privacy-policy/66746788" class="iubenda-white iubenda-noiframe iubenda-embed" title="Privacy Policy ">Privacy Policy</a>
+        <a href="https://www.iubenda.com/privacy-policy/66746788/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed" title="Cookie Policy ">Cookie Policy</a>
         <a href="note-legali.html" class="transition hover:text-white/55">Note legali</a>
       </nav>
     </div>
   </footer>
+
+  <script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>
 
   <div id="career-modal" class="pointer-events-none fixed inset-0 z-[80] hidden items-end justify-center bg-black/70 px-4 pb-4 pt-10 opacity-0 transition md:items-center">
     <div class="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(150deg,#0c1730_0%,#0b1528_62%,#091022_100%)] shadow-[0_30px_80px_rgba(0,0,0,.55)]">

@@ -184,6 +184,88 @@
       line-height: 1.76;
     }
 
+    #site-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      z-index: 50;
+      height: 70px;
+    }
+    #site-nav > div {
+      display: flex;
+      height: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding-left: 5vw;
+      padding-right: 5vw;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #site-nav ul {
+      display: none;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    #site-nav > div > a {
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+    #site-nav > div > a svg {
+      display: block;
+      height: 34px;
+      width: auto;
+    }
+    #site-nav > div > a img {
+      display: block;
+      height: 32px;
+      width: auto;
+    }
+    #site-nav ul a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .5rem 1rem;
+      color: rgba(255,255,255,.6);
+      text-decoration: none;
+      font-family: "Barlow Condensed", ui-sans-serif, system-ui;
+      font-size: .95rem;
+      font-weight: 600;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    #site-nav ul li:last-child a {
+      border-radius: 3px;
+      background: #fae04a;
+      color: #203863;
+      padding: .48rem 1.25rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+    #nav-hamburger {
+      display: flex;
+      height: 40px;
+      width: 40px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px;
+    }
+    @media (min-width: 768px) {
+      #site-nav ul {
+        display: flex;
+        align-items: center;
+        gap: .15rem;
+      }
+      #nav-hamburger { display: none; }
+    }
+
     #site-nav::after {
       content: "";
       position: absolute;
@@ -213,6 +295,22 @@
       transition: transform .25s cubic-bezier(.4,0,.2,1);
     }
     .nav-link-tail:hover::after { transform: scaleX(1); }
+
+    #nav-mobile {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 70px;
+      z-index: 40;
+    }
+    #nav-mobile:not(.open) {
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+    }
+    @media (min-width: 768px) {
+      #nav-mobile { display: none; }
+    }
 
     .nav-hamburger-line {
       display: block;
@@ -274,11 +372,16 @@
       </a>
 
       <ul class="hidden items-center gap-[.15rem] md:flex">
-        <li><a href="/servizi" class="nav-link-tail relative px-4 py-2 font-display text-[.95rem] font-semibold uppercase tracking-[.1em] text-white/60 transition hover:text-white">Servizi</a></li>
+        <li><a href="servizi.html" class="nav-link-tail relative px-4 py-2 font-display text-[.95rem] font-semibold uppercase tracking-[.1em] text-white/60 transition hover:text-white">Servizi</a></li>
         <li><a href="chi-siamo.html" class="nav-link-tail relative px-4 py-2 font-display text-[.95rem] font-semibold uppercase tracking-[.1em] text-white/60 transition hover:text-white">Chi siamo</a></li>
         <li><a href="/#metodo-hurka" class="nav-link-tail relative px-4 py-2 font-display text-[.95rem] font-semibold uppercase tracking-[.1em] text-white/60 transition hover:text-white">Il metodo</a></li>
         <li><a href="contatti.html" class="nav-link-tail relative px-4 py-2 font-display text-[.95rem] font-semibold uppercase tracking-[.1em] text-white/60 transition hover:text-white">Contatti</a></li>
-        <li><a href="#contatti" class="inline-flex items-center gap-2 rounded-[3px] bg-brand-yellow px-5 py-[.48rem] font-display text-[.95rem] font-bold uppercase tracking-[.08em] text-brand-navy transition hover:-translate-y-px hover:brightness-105 hover:shadow-[0_4px_18px_rgba(250,224,74,.35)]">Contattaci<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></a></li>
+        <li>
+          <a href="#contatti" class="inline-flex items-center gap-2 rounded-[3px] bg-brand-yellow px-5 py-[.48rem] font-display text-[.95rem] font-bold uppercase tracking-[.08em] text-brand-navy transition hover:-translate-y-px hover:brightness-105 hover:shadow-[0_4px_18px_rgba(250,224,74,.35)]">
+            Contattaci
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </a>
+        </li>
       </ul>
 
       <button id="nav-hamburger" class="flex h-10 w-10 flex-col justify-center gap-[6px] p-[6px] md:hidden" aria-label="Apri menu" aria-expanded="false">
@@ -291,12 +394,15 @@
 
   <div id="nav-mobile" class="pointer-events-none fixed left-0 right-0 top-[70px] z-40 translate-y-[-8px] border-t border-brand-yellow/10 bg-[rgba(6,14,28,.97)] px-[5vw] pb-8 pt-3 opacity-0 backdrop-blur-[20px] transition duration-300">
     <ul class="flex flex-col">
-      <li class="border-b border-white/5"><a href="/servizi" class="nav-mobile-link block py-[.6rem] font-display text-[2.2rem] font-bold uppercase tracking-[.04em] text-white/70 transition hover:pl-[.4rem] hover:text-brand-yellow">Servizi</a></li>
+      <li class="border-b border-white/5"><a href="servizi.html" class="nav-mobile-link block py-[.6rem] font-display text-[2.2rem] font-bold uppercase tracking-[.04em] text-white/70 transition hover:pl-[.4rem] hover:text-brand-yellow">Servizi</a></li>
       <li class="border-b border-white/5"><a href="chi-siamo.html" class="nav-mobile-link block py-[.6rem] font-display text-[2.2rem] font-bold uppercase tracking-[.04em] text-white/70 transition hover:pl-[.4rem] hover:text-brand-yellow">Chi siamo</a></li>
       <li class="border-b border-white/5"><a href="/#metodo-hurka" class="nav-mobile-link block py-[.6rem] font-display text-[2.2rem] font-bold uppercase tracking-[.04em] text-white/70 transition hover:pl-[.4rem] hover:text-brand-yellow">Il metodo</a></li>
       <li class="border-b border-white/5"><a href="contatti.html" class="nav-mobile-link block py-[.6rem] font-display text-[2.2rem] font-bold uppercase tracking-[.04em] text-white/70 transition hover:pl-[.4rem] hover:text-brand-yellow">Contatti</a></li>
     </ul>
-    <a href="#contatti" class="nav-mobile-link mt-6 inline-flex items-center gap-[.55rem] rounded bg-brand-yellow px-8 py-[.82rem] font-display text-[1.05rem] font-extrabold uppercase tracking-[.08em] text-brand-navy transition hover:-translate-y-px hover:brightness-105">Contattaci<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></a>
+    <a href="#contatti" class="nav-mobile-link mt-6 inline-flex items-center gap-[.55rem] rounded bg-brand-yellow px-8 py-[.82rem] font-display text-[1.05rem] font-extrabold uppercase tracking-[.08em] text-brand-navy transition hover:-translate-y-px hover:brightness-105">
+      Contattaci
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    </a>
   </div>
 
   <section class="relative flex min-h-[82vh] items-center overflow-hidden bg-[radial-gradient(circle_at_78%_28%,rgba(250,224,74,.12),transparent_18%),radial-gradient(circle_at_18%_18%,rgba(255,255,255,.04),transparent_26%),linear-gradient(120deg,#0a1425_0%,#132648_48%,#0b1528_100%)] pb-16 pt-[70px]">
@@ -686,31 +792,44 @@
           </svg>
         </div>
         <p class="mt-5 max-w-[230px] text-sm leading-[1.65] text-white/35">
-          Il tuo ufficio tecnico esterno per energia, fotovoltaico, comunità energetica e servizi ai condomini.
+          Il tuo ufficio tecnico esterno per energia, fotovoltaico e servizi ai condomini.
           Soluzioni integrate, risultati immediati.
         </p>
+        <div class="mt-7 flex gap-2.5">
+          <a href="#" class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 transition hover:border-brand-yellow hover:bg-brand-yellow/10" aria-label="LinkedIn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="#" class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 transition hover:border-brand-yellow hover:bg-brand-yellow/10" aria-label="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="mailto:info@hurka.it" class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 transition hover:border-brand-yellow hover:bg-brand-yellow/10" aria-label="Email">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+        </div>
       </div>
 
       <div class="order-1 md:order-none">
         <div class="mb-5 font-display text-[.72rem] font-bold uppercase tracking-[.22em] text-brand-yellow">Servizi</div>
         <ul class="space-y-3 text-sm text-white/45">
-          <li><a href="luce-gas.html" class="transition hover:text-white">Luce &amp; Gas</a></li>
-          <li><a href="fotovoltaico.html" class="transition hover:text-white">Impianti Fotovoltaici</a></li>
-          <li><a href="comunita-energetica.html" class="transition hover:text-white">Comunità Energetica (CER)</a></li>
-          <li><a href="servizi-condomini.html" class="transition hover:text-white">Servizi ai Condomini</a></li>
-          <li><a href="consulenza-pa.html" class="font-semibold text-brand-yellow/80 transition hover:text-brand-yellow">Consulenza PA</a></li>
+          <li><a href="servizi.html" class="transition hover:text-white">Tutti i servizi</a></li>
+          <li><a href="luce-gas.html" class="font-semibold text-brand-yellow/80 transition hover:text-brand-yellow">Luce &amp; Gas</a></li>
+          <li><a href="fotovoltaico.html" class="font-semibold text-brand-yellow/80 transition hover:text-brand-yellow">Impianti Fotovoltaici</a></li>
+          <li><a href="comunita-energetica.html" class="font-semibold text-brand-yellow/80 transition hover:text-brand-yellow">Comunità Energetica (CER)</a></li>
+          <li><a href="servizi-condomini.html" class="font-semibold text-brand-yellow/80 transition hover:text-brand-yellow">Servizi ai Condomini</a></li>
         </ul>
       </div>
 
       <div class="order-2 md:order-none">
         <div class="mb-5 font-display text-[.72rem] font-bold uppercase tracking-[.22em] text-brand-yellow">Azienda</div>
-        <ul class="space-y-3 text-sm text-white/45">
-          <li><a href="chi-siamo.html" class="transition hover:text-white">Chi siamo</a></li>
-          <li><a href="/#metodo-hurka" class="transition hover:text-white">Il metodo HURKA!</a></li>
-          <li><a href="contatti.html" class="transition hover:text-white">Contatti</a></li>
-          <li><a href="/" class="transition hover:text-white">Home</a></li>
-        </ul>
-      </div>
+        <button id="career-open" type="button" class="group w-full rounded-xl border border-brand-yellow/45 bg-[linear-gradient(135deg,rgba(250,224,74,.15),rgba(250,224,74,.05))] px-4 py-3 text-left transition hover:-translate-y-px hover:border-brand-yellow hover:shadow-[0_14px_30px_rgba(250,224,74,.16)]">
+
+          <div class="mt-2 flex items-center justify-between gap-3">
+            <span class="font-display text-[1.12rem] font-extrabold uppercase leading-[1.05] text-white">Lavora con noi</span>
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-yellow text-brand-navy transition group-hover:translate-x-0.5">→</span>
+          </div>
+          <p class="mt-1.5 text-xs text-white/60">Cerchiamo profili tecnici e commerciali per crescere insieme.</p>
+        </button>
+             </div>
 
       <div class="order-3 md:order-none">
         <div class="mb-5 font-display text-[.72rem] font-bold uppercase tracking-[.22em] text-brand-yellow">Contatti</div>
@@ -728,7 +847,7 @@
 
     <div class="mx-auto flex max-w-[1100px] flex-col gap-4 px-[5vw] py-6 text-[.78rem] text-white/25 lg:flex-row lg:items-center lg:justify-between">
       <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-6">
-        <span>© 2025 HURKA! Consulenza Integrata — Tutti i diritti riservati</span>
+        <span>© 2026 HURKA! Consulenza Integrata — Tutti i diritti riservati</span>
         <a href="https://stacomunicazionedesign.it" target="_blank" rel="noopener" class="text-white/35 transition hover:text-white/60">Powered by Stà Comunicazione &amp; Design</a>
       </div>
       <nav class="flex flex-wrap items-center gap-6 [&_.iubenda-embed]:transition [&_.iubenda-embed]:hover:text-white/55">
@@ -740,6 +859,80 @@
   </footer>
 
   <script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>
+
+  <div id="career-modal" class="pointer-events-none fixed inset-0 z-[80] hidden items-end justify-center bg-black/70 px-4 pb-4 pt-10 opacity-0 transition md:items-center">
+    <div class="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(150deg,#0c1730_0%,#0b1528_62%,#091022_100%)] shadow-[0_30px_80px_rgba(0,0,0,.55)]">
+      <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(250,224,74,.20),transparent_26%)]"></div>
+      <div class="relative p-6 sm:p-7">
+        <div class="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 font-display text-[.72rem] font-bold uppercase tracking-[.2em] text-brand-yellow">
+              Recruiting HURKA!
+              <span class="h-px w-7 bg-brand-yellow/60"></span>
+            </div>
+            <h3 class="mt-2 font-display text-3xl font-extrabold uppercase leading-[.95] text-white">Candidati ora</h3>
+            <p class="mt-2 text-sm text-white/65">Cerchiamo persone pratiche, affidabili e orientate al risultato.</p>
+          </div>
+          <button type="button" data-career-close class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 text-white/75 transition hover:border-brand-yellow hover:text-brand-yellow" aria-label="Chiudi modale">✕</button>
+        </div>
+        <div class="space-y-4 text-sm leading-6 text-white/75">
+          <p>
+            In HURKA! lavoriamo su <span class="font-semibold text-white">luce e gas</span>, <span class="font-semibold text-white">fotovoltaico</span>,
+            <span class="font-semibold text-white">servizi ai condomini</span> e <span class="font-semibold text-white">supporto tecnico per PA</span>.
+          </p>
+          <p>
+            Cerchiamo profili <span class="font-semibold text-white">tecnici</span>, <span class="font-semibold text-white">commerciali</span> e
+            <span class="font-semibold text-white">operativi</span> capaci di leggere problemi reali, proporre soluzioni concrete e seguire il cliente fino al risultato.
+          </p>
+          <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div class="mb-2 font-display text-[.78rem] font-bold uppercase tracking-[.16em] text-brand-yellow">Cosa valorizziamo</div>
+            <ul class="space-y-1.5 text-white/70">
+              <li>Approccio pratico e orientamento al cliente</li>
+              <li>Autonomia operativa e responsabilita</li>
+              <li>Formazione e crescita continua</li>
+            </ul>
+          </div>
+          <a href="#contatti" data-career-close class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-yellow px-6 py-3 font-display text-[.95rem] font-extrabold uppercase tracking-[.08em] text-brand-navy transition hover:brightness-95">
+            Candidati dalla sezione contatti
+            <span>→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const openBtn = document.getElementById('career-open');
+      const modal = document.getElementById('career-modal');
+      const closeBtns = document.querySelectorAll('[data-career-close]');
+
+      if (!openBtn || !modal) return;
+
+      function setOpen(open) {
+        modal.classList.toggle('hidden', !open);
+        modal.classList.toggle('flex', open);
+        modal.classList.toggle('pointer-events-none', !open);
+        modal.classList.toggle('opacity-0', !open);
+        modal.classList.toggle('opacity-100', open);
+        document.body.classList.toggle('overflow-hidden', open);
+      }
+
+      openBtn.addEventListener('click', function() { setOpen(true); });
+
+      closeBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() { setOpen(false); });
+      });
+
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) setOpen(false);
+      });
+
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') setOpen(false);
+      });
+    })();
+  </script>
 
   <script>
     (function() {
