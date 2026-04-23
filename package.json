@@ -1,0 +1,12 @@
+{
+  "name": "hurka",
+  "private": true,
+  "scripts": {
+    "test:bill-analysis": "node --test check-bolletta-beta/tests/bill-analysis.test.mjs",
+    "test:bill-integration": "node check-bolletta-beta/scripts/run-integration-scenarios.mjs",
+    "test:bill-e2e": "playwright test -c check-bolletta-beta/playwright.config.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}

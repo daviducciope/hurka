@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Check Bolletta Beta Privata | HURKA!</title>
+  <meta name="description" content="Beta privata HURKA per analizzare la bolletta, capire il prezzo e stimare il risparmio con verifica gratuita." />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet" />
+  <meta name="bill-analysis-api-base" content="" />
+  <meta name="theme-color" content="#203863" />
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" sizes="any" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" sizes="180x180" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RZDLBD9VEM"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RZDLBD9VEM');
+  </script>
+  <style>
+    :root {
+      --navy: #203863;
+      --navy-deep: #14233f;
+      --yellow: #fae04a;
+      --teal: #304f4f;
+      --cream: #f5f2ea;
+      --ink: #101a2c;
+      --line: rgba(16, 26, 44, 0.12);
+      --shadow: 0 24px 80px rgba(10, 18, 34, 0.16);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Barlow", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(250, 224, 74, 0.22), transparent 28%),
+        linear-gradient(180deg, #eef2f7 0%, #faf8f4 40%, #ffffff 100%);
+    }
+
+    a { color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .45rem .8rem;
+      border-radius: 999px;
+      background: rgba(32, 56, 99, 0.09);
+      color: var(--navy);
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(245, 242, 234, 0.82);
+      border-bottom: 1px solid rgba(32, 56, 99, 0.08);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 72px;
+    }
+
+    .brand-lockup {
+      display: inline-flex;
+      align-items: center;
+      gap: .9rem;
+      text-decoration: none;
+    }
+
+    .brand-lockup img { height: 30px; }
+
+    .beta-pill {
+      padding: .45rem .75rem;
+      border-radius: 999px;
+      background: var(--navy);
+      color: white;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      padding: 4.5rem 0 2.5rem;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+
+    .hero-copy,
+    .hero-panel,
+    .section-card,
+    .form-shell,
+    .results-shell,
+    .faq-item {
+      border: 1px solid rgba(32, 56, 99, 0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-copy {
+      position: relative;
+      overflow: hidden;
+      padding: 2rem;
+      border-radius: 34px;
+      background: linear-gradient(145deg, rgba(20, 35, 63, 0.98), rgba(32, 56, 99, 0.96));
+      color: white;
+    }
+
+    .hero-copy::after {
+      content: "";
+      position: absolute;
+      inset: auto -8% -28% auto;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(250, 224, 74, 0.5) 0%, rgba(250, 224, 74, 0) 70%);
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      font-family: "Barlow Condensed", sans-serif;
+      line-height: .95;
+      letter-spacing: -.02em;
+    }
+
+    h1 {
+      margin-top: 1rem;
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      max-width: 10ch;
+    }
+
+    .hero-copy p {
+      max-width: 56ch;
+      margin: 1.2rem 0 0;
+      font-size: 1.1rem;
+      line-height: 1.72;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .9rem;
+      margin-top: 1.6rem;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .secondary-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+      min-height: 52px;
+      padding: .9rem 1.25rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .18s ease, background-color .18s ease, border-color .18s ease;
+    }
+
+    .primary-btn {
+      background: var(--yellow);
+      color: var(--navy);
+    }
+
+    .secondary-btn,
+    .secondary-link {
+      background: rgba(255,255,255,0.06);
+      color: white;
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover,
+    .secondary-link:hover {
+      transform: translateY(-1px);
+    }
+
+    .microcopy {
+      margin-top: .85rem;
+      font-size: .95rem;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 1rem;
+      padding: 1.5rem;
+      border-radius: 34px;
+      background: rgba(255,255,255,0.84);
+    }
+
+    .panel-stat {
+      padding: 1rem 1.1rem;
+      border-radius: var(--radius-lg);
+      background: white;
+      border: 1px solid rgba(32, 56, 99, 0.08);
+    }
+
+    .panel-stat span {
+      display: block;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(16, 26, 44, 0.6);
+    }
+
+    .panel-stat strong {
+      display: block;
+      margin-top: .5rem;
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 2.2rem;
+      color: var(--navy);
+    }
+
+    .process-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .9rem;
+      margin-top: 1rem;
+    }
+
+    .process-step {
+      padding: 1rem;
+      border-radius: var(--radius-lg);
+      background: rgba(32, 56, 99, 0.06);
+      border: 1px solid transparent;
+    }
+
+    .process-step[data-active="true"] {
+      border-color: rgba(250, 224, 74, 0.8);
+      background: rgba(250, 224, 74, 0.16);
+    }
+
+    .section {
+      padding: 1.3rem 0 0;
+    }
+
+    .section-grid,
+    .result-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .section-grid-two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .section-card,
+    .result-card {
+      padding: 1.4rem;
+      border-radius: var(--radius-xl);
+      background: rgba(255,255,255,0.88);
+    }
+
+    .section-card p,
+    .result-card p {
+      margin: .7rem 0 0;
+      line-height: 1.7;
+      color: rgba(16, 26, 44, 0.8);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .form-shell,
+    .results-shell {
+      padding: 1.4rem;
+      border-radius: 30px;
+      background: rgba(255,255,255,0.9);
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .9rem;
+      margin-top: 1rem;
+    }
+
+    .field,
+    .upload-field {
+      display: grid;
+      gap: .45rem;
+    }
+
+    .field label,
+    .upload-field label,
+    .checkbox-row label {
+      font-size: .9rem;
+      font-weight: 600;
+      color: rgba(16, 26, 44, 0.86);
+    }
+
+    .field input,
+    .field select,
+    .upload-field input {
+      width: 100%;
+      min-height: 52px;
+      padding: .9rem 1rem;
+      border-radius: 16px;
+      border: 1px solid rgba(32, 56, 99, 0.16);
+      background: white;
+      font: inherit;
+      color: var(--ink);
+    }
+
+    .upload-box {
+      padding: 1rem;
+      border-radius: 24px;
+      border: 1.5px dashed rgba(32, 56, 99, 0.22);
+      background: linear-gradient(180deg, rgba(250, 224, 74, 0.13), rgba(255, 255, 255, 0.9));
+    }
+
+    .checkbox-row {
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      margin-top: .9rem;
+    }
+
+    .checkbox-row input {
+      margin-top: .2rem;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--navy);
+    }
+
+    .helper,
+    .privacy-note,
+    .status-note {
+      font-size: .92rem;
+      line-height: 1.65;
+      color: rgba(16, 26, 44, 0.72);
+    }
+
+    .status-note {
+      margin-top: .9rem;
+      padding: .9rem 1rem;
+      border-radius: 16px;
+      background: rgba(32, 56, 99, 0.06);
+    }
+
+    .status-note[data-tone="error"] {
+      background: rgba(180, 34, 34, 0.09);
+      color: #821515;
+    }
+
+    .status-note[data-tone="warning"] {
+      background: rgba(250, 224, 74, 0.24);
+      color: #5d4a00;
+    }
+
+    .result-state {
+      min-height: 320px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border-radius: var(--radius-xl);
+      border: 1px dashed rgba(32, 56, 99, 0.18);
+      background: rgba(32, 56, 99, 0.03);
+    }
+
+    .loading-shell {
+      max-width: 42ch;
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .55rem .9rem;
+      border-radius: 999px;
+      background: rgba(32, 56, 99, 0.08);
+      color: var(--navy);
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .ai-spinner {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(32, 56, 99, 0.18);
+      border-top-color: var(--yellow);
+      animation: spin .85s linear infinite;
+    }
+
+    .loading-steps {
+      display: grid;
+      gap: .75rem;
+      margin-top: 1rem;
+      text-align: left;
+    }
+
+    .loading-step {
+      padding: .9rem 1rem;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.84);
+      border: 1px solid rgba(32, 56, 99, 0.08);
+      color: rgba(16, 26, 44, 0.82);
+      font-size: .95rem;
+    }
+
+    .loading-step strong {
+      display: block;
+      margin-bottom: .2rem;
+      color: var(--navy);
+    }
+
+    .result-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 1rem;
+    }
+
+    .result-card-primary {
+      grid-column: 1 / -1;
+      background: linear-gradient(140deg, rgba(20, 35, 63, 0.98), rgba(32, 56, 99, 0.95));
+      color: white;
+    }
+
+    .result-card-primary p,
+    .result-card-primary .eyebrow {
+      color: rgba(255,255,255,0.82);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .result-card h3 {
+      margin-top: .5rem;
+      font-size: 2rem;
+      color: var(--navy);
+    }
+
+    .result-card-primary h3 { color: white; }
+
+    .inline-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.1rem;
+    }
+
+    .inline-metrics div {
+      min-width: 170px;
+      padding: .9rem 1rem;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .inline-metrics span {
+      display: block;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .inline-metrics strong {
+      display: block;
+      margin-top: .4rem;
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 2rem;
+    }
+
+    .result-list {
+      margin: .8rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .result-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .75rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .result-note {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-top: 1rem;
+      padding: .9rem 1rem;
+      border-radius: 18px;
+      background: rgba(48, 79, 79, 0.08);
+      color: rgba(16, 26, 44, 0.82);
+    }
+
+    footer {
+      padding: 2rem 0 3rem;
+      color: rgba(16, 26, 44, 0.72);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid,
+      .section-grid,
+      .section-grid-two,
+      .form-grid,
+      .result-grid,
+      .field-grid,
+      .process-strip {
+        grid-template-columns: 1fr;
+      }
+
+      h1 { max-width: 12ch; }
+      .topbar-inner { flex-direction: column; justify-content: center; padding: .9rem 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand-lockup" href="../index.html" aria-label="HURKA! home">
+        <img src="../lg_hurka.svg" alt="HURKA!" />
+        <span class="eyebrow">Beta privata di validazione lead</span>
+      </a>
+      <span class="beta-pill">Noindex / accesso diretto</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Check-up tecnico commerciale</span>
+          <h1>Usa la AI per risparmiare con HURKA!</h1>
+          <p>Carica la bolletta e ricevi una lettura chiara del prezzo, delle voci che pesano di piu e del margine di risparmio possibile. La beta resta privata, ma il flusso di analisi e reale.</p>
+          <div class="cta-row">
+            <a class="primary-btn" href="#upload-form">Carica bolletta</a>
+            <button class="secondary-btn" type="button" data-example-button>Guarda un esempio</button>
+          </div>
+          <div class="microcopy">PDF o foto. La AI legge il documento, estrae i dati e prepara la sintesi finale. Supporto a PDF, JPG e PNG fino a 10 MB.</div>
+          <div class="process-strip">
+            <div class="process-step" data-progress-step="upload" data-progress-step-label="Upload" data-progress-step data-active="true">
+              <strong>1. Upload</strong>
+              <p>Carichi il documento e lasci il contatto.</p>
+            </div>
+            <div class="process-step" data-progress-step="analysis" data-active="false">
+              <strong>2. Analisi</strong>
+              <p>Leggiamo le voci principali e stimiamo il margine.</p>
+            </div>
+            <div class="process-step" data-progress-step="done" data-active="false">
+              <strong>3. Verifica HURKA</strong>
+              <p>Se serve, passi subito a un consulente.</p>
+            </div>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="Metriche beta">
+          <img src="../assets/bolletta-risparmio-energia.jpg" alt="Analisi bolletta HURKA" style="border-radius:24px; min-height:240px; object-fit:cover;" />
+          <div class="panel-stat">
+            <span>Claim</span>
+            <strong>Usa la AI per risparmiare HURKA!</strong>
+          </div>
+          <div class="panel-stat">
+            <span>Cosa capisci</span>
+            <strong>Importo, offerta, voci di costo</strong>
+          </div>
+          <div class="panel-stat">
+            <span>Output</span>
+            <strong>Risparmio stimato + verifica HURKA</strong>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="upload-form">
+      <div class="container form-grid">
+        <div class="form-shell">
+          <span class="eyebrow">Upload e lead capture</span>
+          <h2 style="margin-top:.8rem;font-size:3rem;color:var(--navy);">Una bolletta dentro, una risposta utile fuori</h2>
+          <p class="helper">La AI legge il documento, estrae i dati principali e prepara una sintesi che ti dice se c'e davvero margine di risparmio.</p>
+          <form data-bill-form novalidate>
+            <div class="upload-box">
+              <div class="upload-field">
+                <label for="bill-file">Bolletta</label>
+                <input id="bill-file" name="billFile" type="file" accept=".pdf,image/jpeg,image/png,application/pdf" required />
+                <div class="helper" data-upload-hint>Accettiamo PDF, JPG, PNG fino a 10 MB.</div>
+              </div>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="nome">Nome e cognome</label>
+                <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Mario Rossi" required />
+              </div>
+              <div class="field">
+                <label for="telefono">Telefono</label>
+                <input id="telefono" name="telefono" type="tel" autocomplete="tel" placeholder="+39 388 866 8837" required />
+              </div>
+              <div class="field">
+                <label for="email">Email <span style="opacity:.6;">(facoltativa)</span></label>
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="nome@esempio.it" />
+              </div>
+              <div class="field">
+                <label for="comune">Comune fornitura</label>
+                <input id="comune" name="comune" type="text" autocomplete="address-level2" placeholder="Pescara" required />
+              </div>
+              <div class="field">
+                <label for="commodityHint">Tipo bolletta</label>
+                <select id="commodityHint" name="commodityHint">
+                  <option value="luce">Luce</option>
+                  <option value="gas">Gas</option>
+                  <option value="dual">Dual</option>
+                </select>
+              </div>
+            </div>
+            <div class="checkbox-row">
+              <input id="consent-analysis" name="consentAnalysis" type="checkbox" required />
+              <label for="consent-analysis">Autorizzo HURKA a usare i dati della bolletta per fornirmi l'analisi richiesta.</label>
+            </div>
+            <div class="checkbox-row">
+              <input id="consent-marketing" name="consentMarketing" type="checkbox" />
+              <label for="consent-marketing">Autorizzo il ricontatto commerciale successivo. Questo consenso e facoltativo e separato.</label>
+            </div>
+            <div class="privacy-note">Usiamo i dati della bolletta solo per l'analisi richiesta e, se lo autorizzi, per ricontattarti. Il consenso marketing non e pre-selezionato e non condiziona il risultato.</div>
+            <div class="cta-row" style="margin-top:1.2rem;">
+              <button class="primary-btn" type="submit" data-submit-button>Carica bolletta</button>
+              <a class="secondary-btn" href="https://wa.me/393888668837?text=Ciao%20HURKA!%2C%20vorrei%20usare%20la%20beta%20check%20bolletta." target="_blank" rel="noopener" data-whatsapp-link>WhatsApp diretto</a>
+            </div>
+            <div class="status-note" data-form-feedback hidden></div>
+          </form>
+        </div>
+
+        <aside class="results-shell" data-result-panel hidden>
+          <span class="eyebrow">Risultato</span>
+          <h2 style="margin-top:.8rem;font-size:3rem;color:var(--navy);">La AI sta leggendo la tua bolletta</h2>
+          <div class="result-state" data-result-state>
+            <div class="loading-shell">
+              <div class="ai-badge"><span class="ai-spinner" aria-hidden="true"></span>AI HURKA in elaborazione</div>
+              <h3 style="font-size:2rem;color:var(--navy);margin-top:1rem;">Carica la bolletta e attendi qualche secondo</h3>
+              <p style="max-width:38ch;margin:1rem auto 0;">Dopo l'upload vedrai una sintesi chiara: perche paghi questa cifra, cosa pesa di piu e quanto potresti risparmiare.</p>
+              <div class="loading-steps">
+                <div class="loading-step">
+                  <strong>1. Upload del documento</strong>
+                  Il file viene inviato al motore di analisi.
+                </div>
+                <div class="loading-step">
+                  <strong>2. Lettura AI della bolletta</strong>
+                  La AI estrae totale, consumi, offerta e voci di costo.
+                </div>
+                <div class="loading-step">
+                  <strong>3. Sintesi finale HURKA</strong>
+                  Prepariamo una risposta leggibile con risparmio stimato e prossimo passo.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div data-result-content hidden></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="privacy-note">Pagina non linkata. Meta <code>noindex,nofollow</code> gia impostati. Per contatti: <a href="mailto:info@hurka.it">info@hurka.it</a> oppure <a href="tel:+393888668837">+39 388 866 8837</a>.</div>
+    </div>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

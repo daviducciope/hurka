@@ -1,1 +1,5 @@
+node_modules/
+test-results/
+.codex
+check-bolletta-beta/aws_credential.md
 accessi_IAM_aws.md
