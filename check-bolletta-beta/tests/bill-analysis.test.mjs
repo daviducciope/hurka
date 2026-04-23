@@ -9,7 +9,7 @@ import {
   createMockAnalysis,
   validateUploadInput,
 } from '../bill-analysis-core.mjs';
-import { buildAnalysisMarkup } from '../ui-core.mjs';
+import { buildAnalysisMarkup, getEsitoOutcome } from '../ui-core.mjs';
 
 const lambdaModuleUrl = pathToFileURL(resolve(process.cwd(), 'lambda/index.mjs')).href;
 
@@ -542,6 +542,156 @@ test('bill-analysis endpoint preserves successful analysis when SendGrid fails',
     loaded.restore();
   }
 });
+
+// ── Tests per i 3 esiti finali in buildAnalysisMarkup ────────────────────────
+
+test('buildAnalysisMarkup esito A (match forte): mostra risparmio e CTA forte', () => {
+  const analysis = createAnalysisResult({
+    rawAnalysis: createStructuredAnalysis(),
+    meta: { mode: 'live', provider: 'xai', usedFallback: false },
+  });
+  // Inject a match
+  analysis.offerMatch = {
+    hasMatch: true,
+    topOffer: {
+      id: 'sinergas-biennale-luce-casa',
+      name: 'Biennale Luce Casa',
+      provider: 'Sinergas S.p.A.',
+      offerCode: '000753ESFML04XXP0094PB3181260416',
+      priceType: 'fixed_then_indexed',
+      greenEnergy: true,
+      quotaFissaAnnua: 144,
+      caveats: ['Fisso 24 mesi poi diventa PUN + spread'],
+      savings: { annual: 398, monthly: 33, percent: 33, currentAnnualVendorCost: 1201, hurkaAnnualCost: 803 },
+      calculationBasis: { annualConsumptionKwh: 3997, billingDays: 59, spesaMateriaSource: 'extracted', punReferenceUsed: null },
+      priceBasis: 'fixed',
+      perKwhEffective: 0.1649,
+    },
+    alternativeOffer: null,
+    noMatchReason: null,
+    calculatedAt: new Date().toISOString(),
+  };
+
+  assert.equal(getEsitoOutcome(analysis), 'match');
+
+  const html = buildAnalysisMarkup(analysis, { fallback: false });
+
+  // Esito card is present with match styling
+  assert.match(html, /esito-match/);
+  assert.match(html, /Offerta trovata/i);
+  // Risparmio visibile
+  assert.match(html, /398/);
+  // CTA forte WhatsApp
+  assert.match(html, /wa\.me.*Attiva/i);
+  // CTA soft richiamata
+  assert.match(html, /Richiedi richiamata/i);
+  // CTA consulente
+  assert.match(html, /consulente/i);
+  // Offerta name
+  assert.match(html, /Biennale Luce Casa/);
+  // Base calcolo presente
+  assert.match(html, /3997|kWh/);
+  // Nessuna promessa aggressiva
+  assert.ok(!html.includes('miglior fornitore assoluto'));
+  // Footer note corretto
+  assert.match(html, /Analisi reale completata\./);
+  // Detail section presente (provider_name Enel Energia)
+  assert.match(html, /Enel Energia/);
+});
+
+test('buildAnalysisMarkup esito B (nessuna convenienza): messaggio onesto, nessuna offerta', () => {
+  const analysis = createAnalysisResult({
+    rawAnalysis: createStructuredAnalysis(),
+    meta: { mode: 'live', provider: 'xai', usedFallback: false },
+  });
+  analysis.offerMatch = {
+    hasMatch: false,
+    topOffer: null,
+    alternativeOffer: null,
+    noMatchReason: 'Il profilo attuale non mostra un risparmio credibile con le offerte HURKA disponibili.',
+    calculatedAt: new Date().toISOString(),
+  };
+
+  assert.equal(getEsitoOutcome(analysis), 'no-match');
+
+  const html = buildAnalysisMarkup(analysis, { fallback: false });
+
+  assert.match(html, /esito-no-match/);
+  assert.match(html, /gi.+ competitivo|convenienza sufficiente/i);
+  // Nessun numero di risparmio inventato
+  assert.ok(!html.includes('esito-saving-big'));
+  // CTA soft (verifica gratuita comunque)
+  assert.match(html, /Verifica gratuita/i);
+  assert.match(html, /WhatsApp/i);
+  // Nessuna CTA aggressiva tipo "Attiva con HURKA"
+  assert.ok(!html.includes('Attiva con HURKA'));
+  // Footer note corretto
+  assert.match(html, /Analisi reale completata\./);
+  // Detail section
+  assert.match(html, /Enel Energia/);
+  // Prossimo passo con cta_recommendation
+  assert.match(html, /Richiedi una verifica/i);
+});
+
+test('buildAnalysisMarkup esito C (bassa confidenza): verifica assistita, nessuna offerta', () => {
+  const analysis = createAnalysisResult({
+    rawAnalysis: {
+      ...createStructuredAnalysis(),
+      extraction_confidence: 0.42,
+      spesa_materia_eur: 0,
+      quota_consumi_eur: 0,
+      quota_fissa_eur: 0,
+      quota_potenza_eur: 0,
+      consumption_total: 0,
+    },
+    meta: { mode: 'live', provider: 'xai', usedFallback: false },
+  });
+  analysis.offerMatch = {
+    hasMatch: false,
+    topOffer: null,
+    alternativeOffer: null,
+    noMatchReason: 'Confidenza di estrazione troppo bassa (42%) per un confronto affidabile. Verifica assistita consigliata.',
+    calculatedAt: new Date().toISOString(),
+  };
+
+  assert.equal(getEsitoOutcome(analysis), 'low-confidence');
+
+  const html = buildAnalysisMarkup(analysis, { fallback: false });
+
+  assert.match(html, /esito-low-conf/);
+  assert.match(html, /verifica assistita/i);
+  assert.match(html, /42%/);
+  // CTA primaria verso richiamata
+  assert.match(html, /Richiedi richiamata/i);
+  // CTA WhatsApp assistita
+  assert.match(html, /WhatsApp/i);
+  // Nessun match offerta
+  assert.ok(!html.includes('esito-match'));
+  assert.ok(!html.includes('Attiva con HURKA'));
+  // Footer note
+  assert.match(html, /Analisi reale completata\./);
+});
+
+test('getEsitoOutcome restituisce no-match quando offerMatch è assente', () => {
+  const analysis = createAnalysisResult({
+    rawAnalysis: createStructuredAnalysis(),
+    meta: { mode: 'live', provider: 'xai', usedFallback: false },
+  });
+  // offerMatch non impostato (come in unit test senza lambda)
+  assert.equal(getEsitoOutcome(analysis), 'no-match');
+});
+
+test('buildAnalysisMarkup fallback mostra nota Fallback beta attivo', () => {
+  const html = buildAnalysisMarkup(createAnalysisResult({
+    rawAnalysis: createStructuredAnalysis(),
+    meta: { mode: 'mock', provider: 'mock', usedFallback: true },
+  }), { fallback: true });
+
+  assert.match(html, /Fallback beta attivo\./);
+  assert.ok(!html.includes('Analisi reale completata.'));
+});
+
+// ── Test aggiornato regressione buildAnalysisMarkup ──────────────────────────
 
 test('analyzeBillWithGrok parses structured JSON returned in output content blocks', async () => {
   const structured = createStructuredAnalysis();

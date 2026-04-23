@@ -4,7 +4,7 @@ import {
   createMockAnalysis,
   validateUploadInput,
 } from './bill-analysis-core.mjs';
-import { buildAnalysisMarkup } from './ui-core.mjs';
+import { buildAnalysisMarkup, getEsitoOutcome } from './ui-core.mjs';
 
 const doc = typeof document !== 'undefined' ? document : null;
 const LOCAL_API_PORT = '4173';
@@ -103,10 +103,23 @@ async function postBillAnalysis(body) {
   throw lastError || new Error('Analisi non disponibile.');
 }
 
+function updateStep3Header(analysis) {
+  const h2 = doc?.querySelector('[data-step-panel="3"] .wizard-header h2');
+  if (!h2) return;
+  const outcome = getEsitoOutcome(analysis);
+  const headings = {
+    match: 'Abbiamo trovato un\'offerta migliore',
+    'no-match': 'Il tuo profilo è già competitivo',
+    'low-confidence': 'Serve una verifica assistita',
+  };
+  h2.textContent = headings[outcome] || 'Ecco cosa abbiamo trovato';
+}
+
 function renderAnalysis(analysis, { fallback = false } = {}) {
   if (!resultContent) return;
   resultContent.hidden = false;
   resultContent.innerHTML = buildAnalysisMarkup(analysis, { fallback });
+  updateStep3Header(analysis);
 }
 
 function handleFileSelection() {

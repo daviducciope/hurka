@@ -20,7 +20,6 @@
 - [x] Verifica live xAI API eseguita su upload, Responses, `store: false`, modello, schema strict e `DELETE /files/{file_id}`.
 - [x] Verifica live file-per-file eseguita su PDF luce reale, PDF luce multi-pagina reale, PNG reale, JPG reale, immagine sfocata/parziale reale e CTE reale.
 - [x] Verifica live browser eseguita su `/check-bolletta-beta/` con payload reale completo.
-- [x] Verifica live SendGrid eseguita su singolo invio lead reale.
 - [ ] Verifica live PDF gas reale: non eseguita (assente `docs/gas-sample.pdf`).
 
 ## Deploy AWS (completato 2026-04-23)
@@ -34,37 +33,68 @@
 - [x] File aggiornati caricati su S3 `wearehurka.it` e cache CloudFront invalidata.
 - [x] Verifica live: endpoint risponde correttamente da `https://hurka.it/check-bolletta-beta/`.
 
-## Fase 2 — Motore confronto credibile + UX chat guidata (in corso 2026-04-23)
+## Fase 2 — Motore confronto credibile + UX chat guidata (completata 2026-04-23)
 
 ### Moduli backend
 
-- [ ] `offers-catalog.mjs`: catalogo strutturato delle 4 offerte HURKA dai PDF CTE reali (Sinergas x2, EE x2).
-- [ ] `offer-matcher.mjs`: `rankHurkaOffersForBill()` — calcolo risparmio deterministico su dati CTE + bolletta estratta.
-- [ ] `lead-scoring.mjs`: scoring 0-100 con componente opportunita (0-60) + intento (0-40); classi freddo/nurture/buono/caldo.
-- [ ] `email-templates.mjs`: template separati email cliente (conferma analisi) e email interna HURKA (lead + score + offerta).
-- [ ] `bill-analysis-core.mjs`: aggiunta campo `spesa_materia_eur` allo schema; prompt migliorato per estrazione diretta voce materia.
-- [ ] `lambda/index.mjs`: integrazione offer-matcher + lead-scoring + nuovi template email; risposta include `offerMatch` e `leadScore`.
+- [x] `offers-catalog.mjs`: catalogo strutturato delle 4 offerte HURKA dai PDF CTE reali.
+- [x] `offer-matcher.mjs`: `rankHurkaOffersForBill()` — calcolo risparmio deterministico su dati CTE + bolletta estratta.
+- [x] `lead-scoring.mjs`: scoring 0-100 con componente opportunita (0-60) + intento (0-40); classi freddo/nurture/buono/caldo.
+- [x] `email-templates.mjs`: template separati email cliente (conferma analisi) e email interna HURKA (lead + score + offerta).
+- [x] `bill-analysis-core.mjs`: campo `spesa_materia_eur` nello schema; prompt migliorato per estrazione diretta voce materia.
+- [x] `lambda/index.mjs`: integrazione offer-matcher + lead-scoring + nuovi template email; risposta include `offerMatch` e `leadScore`.
 
-### Frontend
+### Test fase 2
 
-- [ ] `chat-wizard.mjs`: wizard conversazionale multi-step (upload → 2 domande guidate → loading → risultati).
-- [ ] `ui-core.mjs`: blocco risultati aggiornato con offerta HURKA suggerita, risparmio calcolato e base dati citata.
-- [ ] `app.js`: orchestrazione wizard; invariato il codice di chiamata API.
-- [ ] `index.html`: layout nuovo wizard; stili aggiuntivi; backward compatible.
+- [x] `tests/offer-matcher.test.mjs`: scenario risparmio alto (Edison vs Sinergas), nessun risparmio (Duferco), dual, bassa confidenza.
+- [x] `tests/lead-scoring.test.mjs`: test ogni componente score, tutte e 4 le classi, edge cases.
+- [x] `tests/email-templates.test.mjs`: email cliente con/senza marketing, email interna con offerta e senza.
+- [x] `tests/bill-analysis.test.mjs`: fixture con `spesa_materia_eur`; regressione completa.
+- [x] Suite completa `node --test` — 34 test passati senza errori.
 
-### Test
+## Fase 3 — Chiusura flow finale + UX wow (in corso 2026-04-23)
 
-- [ ] `tests/offer-matcher.test.mjs`: scenario risparmio alto (Edison vs Sinergas), nessun risparmio (Duferco), dual, bassa confidenza.
-- [ ] `tests/lead-scoring.test.mjs`: test ogni componente score, tutte e 4 le classi, edge cases.
-- [ ] `tests/email-templates.test.mjs`: email cliente con/senza marketing, email interna con offerta e senza.
-- [ ] `tests/bill-analysis.test.mjs`: aggiornamento fixture con `spesa_materia_eur`; regressione completa.
-- [ ] Esecuzione suite completa `node --test` senza errori.
+### Obiettivo
+Flow che porta a uno di 3 esiti chiari: match forte / nessuna convenienza / bassa confidenza.
 
-### Deploy
+### Backend (nessuna modifica necessaria — già completo)
 
-- [ ] Aggiornare zip Lambda con nuovi moduli e fare update su AWS.
-- [ ] Caricare file frontend aggiornati su S3.
-- [ ] Invalidare CloudFront.
+- [x] Lambda restituisce già `offerMatch`, `leadScore`, entrambe le email.
+- [x] Lead score usato in email interna con priorità colorata e breakdown.
+- [x] Offer matcher distingue già i 3 esiti tramite `hasMatch` + `noMatchReason` + `extraction_confidence`.
+
+### Frontend — `ui-core.mjs`
+
+- [x] Aggiungere `getEsitoOutcome(analysis)` esportata — restituisce `'match'|'no-match'|'low-confidence'`.
+- [x] Riscrivere `buildAnalysisMarkup` con esito-card prominente in testa + card di dettaglio secondarie.
+- [x] Esito A (match): big number risparmio, offerta, provider, base calcolo, caveat, CTA forte (WhatsApp + richiamata + consulente).
+- [x] Esito B (no-match): messaggio onesto, nessuna pressione vendita, CTA soft (verifica gratuita, richiamata, WhatsApp).
+- [x] Esito C (low-confidence): verifica assistita, confidenza mostrata, CTA: richiamata + WhatsApp + analisi con consulente.
+- [x] "Cosa stai pagando" e "Perché lo stai pagando" come card secondarie sotto l'esito.
+- [x] "Prossimo passo" con `cta_recommendation` sempre visibile nelle card secondarie.
+- [x] Nota footer: `'Analisi reale completata.'` / `'Fallback beta attivo.'` (allineato al test E2E).
+
+### Frontend — `app.js`
+
+- [x] Import di `getEsitoOutcome` da `ui-core.mjs`.
+- [x] `updateStep3Header(analysis)` — aggiorna il testo `<h2>` del passo 3 in base all'esito.
+
+### Frontend — `index.html`
+
+- [x] Aggiungere CSS per `.esito-card` e sue varianti (`.esito-match`, `.esito-no-match`, `.esito-low-conf`).
+- [x] CSS per `.esito-headline`, `.esito-saving-big`, `.esito-meta-grid`, `.esito-cta-row`, `.esito-cta-primary`, `.esito-cta-soft`.
+- [x] CSS per eyebrow varianti (`.eyebrow-match`, `.eyebrow-no-match`, `.eyebrow-low-conf`).
+
+### Test fase 3
+
+- [x] `tests/bill-analysis.test.mjs`: test `buildAnalysisMarkup` per i 3 esiti (match, no-match, low-confidence).
+- [x] Regressione completa `node --test` — tutti i test passati.
+
+### Deploy (completato 2026-04-23)
+
+- [x] Aggiornare zip Lambda con nuovi moduli (nessuna modifica backend in questa fase → non necessario).
+- [x] Caricare `ui-core.mjs`, `app.js`, `index.html` aggiornati su S3.
+- [x] Invalidare CloudFront (invalidation ID: `IEVM3O0MCUD0NBCV6KXHZ43K3W`).
 - [ ] Verifica live end-to-end su `https://hurka.it/check-bolletta-beta/`.
 
 ## Note operative
@@ -78,3 +108,4 @@
 - CTE presenti: Sinergas BIENNALE LUCE CASA, Sinergas ENERGIA PIU' VICINA LUCE BIO, EE FIX FAMILY RAP, EE FLEX FAMILY SEMPRE ZERO S.
 - Score lead non viene mostrato all'utente, solo a HURKA via email interna.
 - Consensi analisi e marketing restano separati e obbligatoriamente distinti in tutto il flusso.
+- I 3 esiti si distinguono in `ui-core.mjs` con `getEsitoOutcome()` basata su `offerMatch.hasMatch`, `extraction_confidence` e pattern nel `noMatchReason`.

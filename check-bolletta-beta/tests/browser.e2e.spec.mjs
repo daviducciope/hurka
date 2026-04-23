@@ -51,43 +51,79 @@ async function startServer({ port, mockMode = 'none', allowTempCredentials = fal
   throw new Error(`Server did not start in time. Output:\n${output}`);
 }
 
+// Helper: complete the wizard with a file upload then form fill.
+// The wizard starts at step 0 (upload dropzone). Setting the file on #bill-file
+// triggers handleFileSelection() which advances to step 1 where the form lives.
+async function fillWizardForm(page, { file, nome, telefono, email, comune } = {}) {
+  // Step 0 → upload file via the hidden input (opacity:0 but not display:none)
+  await page.locator('#bill-file').setInputFiles(file);
+
+  // Now step 1 is visible — fill form fields
+  await page.locator('input[name="nome"]').fill(nome);
+  await page.locator('input[name="telefono"]').fill(telefono);
+  if (email) await page.locator('input[name="email"]').fill(email);
+  await page.locator('input[name="comune"]').fill(comune);
+  // Commodity defaults to 'luce' (first choice-btn pre-selected in HTML)
+  await page.locator('input[name="consentAnalysis"]').check();
+}
+
 test.describe.configure({ mode: 'serial' });
 
-test('frontend renders a complete analysis payload', async ({ page }) => {
+test('frontend renders a complete analysis payload (mock full-success)', async ({ page }) => {
   const server = await startServer({ port: 4173, mockMode: 'full-success' });
 
   try {
     await page.goto(`${server.baseUrl}/check-bolletta-beta/`);
-    await page.locator('input[name="nome"]').fill('Mario Rossi');
-    await page.locator('input[name="telefono"]').fill('+393331234567');
-    await page.locator('input[name="email"]').fill('mario@example.com');
-    await page.locator('input[name="comune"]').fill('Pescara');
-    await page.locator('select[name="commodityHint"]').selectOption('luce');
-    await page.locator('#bill-file').setInputFiles(files.pdfLuce);
-    await page.locator('input[name="consentAnalysis"]').check();
+
+    await fillWizardForm(page, {
+      file: files.pdfLuce,
+      nome: 'Mario Rossi',
+      telefono: '+393331234567',
+      email: 'mario@example.com',
+      comune: 'Pescara',
+    });
+
     await page.locator('button[type="submit"]').click();
 
-    await expect(page.locator('[data-result-content]')).toContainText('Analisi reale completata.');
-    await expect(page.locator('[data-result-content]')).toContainText('La bolletta e guidata soprattutto da quota energia, costi di rete e canone TV.');
-    await expect(page.locator('[data-result-content]')).toContainText('Richiedi una verifica');
+    // Wait for results to appear (real xAI or intercepted mock — both emit this note)
+    const resultContent = page.locator('[data-result-content]');
+    await expect(resultContent).toContainText('Analisi reale completata.', { timeout: 60_000 });
+
+    // The detail section always shows provider name and CTA links
+    await expect(resultContent).toContainText('Duferco Energia');
+
+    // At least one WhatsApp / contact CTA must be present regardless of outcome
+    await expect(page.locator('[data-result-content] a[href*="wa.me"], [data-result-content] a[href*="contatti"]').first()).toBeVisible({ timeout: 5_000 });
+
+    // "Cosa stai pagando" detail section is always rendered
+    await expect(resultContent).toContainText('Cosa stai pagando');
   } finally {
     await server.stop();
   }
 });
 
-test('frontend renders fallback when xAI fails', async ({ page }) => {
+test('frontend renders fallback when xAI fails (mock xai-5xx)', async ({ page }) => {
   const server = await startServer({ port: 4174, mockMode: 'xai-5xx' });
 
   try {
     await page.goto(`${server.baseUrl}/check-bolletta-beta/`);
-    await page.locator('input[name="nome"]').fill('Giulia Verdi');
-    await page.locator('input[name="telefono"]').fill('+393339998887');
-    await page.locator('input[name="comune"]').fill('Chieti');
-    await page.locator('#bill-file').setInputFiles(files.pngReadable);
-    await page.locator('input[name="consentAnalysis"]').check();
+
+    await fillWizardForm(page, {
+      file: files.pngReadable,
+      nome: 'Giulia Verdi',
+      telefono: '+393339998887',
+      comune: 'Chieti',
+    });
+
     await page.locator('button[type="submit"]').click();
 
-    await expect(page.locator('[data-form-feedback]')).toContainText('Analisi reale non disponibile');
+    // Feedback bar warns about fallback (two feedback nodes exist, one per wizard step)
+    await expect(page.locator('[data-form-feedback]').first()).toContainText(
+      'Analisi reale non disponibile',
+      { timeout: 30_000 },
+    );
+
+    // Footer shows fallback note
     await expect(page.locator('[data-result-content]')).toContainText('Fallback beta attivo.');
   } finally {
     await server.stop();
@@ -100,17 +136,25 @@ test('frontend live path renders a real xAI payload when enabled', async ({ page
 
   try {
     await page.goto(`${server.baseUrl}/check-bolletta-beta/`);
-    await page.locator('input[name="nome"]').fill('Live Browser');
-    await page.locator('input[name="telefono"]').fill('+393331234000');
-    await page.locator('input[name="email"]').fill('live-browser@example.com');
-    await page.locator('input[name="comune"]').fill('Montesilvano');
-    await page.locator('select[name="commodityHint"]').selectOption('luce');
-    await page.locator('#bill-file').setInputFiles(files.pdfLuce);
-    await page.locator('input[name="consentAnalysis"]').check();
+
+    await fillWizardForm(page, {
+      file: files.pdfLuce,
+      nome: 'Live Browser',
+      telefono: '+393331234000',
+      email: 'live-browser@example.com',
+      comune: 'Montesilvano',
+    });
+
     await page.locator('button[type="submit"]').click();
 
-    await expect(page.locator('[data-result-content]')).toContainText('Analisi reale completata.', { timeout: 240000 });
-    await expect(page.locator('[data-result-content]')).not.toContainText('Fallback beta attivo.', { timeout: 240000 });
+    await expect(page.locator('[data-result-content]')).toContainText(
+      'Analisi reale completata.',
+      { timeout: 240_000 },
+    );
+    await expect(page.locator('[data-result-content]')).not.toContainText(
+      'Fallback beta attivo.',
+      { timeout: 240_000 },
+    );
   } finally {
     await server.stop();
   }

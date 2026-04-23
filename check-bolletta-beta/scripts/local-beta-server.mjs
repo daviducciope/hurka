@@ -121,6 +121,13 @@ globalThis.fetch = async (url, init = {}) => {
   return realFetch(url, init);
 };
 
+// In mock modes: set a dummy key so the lambda uses the real xAI pipeline path
+// (the intercepted fetch above prevents any real API call from reaching x.ai).
+// Always override, even if a real key exists in the environment.
+if (mockMode !== 'none') {
+  process.env.XAI_API_KEY = 'mock-key-browser-test';
+}
+
 const { handler } = await import('../../lambda/index.mjs');
 
 function contentTypeFor(filePath) {
@@ -141,7 +148,20 @@ async function serveStatic(req, res, pathname) {
     return;
   }
 
-  const body = await readFile(absolutePath);
+  let body = await readFile(absolutePath);
+
+  // When serving the beta HTML, override the API base so the browser uses the
+  // local server instead of the production endpoint. This prevents local E2E
+  // tests from leaking real PDF data to the live Lambda.
+  if (absolutePath.endsWith('check-bolletta-beta/index.html')) {
+    let html = body.toString('utf8');
+    html = html.replace(
+      /<meta name="bill-analysis-api-base" content="[^"]*"/,
+      '<meta name="bill-analysis-api-base" content=""',
+    );
+    body = Buffer.from(html, 'utf8');
+  }
+
   res.writeHead(200, { 'content-type': contentTypeFor(absolutePath) });
   res.end(body);
 }
