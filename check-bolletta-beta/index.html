@@ -7,7 +7,7 @@
   <meta name="description" content="Beta privata HURKA per analizzare la bolletta, capire il prezzo e stimare il risparmio con verifica gratuita." />
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
   <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet" />
-  <meta name="bill-analysis-api-base" content="" />
+  <meta name="bill-analysis-api-base" content="https://dewas95a1m.execute-api.eu-central-1.amazonaws.com" />
   <meta name="theme-color" content="#203863" />
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="icon" href="../favicon.svg" type="image/svg+xml" sizes="any" />
@@ -535,6 +535,294 @@
       to { transform: rotate(360deg); }
     }
 
+    /* ── Wizard ── */
+    .wizard-outer {
+      padding: 3rem 0 4rem;
+    }
+
+    .wizard-shell {
+      max-width: 780px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(32,56,99,0.09);
+      border-radius: 36px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .wizard-header {
+      padding: 2rem 2.5rem 1.4rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .wizard-header h2 {
+      margin-top: .6rem;
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      color: var(--navy);
+    }
+
+    .wizard-body {
+      padding: 2rem 2.5rem;
+    }
+
+    /* Step panels */
+    [data-step-panel] { transition: opacity .2s; }
+
+    /* Step 0 — upload */
+    .dropzone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .7rem;
+      min-height: 200px;
+      padding: 2rem;
+      border: 2px dashed rgba(32,56,99,0.22);
+      border-radius: 24px;
+      background: linear-gradient(180deg,rgba(250,224,74,0.10),rgba(255,255,255,0.8));
+      cursor: pointer;
+      text-align: center;
+      transition: border-color .2s, background .2s;
+    }
+
+    .dropzone:hover, .dropzone.drag-over {
+      border-color: var(--navy);
+      background: rgba(32,56,99,0.05);
+    }
+
+    .dropzone[data-has-file="true"] {
+      border-color: var(--teal);
+      background: rgba(48,79,79,0.06);
+    }
+
+    .dropzone-icon {
+      font-size: 2.8rem;
+    }
+
+    .dropzone h3 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: var(--navy);
+    }
+
+    .dropzone p {
+      margin: 0;
+      font-size: .92rem;
+      color: rgba(16,26,44,.65);
+    }
+
+    [data-file-name] {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    /* Step 1 — questions */
+    .question-block {
+      margin-bottom: 1.6rem;
+    }
+
+    .question-block h3 {
+      font-size: 1.1rem;
+      margin: 0 0 .75rem;
+      color: var(--navy);
+    }
+
+    .choice-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+    }
+
+    .choice-btn {
+      padding: .7rem 1.1rem;
+      border-radius: 999px;
+      border: 1.5px solid rgba(32,56,99,0.2);
+      background: white;
+      font: 600 .95rem/1 'Barlow', sans-serif;
+      color: var(--navy);
+      cursor: pointer;
+      transition: all .16s;
+    }
+
+    .choice-btn:hover { border-color: var(--navy); }
+
+    .choice-btn.selected {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+    }
+
+    /* Step 3 — results */
+    .result-card-match {
+      grid-column: 1 / -1;
+      background: linear-gradient(138deg,rgba(48,79,79,0.96),rgba(32,56,99,0.92));
+      color: white;
+    }
+
+    .result-card-match .eyebrow-green {
+      background: rgba(250,224,74,0.18);
+      color: var(--yellow);
+    }
+
+    .result-card-match h3 { color: white; }
+    .result-card-match p { color: rgba(255,255,255,.8); }
+
+    .result-card-no-match {
+      grid-column: 1 / -1;
+    }
+
+    .match-savings {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .match-savings-main {
+      flex: 1 1 200px;
+    }
+
+    .match-savings-main span {
+      display: block;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: rgba(255,255,255,.7);
+    }
+
+    .match-savings-main strong {
+      display: block;
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 3rem;
+      color: var(--yellow);
+      line-height: 1;
+    }
+
+    .match-savings-main strong small {
+      font-size: 1.4rem;
+    }
+
+    .match-savings-main em {
+      display: block;
+      font-style: normal;
+      font-size: .9rem;
+      color: rgba(255,255,255,.7);
+      margin-top: .3rem;
+    }
+
+    .match-savings-detail {
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+      flex: 1 1 160px;
+    }
+
+    .match-savings-detail div {
+      padding: .75rem 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .match-savings-detail span {
+      display: block;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: rgba(255,255,255,.6);
+    }
+
+    .match-savings-detail strong {
+      display: block;
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 1.5rem;
+      color: white;
+    }
+
+    .match-basis-note {
+      margin-top: 1rem;
+      font-size: .82rem;
+      color: rgba(255,255,255,.55);
+      font-style: italic;
+    }
+
+    .match-alt {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-top: .9rem;
+      padding: .75rem 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
+      font-size: .9rem;
+      color: rgba(255,255,255,.8);
+    }
+
+    .match-alt-label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+    }
+
+    .match-alt strong { flex: 1; }
+
+    .match-cta-row {
+      margin-top: 1.2rem;
+    }
+
+    .match-cta-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .85rem 1.6rem;
+      border-radius: 999px;
+      background: var(--yellow);
+      color: var(--navy);
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .16s;
+    }
+
+    .match-cta-primary:hover { transform: translateY(-1px); }
+
+    .match-cta-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      margin-top: .9rem;
+      padding: .7rem 1.2rem;
+      border-radius: 999px;
+      border: 1.5px solid rgba(32,56,99,0.18);
+      color: var(--navy);
+      font-weight: 600;
+      font-size: .95rem;
+      text-decoration: none;
+    }
+
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-bottom: .5rem;
+    }
+
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(32,56,99,0.18);
+      transition: background .2s;
+    }
+
+    [data-wizard][data-step="0"] .step-dot:nth-child(1),
+    [data-wizard][data-step="1"] .step-dot:nth-child(2),
+    [data-wizard][data-step="2"] .step-dot:nth-child(3),
+    [data-wizard][data-step="3"] .step-dot:nth-child(3) {
+      background: var(--navy);
+    }
+
     @media (max-width: 960px) {
       .hero-grid,
       .section-grid,
@@ -548,6 +836,7 @@
 
       h1 { max-width: 12ch; }
       .topbar-inner { flex-direction: column; justify-content: center; padding: .9rem 0; }
+      .wizard-body, .wizard-header { padding: 1.4rem; }
     }
   </style>
 </head>
@@ -563,133 +852,160 @@
   </header>
 
   <main>
-    <section class="hero">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <span class="eyebrow">Check-up tecnico commerciale</span>
-          <h1>Usa la AI per risparmiare con HURKA!</h1>
-          <p>Carica la bolletta e ricevi una lettura chiara del prezzo, delle voci che pesano di piu e del margine di risparmio possibile. La beta resta privata, ma il flusso di analisi e reale.</p>
-          <div class="cta-row">
-            <a class="primary-btn" href="#upload-form">Carica bolletta</a>
-            <button class="secondary-btn" type="button" data-example-button>Guarda un esempio</button>
-          </div>
-          <div class="microcopy">PDF o foto. La AI legge il documento, estrae i dati e prepara la sintesi finale. Supporto a PDF, JPG e PNG fino a 10 MB.</div>
-          <div class="process-strip">
-            <div class="process-step" data-progress-step="upload" data-progress-step-label="Upload" data-progress-step data-active="true">
-              <strong>1. Upload</strong>
-              <p>Carichi il documento e lasci il contatto.</p>
-            </div>
-            <div class="process-step" data-progress-step="analysis" data-active="false">
-              <strong>2. Analisi</strong>
-              <p>Leggiamo le voci principali e stimiamo il margine.</p>
-            </div>
-            <div class="process-step" data-progress-step="done" data-active="false">
-              <strong>3. Verifica HURKA</strong>
-              <p>Se serve, passi subito a un consulente.</p>
-            </div>
-          </div>
-        </div>
-        <aside class="hero-panel" aria-label="Metriche beta">
-          <img src="../assets/bolletta-risparmio-energia.jpg" alt="Analisi bolletta HURKA" style="border-radius:24px; min-height:240px; object-fit:cover;" />
-          <div class="panel-stat">
-            <span>Claim</span>
-            <strong>Usa la AI per risparmiare HURKA!</strong>
-          </div>
-          <div class="panel-stat">
-            <span>Cosa capisci</span>
-            <strong>Importo, offerta, voci di costo</strong>
-          </div>
-          <div class="panel-stat">
-            <span>Output</span>
-            <strong>Risparmio stimato + verifica HURKA</strong>
-          </div>
-        </aside>
-      </div>
-    </section>
+    <section class="wizard-outer">
+      <div class="container">
 
-    <section class="section" id="upload-form">
-      <div class="container form-grid">
-        <div class="form-shell">
-          <span class="eyebrow">Upload e lead capture</span>
-          <h2 style="margin-top:.8rem;font-size:3rem;color:var(--navy);">Una bolletta dentro, una risposta utile fuori</h2>
-          <p class="helper">La AI legge il documento, estrae i dati principali e prepara una sintesi che ti dice se c'e davvero margine di risparmio.</p>
-          <form data-bill-form novalidate>
-            <div class="upload-box">
-              <div class="upload-field">
-                <label for="bill-file">Bolletta</label>
-                <input id="bill-file" name="billFile" type="file" accept=".pdf,image/jpeg,image/png,application/pdf" required />
-                <div class="helper" data-upload-hint>Accettiamo PDF, JPG, PNG fino a 10 MB.</div>
-              </div>
-            </div>
-            <div class="field-grid">
-              <div class="field">
-                <label for="nome">Nome e cognome</label>
-                <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Mario Rossi" required />
-              </div>
-              <div class="field">
-                <label for="telefono">Telefono</label>
-                <input id="telefono" name="telefono" type="tel" autocomplete="tel" placeholder="+39 388 866 8837" required />
-              </div>
-              <div class="field">
-                <label for="email">Email <span style="opacity:.6;">(facoltativa)</span></label>
-                <input id="email" name="email" type="email" autocomplete="email" placeholder="nome@esempio.it" />
-              </div>
-              <div class="field">
-                <label for="comune">Comune fornitura</label>
-                <input id="comune" name="comune" type="text" autocomplete="address-level2" placeholder="Pescara" required />
-              </div>
-              <div class="field">
-                <label for="commodityHint">Tipo bolletta</label>
-                <select id="commodityHint" name="commodityHint">
-                  <option value="luce">Luce</option>
-                  <option value="gas">Gas</option>
-                  <option value="dual">Dual</option>
-                </select>
-              </div>
-            </div>
-            <div class="checkbox-row">
-              <input id="consent-analysis" name="consentAnalysis" type="checkbox" required />
-              <label for="consent-analysis">Autorizzo HURKA a usare i dati della bolletta per fornirmi l'analisi richiesta.</label>
-            </div>
-            <div class="checkbox-row">
-              <input id="consent-marketing" name="consentMarketing" type="checkbox" />
-              <label for="consent-marketing">Autorizzo il ricontatto commerciale successivo. Questo consenso e facoltativo e separato.</label>
-            </div>
-            <div class="privacy-note">Usiamo i dati della bolletta solo per l'analisi richiesta e, se lo autorizzi, per ricontattarti. Il consenso marketing non e pre-selezionato e non condiziona il risultato.</div>
-            <div class="cta-row" style="margin-top:1.2rem;">
-              <button class="primary-btn" type="submit" data-submit-button>Carica bolletta</button>
-              <a class="secondary-btn" href="https://wa.me/393888668837?text=Ciao%20HURKA!%2C%20vorrei%20usare%20la%20beta%20check%20bolletta." target="_blank" rel="noopener" data-whatsapp-link>WhatsApp diretto</a>
-            </div>
-            <div class="status-note" data-form-feedback hidden></div>
-          </form>
+        <!-- Hero tagline sopra il wizard -->
+        <div style="text-align:center;margin-bottom:2rem;">
+          <span class="eyebrow">Check bolletta · Beta privata HURKA</span>
+          <h1 style="margin:.7rem auto 0;max-width:18ch;font-size:clamp(2.4rem,5vw,4rem);color:var(--navy);">Carica la bolletta — ti spieghiamo perché stai pagando quella cifra</h1>
+          <p style="margin:.9rem auto 0;max-width:52ch;font-size:1.05rem;line-height:1.7;color:rgba(16,26,44,.7)">Nessun comparatore generico. Leggiamo la tua bolletta e, se c'è un'offerta HURKA davvero più conveniente, te la proponiamo con i numeri precisi.</p>
         </div>
 
-        <aside class="results-shell" data-result-panel hidden>
-          <span class="eyebrow">Risultato</span>
-          <h2 style="margin-top:.8rem;font-size:3rem;color:var(--navy);">La AI sta leggendo la tua bolletta</h2>
-          <div class="result-state" data-result-state>
-            <div class="loading-shell">
-              <div class="ai-badge"><span class="ai-spinner" aria-hidden="true"></span>AI HURKA in elaborazione</div>
-              <h3 style="font-size:2rem;color:var(--navy);margin-top:1rem;">Carica la bolletta e attendi qualche secondo</h3>
-              <p style="max-width:38ch;margin:1rem auto 0;">Dopo l'upload vedrai una sintesi chiara: perche paghi questa cifra, cosa pesa di piu e quanto potresti risparmiare.</p>
-              <div class="loading-steps">
-                <div class="loading-step">
-                  <strong>1. Upload del documento</strong>
-                  Il file viene inviato al motore di analisi.
+        <div class="wizard-shell" data-wizard data-step="0">
+
+          <!-- Step 0: upload -->
+          <div data-step-panel="0">
+            <div class="wizard-header">
+              <div class="step-indicator" aria-hidden="true">
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+              </div>
+              <span class="eyebrow">Passo 1 di 3</span>
+              <h2>Carica la bolletta</h2>
+            </div>
+            <div class="wizard-body">
+              <div class="dropzone" data-upload-dropzone role="button" tabindex="0" aria-label="Seleziona o trascina la bolletta">
+                <div class="dropzone-icon">📄</div>
+                <h3>Trascina qui la bolletta</h3>
+                <p>oppure clicca per selezionare il file</p>
+                <div data-file-name style="display:none"></div>
+                <div class="helper" data-upload-hint>PDF, JPG, PNG · max 10 MB</div>
+              </div>
+              <input id="bill-file" name="billFile" type="file" accept=".pdf,image/jpeg,image/png,application/pdf" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px" tabindex="-1" />
+              <div style="margin-top:1.4rem;display:flex;flex-wrap:wrap;gap:.7rem;align-items:center">
+                <button class="primary-btn" type="button" data-example-button style="background:rgba(32,56,99,0.08);color:var(--navy)">Guarda un esempio →</button>
+                <span style="font-size:.88rem;color:rgba(16,26,44,.55)">Analisi privata · dati usati solo per il check</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 1: 2 domande + form contatti -->
+          <div data-step-panel="1" hidden>
+            <div class="wizard-header">
+              <div class="step-indicator" aria-hidden="true">
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+              </div>
+              <span class="eyebrow">Passo 2 di 3</span>
+              <h2>Due domande veloci</h2>
+            </div>
+            <div class="wizard-body">
+              <form data-bill-form novalidate>
+                <!-- file hidden (già selezionato) -->
+                <input id="bill-file-hidden" name="billFile" type="file" accept=".pdf,image/jpeg,image/png,application/pdf" style="display:none" tabindex="-1" />
+
+                <div class="question-block">
+                  <h3>Cosa conta di più per te?</h3>
+                  <div class="choice-row">
+                    <button type="button" class="choice-btn selected" data-choice-group="preferenza" data-choice-value="risparmio">Risparmiare il più possibile</button>
+                    <button type="button" class="choice-btn" data-choice-group="preferenza" data-choice-value="stabilita">Prezzo fisso / certezza</button>
+                  </div>
+                  <input type="hidden" name="preferenza" value="risparmio" />
                 </div>
-                <div class="loading-step">
-                  <strong>2. Lettura AI della bolletta</strong>
-                  La AI estrae totale, consumi, offerta e voci di costo.
+
+                <div class="question-block">
+                  <h3>Quale fornitura vuoi analizzare?</h3>
+                  <div class="choice-row">
+                    <button type="button" class="choice-btn selected" data-choice-group="commodityHint" data-choice-value="luce">Solo luce</button>
+                    <button type="button" class="choice-btn" data-choice-group="commodityHint" data-choice-value="gas">Solo gas</button>
+                    <button type="button" class="choice-btn" data-choice-group="commodityHint" data-choice-value="dual">Luce + gas</button>
+                  </div>
+                  <input type="hidden" name="commodityHint" value="luce" />
                 </div>
-                <div class="loading-step">
-                  <strong>3. Sintesi finale HURKA</strong>
-                  Prepariamo una risposta leggibile con risparmio stimato e prossimo passo.
+
+                <div class="field-grid" style="margin-top:1.4rem">
+                  <div class="field">
+                    <label for="nome">Nome e cognome</label>
+                    <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Mario Rossi" required />
+                  </div>
+                  <div class="field">
+                    <label for="telefono">Telefono</label>
+                    <input id="telefono" name="telefono" type="tel" autocomplete="tel" placeholder="+39 388 866 8837" required />
+                  </div>
+                  <div class="field">
+                    <label for="email">Email <span style="opacity:.6">(facoltativa)</span></label>
+                    <input id="email" name="email" type="email" autocomplete="email" placeholder="mario@esempio.it" />
+                  </div>
+                  <div class="field">
+                    <label for="comune">Comune fornitura</label>
+                    <input id="comune" name="comune" type="text" autocomplete="address-level2" placeholder="Pescara" required />
+                  </div>
+                </div>
+
+                <div class="checkbox-row" style="margin-top:1.2rem">
+                  <input id="consent-analysis" name="consentAnalysis" type="checkbox" required />
+                  <label for="consent-analysis">Autorizzo HURKA a usare i dati della bolletta per fornirmi l'analisi richiesta.</label>
+                </div>
+                <div class="checkbox-row">
+                  <input id="consent-marketing" name="consentMarketing" type="checkbox" />
+                  <label for="consent-marketing">Acconsento al ricontatto commerciale. <span style="opacity:.65">(Facoltativo, separato dall'analisi.)</span></label>
+                </div>
+
+                <div class="privacy-note" style="margin-top:.9rem">Il consenso marketing non è pre-selezionato e non condiziona il risultato dell'analisi.</div>
+
+                <div class="cta-row" style="margin-top:1.4rem">
+                  <button class="primary-btn" type="submit" data-submit-button>Analizza la bolletta →</button>
+                  <a class="secondary-btn" href="https://wa.me/393888668837?text=Ciao%20HURKA!%2C%20vorrei%20un%20check%20gratuito%20sulla%20bolletta." target="_blank" rel="noopener" data-whatsapp-link style="background:rgba(32,56,99,0.08);color:var(--navy);border-color:transparent">WhatsApp diretto</a>
+                </div>
+                <div class="status-note" data-form-feedback hidden></div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Step 2: loading -->
+          <div data-step-panel="2" hidden>
+            <div class="wizard-header">
+              <div class="step-indicator" aria-hidden="true">
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+              </div>
+              <span class="eyebrow">Passo 3 di 3</span>
+              <h2>Lettura in corso…</h2>
+            </div>
+            <div class="wizard-body" data-loading-state>
+              <div style="text-align:center;padding:1.5rem 0">
+                <div class="ai-badge" style="margin-bottom:1.2rem"><span class="ai-spinner" aria-hidden="true"></span>AI HURKA in elaborazione</div>
+                <div class="loading-steps" style="max-width:440px;margin:0 auto">
+                  <div class="loading-step"><strong>Ricezione bolletta</strong>Il documento è arrivato al motore di analisi.</div>
+                  <div class="loading-step"><strong>Lettura AI in corso</strong>Estraiamo totale, consumi, fornitore e voci di costo.</div>
+                  <div class="loading-step"><strong>Confronto offerte HURKA</strong>Calcoliamo il risparmio reale sulla base dei dati CTE.</div>
                 </div>
               </div>
             </div>
           </div>
-          <div data-result-content hidden></div>
-        </aside>
+
+          <!-- Step 3: results -->
+          <div data-step-panel="3" hidden>
+            <div class="wizard-header">
+              <div class="step-indicator" aria-hidden="true">
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+              </div>
+              <span class="eyebrow">Analisi completata</span>
+              <h2>Ecco cosa abbiamo trovato</h2>
+            </div>
+            <div class="wizard-body">
+              <div class="status-note" data-form-feedback hidden></div>
+              <div data-result-content></div>
+            </div>
+          </div>
+
+        </div><!-- /wizard-shell -->
       </div>
     </section>
   </main>

@@ -1,6 +1,3 @@
-// Lambda function: hurka-contact-form
-// Receives form data via API Gateway, sends notification + auto-reply via SendGrid.
-
 import {
   BILL_ANALYSIS_JSON_SCHEMA,
   BILL_ANALYSIS_SYSTEM_PROMPT,
@@ -9,12 +6,14 @@ import {
   XAI_FILE_PURPOSE,
   XAI_MODEL,
   XAI_TIMEOUT_MS,
-  buildLeadEmailText,
   createAnalysisResult,
   createMockAnalysis,
   normalizeUploadFields,
   validateUploadInput,
 } from '../check-bolletta-beta/bill-analysis-core.mjs';
+import { rankHurkaOffersForBill } from '../check-bolletta-beta/offer-matcher.mjs';
+import { computeLeadScore } from '../check-bolletta-beta/lead-scoring.mjs';
+import { buildCustomerEmail, buildInternalLeadEmail } from '../check-bolletta-beta/email-templates.mjs';
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const TO_EMAIL = process.env.TO_EMAIL || 'info@smartconitalia.com';
@@ -434,34 +433,6 @@ async function runBillAnalysisPipeline({ fields, file, fileBuffer }, options = {
   }
 }
 
-async function notifyBillAnalysisLead({ fields, file, analysis }) {
-  if (!SENDGRID_API_KEY) return false;
-
-  const bodyText = buildLeadEmailText({ fields, file, analysis });
-  const html = `
-    <div style="font-family:sans-serif;max-width:720px;margin:0 auto;color:#333;">
-      <div style="background:#203863;padding:24px 32px;">
-        <h1 style="margin:0;color:#fae04a;font-size:24px;letter-spacing:1px;">Nuovo lead check bolletta beta</h1>
-      </div>
-      <div style="padding:24px 32px;background:#ffffff;">
-        <pre style="white-space:pre-wrap;font-family:ui-monospace,monospace;background:#f8f7f4;padding:20px;border-radius:8px;border:1px solid #e0e0e0;">${escapeHtml(bodyText)}</pre>
-      </div>
-    </div>`;
-
-  await sendEmail({
-    personalizations: [{ to: [{ email: TO_EMAIL }] }],
-    from: { email: FROM_EMAIL, name: FROM_NAME },
-    reply_to: fields.email ? { email: fields.email, name: fields.nome || 'Lead check bolletta' } : undefined,
-    subject: `[HURKA Beta] ${fields.nome || 'Nuovo lead'} - ${analysis.leadTier}`,
-    content: [
-      { type: 'text/plain', value: bodyText },
-      { type: 'text/html', value: html },
-    ],
-  });
-
-  return true;
-}
-
 async function handleBillAnalysisUpload(event, options = {}) {
   const contentType = getHeader(event.headers, 'content-type');
   let fields = {};
@@ -508,12 +479,73 @@ async function handleBillAnalysisUpload(event, options = {}) {
     pipeline.analysis.meta.xaiFileDeleted = cleanupMeta.xaiFileDeleted;
   }
 
+  // Offer matching: deterministic, based on CTE data + extracted bill numbers
+  const offerMatch = rankHurkaOffersForBill(pipeline.analysis, {
+    preferenceType: validation.fields.preferenza || 'risparmio',
+    commodityOverride: validation.fields.commodityHint || undefined,
+  });
+  pipeline.analysis.offerMatch = offerMatch;
+
+  // Lead scoring
+  const leadScore = computeLeadScore(pipeline.analysis, {
+    phoneValid: Boolean(validation.fields.telefono),
+    emailProvided: Boolean(validation.fields.email),
+    answeredQuestions: Boolean(validation.fields.preferenza && validation.fields.commodityHint),
+    consentMarketing: validation.fields.consentMarketing,
+    whatsappClicked: false,
+    callbackRequested: false,
+  });
+
   let emailSent = false;
+  let customerEmailSent = false;
+
   try {
-    emailSent = await notifyBillAnalysisLead({ fields: validation.fields, file, analysis: pipeline.analysis });
+    // Internal notification with full lead data
+    const internal = buildInternalLeadEmail({
+      fields: validation.fields,
+      file,
+      analysis: pipeline.analysis,
+      leadScore,
+      offerMatch,
+    });
+    await sendEmail({
+      personalizations: [{ to: [{ email: TO_EMAIL }] }],
+      from: { email: FROM_EMAIL, name: FROM_NAME },
+      reply_to: validation.fields.email ? { email: validation.fields.email, name: validation.fields.nome } : undefined,
+      subject: internal.subject,
+      content: [
+        { type: 'text/plain', value: internal.text },
+        { type: 'text/html', value: internal.html },
+      ],
+    });
+    emailSent = true;
   } catch {
-    emailSent = false;
-    console.warn('Lead notification failed');
+    console.warn('Internal lead notification failed');
+  }
+
+  // Customer confirmation email (only if email was provided)
+  if (validation.fields.email) {
+    try {
+      const customer = buildCustomerEmail({
+        nome: validation.fields.nome,
+        commodity: pipeline.analysis.extraction?.commodity || validation.fields.commodityHint,
+        offerMatch,
+        consentMarketing: validation.fields.consentMarketing,
+      });
+      await sendEmail({
+        personalizations: [{ to: [{ email: validation.fields.email, name: validation.fields.nome }] }],
+        from: { email: FROM_EMAIL, name: FROM_NAME },
+        reply_to: { email: TO_EMAIL, name: FROM_NAME },
+        subject: customer.subject,
+        content: [
+          { type: 'text/plain', value: customer.text },
+          { type: 'text/html', value: customer.html },
+        ],
+      });
+      customerEmailSent = true;
+    } catch {
+      console.warn('Customer confirmation email failed');
+    }
   }
 
   return res(200, {
@@ -525,6 +557,8 @@ async function handleBillAnalysisUpload(event, options = {}) {
       fallbackReason: pipeline.meta?.fallbackReason || '',
       xaiFileDeleted: pipeline.analysis.meta?.xaiFileDeleted,
       emailSent,
+      customerEmailSent,
+      leadScoreClass: leadScore.class,
     },
   });
 }

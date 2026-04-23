@@ -104,6 +104,7 @@ function createStructuredAnalysis() {
     fascia_f1: 118,
     fascia_f2: 82,
     fascia_f3: 86,
+    spesa_materia_eur: 105.1,
     quota_consumi_eur: 76.2,
     quota_fissa_eur: 17.5,
     quota_potenza_eur: 11.4,
@@ -219,7 +220,7 @@ test('buildAnalysisMarkup renders the real payload coherently', () => {
 
   assert.match(html, /Enel Energia|Quota energia/);
   assert.match(html, /Analisi reale completata/);
-  assert.match(html, /Parla con un consulente/);
+  assert.match(html, /WhatsApp|Richiedi richiamata/);
 });
 
 test('bill-analysis endpoint returns 400 when required contact data is missing', async () => {
