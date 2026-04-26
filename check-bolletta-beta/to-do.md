@@ -72,7 +72,7 @@ Flow che porta a uno di 3 esiti chiari: match forte / nessuna convenienza / bass
 - [x] Esito C (low-confidence): verifica assistita, confidenza mostrata, CTA: richiamata + WhatsApp + analisi con consulente.
 - [x] "Cosa stai pagando" e "Perché lo stai pagando" come card secondarie sotto l'esito.
 - [x] "Prossimo passo" con `cta_recommendation` sempre visibile nelle card secondarie.
-- [x] Nota footer: `'Analisi reale completata.'` / `'Fallback beta attivo.'` (allineato al test E2E).
+- [x] Nota footer: `'Analisi AI reale completata.'` / `'Esempio dimostrativo.'` (allineato al test E2E).
 
 ### Frontend — `app.js`
 
@@ -100,7 +100,7 @@ Flow che porta a uno di 3 esiti chiari: match forte / nessuna convenienza / bass
 ## Note operative
 
 - Env Lambda: `XAI_API_KEY`, `SENDGRID_API_KEY`, `TO_EMAIL`, `FROM_EMAIL`, `FROM_NAME`, `INBOUND_WEBHOOK_TOKEN`.
-- Il mock non e piu il percorso principale: se `XAI_API_KEY` e presente, la Lambda tenta sempre la pipeline reale.
+- Il mock non e piu usato sul submit reale: se `XAI_API_KEY` manca o xAI fallisce, la Lambda restituisce errore e non mostra dati finti.
 - Il file remoto xAI viene eliminato a fine pipeline; l'esito e riportato in `meta.xaiFileDeleted`.
 - API endpoint produzione: `https://dewas95a1m.execute-api.eu-central-1.amazonaws.com`
 - PUN reference usato nel matcher: 0.135 €/kWh monorario (prudente, sotto il max 0.1434 di marzo 2026 da CTE Sinergas).

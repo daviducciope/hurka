@@ -135,6 +135,7 @@ function createSelectiveMockFetch({ sendgridOk = true, invalidJson = false, xaiE
           fascia_f1: 90,
           fascia_f2: 70,
           fascia_f3: 69,
+          spesa_materia_eur: 58.83,
           quota_consumi_eur: 44.35,
           quota_fissa_eur: 14.48,
           quota_potenza_eur: 0,
@@ -259,25 +260,28 @@ try {
   }));
 
   const mockedCases = [
-    ['mock_xai_5xx_fallback', files.pdfLuce, createSelectiveMockFetch({ xaiError: true }), (payload) => {
-      if (!payload.meta.usedFallback) throw new Error('mock_xai_5xx_fallback: expected fallback');
+    ['mock_xai_5xx_real_error', files.pdfLuce, createSelectiveMockFetch({ xaiError: true }), 502, (payload) => {
+      if (payload.meta?.usedFallback) throw new Error('mock_xai_5xx_real_error: fallback should not be used');
+      if (payload.code !== 'xai_error') throw new Error('mock_xai_5xx_real_error: expected xai_error');
     }],
-    ['mock_invalid_json_fallback', files.pdfLuce, createSelectiveMockFetch({ invalidJson: true }), (payload) => {
-      if (!payload.meta.usedFallback) throw new Error('mock_invalid_json_fallback: expected fallback');
+    ['mock_invalid_json_real_error', files.pdfLuce, createSelectiveMockFetch({ invalidJson: true }), 502, (payload) => {
+      if (payload.meta?.usedFallback) throw new Error('mock_invalid_json_real_error: fallback should not be used');
+      if (payload.code !== 'xai_error') throw new Error('mock_invalid_json_real_error: expected xai_error');
     }],
-    ['mock_delete_fail', files.pdfLuce, createSelectiveMockFetch({ deleteOk: false }), (payload) => {
+    ['mock_delete_fail', files.pdfLuce, createSelectiveMockFetch({ deleteOk: false }), 200, (payload) => {
       if (payload.analysis.meta.xaiFileDeleted !== false) throw new Error('mock_delete_fail: delete should fail');
     }],
-    ['mock_sendgrid_fail', files.pdfLuce, createSelectiveMockFetch({ sendgridOk: false }), (payload) => {
+    ['mock_sendgrid_fail', files.pdfLuce, createSelectiveMockFetch({ sendgridOk: false }), 200, (payload) => {
       if (payload.meta.emailSent !== false) throw new Error('mock_sendgrid_fail: emailSent should be false');
     }],
   ];
 
-  for (const [name, filePath, fetchImpl, validate] of mockedCases) {
+  for (const [name, filePath, fetchImpl, expectedStatus, validate] of mockedCases) {
     results.push(await runMultipartScenario({
       name,
       filePath,
       fields: buildFields(),
+      expectedStatus,
       fetchImpl,
       validate,
     }));
@@ -314,6 +318,8 @@ try {
         fields,
         validate: (payload) => {
           if (payload.meta.usedFallback) throw new Error(`${name}: unexpected fallback`);
+          if (payload.analysis.offerMatch) throw new Error(`${name}: offer details should not be exposed to browser payload`);
+          if (!payload.analysis.salesOpportunity) throw new Error(`${name}: missing public sales opportunity`);
           if (!payload.analysis?.extraction?.provider_name) throw new Error(`${name}: missing provider_name`);
           if (payload.meta.xaiFileDeleted !== true) throw new Error(`${name}: expected delete success`);
           if (name.includes('blurred') && payload.analysis.extraction.extraction_confidence > 0.85) {

@@ -7,7 +7,6 @@ import {
   XAI_MODEL,
   XAI_TIMEOUT_MS,
   createAnalysisResult,
-  createMockAnalysis,
   normalizeUploadFields,
   validateUploadInput,
 } from '../check-bolletta-beta/bill-analysis-core.mjs';
@@ -29,6 +28,14 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Content-Type': 'application/json',
 };
+
+function makePublicError(message, { statusCode = 500, code = 'internal_error', cause } = {}) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  error.publicCode = code;
+  if (cause) error.cause = cause;
+  return error;
+}
 
 function res(statusCode, body) {
   return { statusCode, headers: CORS_HEADERS, body: JSON.stringify(body) };
@@ -358,18 +365,10 @@ export async function deleteXaiFile(fileId, options = {}) {
 
 async function runBillAnalysisPipeline({ fields, file, fileBuffer }, options = {}) {
   if (!XAI_API_KEY) {
-    return {
-      analysis: createMockAnalysis({
-        fileName: file.name,
-        fileSize: file.size,
-        fields,
-      }),
-      meta: {
-        usedFallback: true,
-        provider: 'mock',
-        fallbackReason: 'missing_xai_config',
-      },
-    };
+    throw makePublicError('Servizio AI reale non configurato.', {
+      statusCode: 503,
+      code: 'missing_xai_config',
+    });
   }
 
   let uploadedFileId = '';
@@ -406,23 +405,11 @@ async function runBillAnalysisPipeline({ fields, file, fileBuffer }, options = {
       },
     };
   } catch (error) {
-    const fallback = createMockAnalysis({
-      fileName: file.name,
-      fileSize: file.size,
-      fields,
+    throw makePublicError('Analisi AI reale non disponibile in questo momento.', {
+      statusCode: 502,
+      code: 'xai_error',
+      cause: error,
     });
-
-    fallback.meta.fallbackReason = 'xai_error';
-
-    return {
-      analysis: fallback,
-      meta: {
-        usedFallback: true,
-        provider: 'mock',
-        fallbackReason: 'xai_error',
-        errorMessage: error instanceof Error ? error.message : 'Unknown xAI error',
-      },
-    };
   } finally {
     if (uploadedFileId) {
       fileDeleted = await deleteXaiFile(uploadedFileId, options);
@@ -431,6 +418,72 @@ async function runBillAnalysisPipeline({ fields, file, fileBuffer }, options = {
       options.onCleanup({ uploadedFileId, xaiFileDeleted: fileDeleted });
     }
   }
+}
+
+function roundToNearest(value, step, mode = 'round') {
+  const normalized = Number(value || 0);
+  if (!Number.isFinite(normalized) || normalized <= 0) return 0;
+  const fn = mode === 'floor' ? Math.floor : mode === 'ceil' ? Math.ceil : Math.round;
+  return fn(normalized / step) * step;
+}
+
+function buildSalesOpportunity({ analysis, offerMatch }) {
+  const confidence = Number(analysis?.extraction?.extraction_confidence || 0);
+
+  if (offerMatch?.hasMatch && offerMatch.topOffer?.savings?.annual > 0) {
+    const annual = Number(offerMatch.topOffer.savings.annual || 0);
+    const min = Math.max(30, roundToNearest(annual * 0.72, 10, 'floor'));
+    const max = Math.max(min + 20, roundToNearest(annual, 10, 'ceil'));
+    const status = annual >= 180 ? 'high-saving' : 'possible-saving';
+
+    return {
+      status,
+      hasSavingOpportunity: true,
+      savingsRange: { min, max },
+      benchmarkSource: 'cte_hurka',
+      confidence,
+      headline: status === 'high-saving'
+        ? 'La bolletta mostra un margine di risparmio interessante.'
+        : 'La bolletta mostra un possibile margine di risparmio.',
+      summary: 'Il range deriva dal confronto tra la spesa materia letta in bolletta e le condizioni economiche disponibili nel catalogo HURKA. I dettagli dell offerta vengono confermati da un consulente prima di qualunque cambio.',
+      nextStep: 'Prenota una verifica gratuita: ti confermiamo i numeri e, solo se conviene davvero, ti proponiamo la soluzione adatta.',
+    };
+  }
+
+  const reason = String(offerMatch?.noMatchReason || '');
+  const lowConfidence = confidence < 0.60 || /confidenza|insufficien|non identificat|dati insufficien/i.test(reason);
+
+  if (lowConfidence) {
+    return {
+      status: 'assisted-review',
+      hasSavingOpportunity: false,
+      savingsRange: { min: 0, max: 0 },
+      benchmarkSource: 'assisted_review',
+      confidence,
+      headline: 'Serve una verifica assistita.',
+      summary: reason || 'I dati letti non bastano per stimare un risparmio serio senza controllo umano.',
+      nextStep: 'Fissa una verifica con un consulente HURKA per leggere la bolletta senza rischiare conclusioni sbagliate.',
+    };
+  }
+
+  return {
+    status: 'limited-saving',
+    hasSavingOpportunity: false,
+    savingsRange: { min: 0, max: 0 },
+    benchmarkSource: 'cte_hurka',
+    confidence,
+    headline: 'Al momento non emerge un risparmio abbastanza forte.',
+    summary: reason || 'Il confronto con le condizioni disponibili non mostra un margine commerciale credibile.',
+    nextStep: 'Possiamo comunque controllare potenza, clausole e struttura della spesa per capire se ci sono anomalie.',
+  };
+}
+
+function buildClientAnalysis(analysis, salesOpportunity) {
+  return {
+    ...analysis,
+    salesOpportunity,
+    offerMatch: undefined,
+  };
 }
 
 async function handleBillAnalysisUpload(event, options = {}) {
@@ -463,17 +516,34 @@ async function handleBillAnalysisUpload(event, options = {}) {
   }
 
   let cleanupMeta = { uploadedFileId: '', xaiFileDeleted: null };
-  const pipeline = await runBillAnalysisPipeline({
-    fields: validation.fields,
-    file,
-    fileBuffer,
-  }, {
-    ...options,
-    onCleanup: (meta) => {
-      cleanupMeta = meta;
-      if (typeof options.onCleanup === 'function') options.onCleanup(meta);
-    },
-  });
+  let pipeline = null;
+
+  try {
+    pipeline = await runBillAnalysisPipeline({
+      fields: validation.fields,
+      file,
+      fileBuffer,
+    }, {
+      ...options,
+      onCleanup: (meta) => {
+        cleanupMeta = meta;
+        if (typeof options.onCleanup === 'function') options.onCleanup(meta);
+      },
+    });
+  } catch (error) {
+    const statusCode = error?.statusCode || 502;
+    console.error('Bill analysis AI error:', error?.cause || error);
+    return res(statusCode, {
+      error: error?.message || 'Analisi AI reale non disponibile.',
+      code: error?.publicCode || 'xai_error',
+      meta: {
+        usedFallback: false,
+        provider: XAI_API_KEY ? 'xai' : 'none',
+        fallbackReason: '',
+        xaiFileDeleted: cleanupMeta.xaiFileDeleted,
+      },
+    });
+  }
 
   if (cleanupMeta.uploadedFileId) {
     pipeline.analysis.meta.xaiFileDeleted = cleanupMeta.xaiFileDeleted;
@@ -485,6 +555,10 @@ async function handleBillAnalysisUpload(event, options = {}) {
     commodityOverride: validation.fields.commodityHint || undefined,
   });
   pipeline.analysis.offerMatch = offerMatch;
+  pipeline.analysis.salesOpportunity = buildSalesOpportunity({
+    analysis: pipeline.analysis,
+    offerMatch,
+  });
 
   // Lead scoring
   const leadScore = computeLeadScore(pipeline.analysis, {
@@ -529,6 +603,7 @@ async function handleBillAnalysisUpload(event, options = {}) {
       const customer = buildCustomerEmail({
         nome: validation.fields.nome,
         commodity: pipeline.analysis.extraction?.commodity || validation.fields.commodityHint,
+        salesOpportunity: pipeline.analysis.salesOpportunity,
         offerMatch,
         consentMarketing: validation.fields.consentMarketing,
       });
@@ -550,7 +625,7 @@ async function handleBillAnalysisUpload(event, options = {}) {
 
   return res(200, {
     message: 'Analisi completata',
-    analysis: pipeline.analysis,
+    analysis: buildClientAnalysis(pipeline.analysis, pipeline.analysis.salesOpportunity),
     meta: {
       usedFallback: Boolean(pipeline.meta?.usedFallback),
       provider: pipeline.meta?.provider || BILL_ANALYSIS_PROVIDER,

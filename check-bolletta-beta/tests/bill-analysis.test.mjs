@@ -124,6 +124,21 @@ function createStructuredAnalysis() {
   };
 }
 
+function attachSalesOpportunity(analysis, overrides = {}) {
+  analysis.salesOpportunity = {
+    status: 'high-saving',
+    hasSavingOpportunity: true,
+    savingsRange: { min: 280, max: 400 },
+    benchmarkSource: 'cte_hurka',
+    confidence: analysis.extraction.extraction_confidence,
+    headline: 'La bolletta mostra un margine di risparmio interessante.',
+    summary: 'Il range deriva dal confronto tra la spesa materia letta in bolletta e le condizioni economiche disponibili nel catalogo HURKA.',
+    nextStep: 'Prenota una verifica gratuita.',
+    ...overrides,
+  };
+  return analysis;
+}
+
 test('validateUploadInput rejects missing consent and unsupported mime type', () => {
   const result = validateUploadInput({
     fields: {
@@ -213,13 +228,13 @@ test('buildLeadEmailText keeps marketing consent separated from analysis consent
 });
 
 test('buildAnalysisMarkup renders the real payload coherently', () => {
-  const html = buildAnalysisMarkup(createAnalysisResult({
+  const html = buildAnalysisMarkup(attachSalesOpportunity(createAnalysisResult({
     rawAnalysis: createStructuredAnalysis(),
     meta: { mode: 'live', provider: 'xai', usedFallback: false },
-  }));
+  })));
 
   assert.match(html, /Enel Energia|Quota energia/);
-  assert.match(html, /Analisi reale completata/);
+  assert.match(html, /Analisi AI reale completata/);
   assert.match(html, /WhatsApp|Richiedi richiamata/);
 });
 
@@ -255,7 +270,7 @@ test('bill-analysis endpoint returns 400 when required contact data is missing',
   }
 });
 
-test('bill-analysis endpoint falls back to mock when xAI is not configured', async () => {
+test('bill-analysis endpoint rejects real submission when xAI is not configured', async () => {
   const loaded = await loadLambdaModule({ env: { XAI_API_KEY: '' } });
 
   try {
@@ -277,12 +292,10 @@ test('bill-analysis endpoint falls back to mock when xAI is not configured', asy
     }));
     const payload = JSON.parse(response.body);
 
-    assert.equal(response.statusCode, 200);
-    assert.equal(payload.meta.usedFallback, true);
-    assert.equal(payload.meta.provider, 'mock');
-    assert.equal(payload.meta.fallbackReason, 'missing_xai_config');
-    assert.equal(payload.analysis.meta.usedFallback, true);
-    assert.equal(payload.meta.emailSent, false);
+    assert.equal(response.statusCode, 503);
+    assert.equal(payload.code, 'missing_xai_config');
+    assert.equal(payload.meta.usedFallback, false);
+    assert.equal(payload.meta.provider, 'none');
   } finally {
     loaded.restore();
   }
@@ -352,6 +365,9 @@ test('bill-analysis endpoint runs the real xAI pipeline, accepts file_id, and de
     assert.equal(payload.meta.provider, 'xai');
     assert.equal(payload.analysis.mode, 'live');
     assert.equal(payload.analysis.extraction.provider_name, 'Enel Energia');
+    assert.equal(payload.analysis.offerMatch, undefined);
+    assert.equal(payload.analysis.salesOpportunity.hasSavingOpportunity, true);
+    assert.equal(payload.analysis.salesOpportunity.benchmarkSource, 'cte_hurka');
     assert.equal(payload.analysis.meta.xaiFileDeleted, true);
     assert.equal(payload.meta.emailSent, false);
     assert.equal(calls.length, 3);
@@ -360,7 +376,7 @@ test('bill-analysis endpoint runs the real xAI pipeline, accepts file_id, and de
   }
 });
 
-test('bill-analysis endpoint degrades to mock on xAI error and still cleans up the uploaded file', async () => {
+test('bill-analysis endpoint returns a real AI error and still cleans up the uploaded file', async () => {
   const calls = [];
   const fetchMock = async (url, init = {}) => {
     calls.push({ url, init });
@@ -406,11 +422,11 @@ test('bill-analysis endpoint degrades to mock on xAI error and still cleans up t
     }));
     const payload = JSON.parse(response.body);
 
-    assert.equal(response.statusCode, 200);
-    assert.equal(payload.meta.usedFallback, true);
-    assert.equal(payload.meta.fallbackReason, 'xai_error');
-    assert.equal(payload.analysis.meta.usedFallback, true);
-    assert.equal(payload.analysis.meta.xaiFileDeleted, true);
+    assert.equal(response.statusCode, 502);
+    assert.equal(payload.code, 'xai_error');
+    assert.equal(payload.meta.usedFallback, false);
+    assert.equal(payload.meta.provider, 'xai');
+    assert.equal(payload.meta.xaiFileDeleted, true);
     assert.equal(calls.length, 3);
   } finally {
     loaded.restore();
@@ -546,31 +562,10 @@ test('bill-analysis endpoint preserves successful analysis when SendGrid fails',
 // ── Tests per i 3 esiti finali in buildAnalysisMarkup ────────────────────────
 
 test('buildAnalysisMarkup esito A (match forte): mostra risparmio e CTA forte', () => {
-  const analysis = createAnalysisResult({
+  const analysis = attachSalesOpportunity(createAnalysisResult({
     rawAnalysis: createStructuredAnalysis(),
     meta: { mode: 'live', provider: 'xai', usedFallback: false },
-  });
-  // Inject a match
-  analysis.offerMatch = {
-    hasMatch: true,
-    topOffer: {
-      id: 'sinergas-biennale-luce-casa',
-      name: 'Biennale Luce Casa',
-      provider: 'Sinergas S.p.A.',
-      offerCode: '000753ESFML04XXP0094PB3181260416',
-      priceType: 'fixed_then_indexed',
-      greenEnergy: true,
-      quotaFissaAnnua: 144,
-      caveats: ['Fisso 24 mesi poi diventa PUN + spread'],
-      savings: { annual: 398, monthly: 33, percent: 33, currentAnnualVendorCost: 1201, hurkaAnnualCost: 803 },
-      calculationBasis: { annualConsumptionKwh: 3997, billingDays: 59, spesaMateriaSource: 'extracted', punReferenceUsed: null },
-      priceBasis: 'fixed',
-      perKwhEffective: 0.1649,
-    },
-    alternativeOffer: null,
-    noMatchReason: null,
-    calculatedAt: new Date().toISOString(),
-  };
+  }));
 
   assert.equal(getEsitoOutcome(analysis), 'match');
 
@@ -578,39 +573,37 @@ test('buildAnalysisMarkup esito A (match forte): mostra risparmio e CTA forte', 
 
   // Esito card is present with match styling
   assert.match(html, /esito-match/);
-  assert.match(html, /Offerta trovata/i);
-  // Risparmio visibile
-  assert.match(html, /398/);
+  assert.match(html, /Possibile risparmio/i);
+  // Range risparmio visibile
+  assert.match(html, /280|400/);
   // CTA forte WhatsApp
-  assert.match(html, /wa\.me.*Attiva/i);
+  assert.match(html, /wa\.me.*Verifica/i);
   // CTA soft richiamata
   assert.match(html, /Richiedi richiamata/i);
   // CTA consulente
   assert.match(html, /consulente/i);
-  // Offerta name
-  assert.match(html, /Biennale Luce Casa/);
-  // Base calcolo presente
-  assert.match(html, /3997|kWh/);
+  // Offerta e fornitore partner non sono esposti al cliente
+  assert.ok(!html.includes('Biennale Luce Casa'));
+  assert.ok(!html.includes('Sinergas'));
   // Nessuna promessa aggressiva
   assert.ok(!html.includes('miglior fornitore assoluto'));
   // Footer note corretto
-  assert.match(html, /Analisi reale completata\./);
+  assert.match(html, /Analisi AI reale completata\./);
   // Detail section presente (provider_name Enel Energia)
   assert.match(html, /Enel Energia/);
 });
 
 test('buildAnalysisMarkup esito B (nessuna convenienza): messaggio onesto, nessuna offerta', () => {
-  const analysis = createAnalysisResult({
+  const analysis = attachSalesOpportunity(createAnalysisResult({
     rawAnalysis: createStructuredAnalysis(),
     meta: { mode: 'live', provider: 'xai', usedFallback: false },
+  }), {
+    status: 'limited-saving',
+    hasSavingOpportunity: false,
+    savingsRange: { min: 0, max: 0 },
+    headline: 'Al momento non emerge un risparmio abbastanza forte.',
+    summary: 'Il profilo attuale non mostra un risparmio credibile con le condizioni disponibili.',
   });
-  analysis.offerMatch = {
-    hasMatch: false,
-    topOffer: null,
-    alternativeOffer: null,
-    noMatchReason: 'Il profilo attuale non mostra un risparmio credibile con le offerte HURKA disponibili.',
-    calculatedAt: new Date().toISOString(),
-  };
 
   assert.equal(getEsitoOutcome(analysis), 'no-match');
 
@@ -626,7 +619,7 @@ test('buildAnalysisMarkup esito B (nessuna convenienza): messaggio onesto, nessu
   // Nessuna CTA aggressiva tipo "Attiva con HURKA"
   assert.ok(!html.includes('Attiva con HURKA'));
   // Footer note corretto
-  assert.match(html, /Analisi reale completata\./);
+  assert.match(html, /Analisi AI reale completata\./);
   // Detail section
   assert.match(html, /Enel Energia/);
   // Prossimo passo con cta_recommendation
@@ -634,7 +627,7 @@ test('buildAnalysisMarkup esito B (nessuna convenienza): messaggio onesto, nessu
 });
 
 test('buildAnalysisMarkup esito C (bassa confidenza): verifica assistita, nessuna offerta', () => {
-  const analysis = createAnalysisResult({
+  const analysis = attachSalesOpportunity(createAnalysisResult({
     rawAnalysis: {
       ...createStructuredAnalysis(),
       extraction_confidence: 0.42,
@@ -645,14 +638,14 @@ test('buildAnalysisMarkup esito C (bassa confidenza): verifica assistita, nessun
       consumption_total: 0,
     },
     meta: { mode: 'live', provider: 'xai', usedFallback: false },
+  }), {
+    status: 'assisted-review',
+    hasSavingOpportunity: false,
+    savingsRange: { min: 0, max: 0 },
+    confidence: 0.42,
+    headline: 'Serve una verifica assistita.',
+    summary: 'Confidenza di estrazione troppo bassa per un confronto affidabile.',
   });
-  analysis.offerMatch = {
-    hasMatch: false,
-    topOffer: null,
-    alternativeOffer: null,
-    noMatchReason: 'Confidenza di estrazione troppo bassa (42%) per un confronto affidabile. Verifica assistita consigliata.',
-    calculatedAt: new Date().toISOString(),
-  };
 
   assert.equal(getEsitoOutcome(analysis), 'low-confidence');
 
@@ -669,7 +662,7 @@ test('buildAnalysisMarkup esito C (bassa confidenza): verifica assistita, nessun
   assert.ok(!html.includes('esito-match'));
   assert.ok(!html.includes('Attiva con HURKA'));
   // Footer note
-  assert.match(html, /Analisi reale completata\./);
+  assert.match(html, /Analisi AI reale completata\./);
 });
 
 test('getEsitoOutcome restituisce no-match quando offerMatch è assente', () => {
@@ -681,14 +674,14 @@ test('getEsitoOutcome restituisce no-match quando offerMatch è assente', () => 
   assert.equal(getEsitoOutcome(analysis), 'no-match');
 });
 
-test('buildAnalysisMarkup fallback mostra nota Fallback beta attivo', () => {
+test('buildAnalysisMarkup example mode shows demo note', () => {
   const html = buildAnalysisMarkup(createAnalysisResult({
     rawAnalysis: createStructuredAnalysis(),
     meta: { mode: 'mock', provider: 'mock', usedFallback: true },
   }), { fallback: true });
 
-  assert.match(html, /Fallback beta attivo\./);
-  assert.ok(!html.includes('Analisi reale completata.'));
+  assert.match(html, /Esempio dimostrativo\./);
+  assert.ok(!html.includes('Analisi AI reale completata.'));
 });
 
 // ── Test aggiornato regressione buildAnalysisMarkup ──────────────────────────

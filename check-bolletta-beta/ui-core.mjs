@@ -23,6 +23,11 @@ function formatCurrencyRound(value) {
  * @returns {'match'|'no-match'|'low-confidence'}
  */
 export function getEsitoOutcome(analysis) {
+  const opportunityStatus = analysis?.salesOpportunity?.status || '';
+  if (opportunityStatus === 'high-saving' || opportunityStatus === 'possible-saving') return 'match';
+  if (opportunityStatus === 'assisted-review') return 'low-confidence';
+  if (opportunityStatus === 'limited-saving') return 'no-match';
+
   const confidence = analysis?.extraction?.extraction_confidence ?? 0;
   const offerMatch = analysis?.offerMatch;
 
@@ -44,66 +49,50 @@ export function getEsitoOutcome(analysis) {
 
 // ── Esito A: match forte ─────────────────────────────────────────────────────
 
-function buildEsitoMatchCard(offerMatch) {
-  const offer = offerMatch.topOffer;
-  const saving = offer.savings;
-  const basis = offer.calculationBasis;
-
-  const basisNote = offer.priceBasis === 'fixed'
-    ? `Prezzo fisso da CTE ${escapeHtml(offer.name)}`
-    : `PUN ref. ${basis.punReferenceUsed} €/kWh + spread offerta`;
-
-  const caveatsHtml = (offer.caveats || []).slice(0, 2).map((c) =>
-    `<div class="esito-caveat">&#9888; ${escapeHtml(c)}</div>`,
-  ).join('');
-
-  const altHtml = offerMatch.alternativeOffer
-    ? `<div class="esito-alt-row">
-        <span class="esito-alt-label">Alternativa</span>
-        <strong>${escapeHtml(offerMatch.alternativeOffer.name)}</strong>
-        <span>${formatCurrencyRound(offerMatch.alternativeOffer.savings.annual)}/anno</span>
-      </div>`
-    : '';
+function buildEsitoMatchCard(analysis) {
+  const opportunity = analysis?.salesOpportunity || {};
+  const range = opportunity.savingsRange || { min: 0, max: 0 };
+  const sourceLabel = opportunity.benchmarkSource === 'cte_hurka'
+    ? 'calcolo su condizioni economiche HURKA disponibili'
+    : 'benchmark commerciale da verificare';
 
   return `
     <article class="esito-card esito-match">
-      <div class="eyebrow eyebrow-match">Esito HURKA &middot; Offerta trovata</div>
-      <h2 class="esito-headline">Puoi risparmiare ${formatCurrencyRound(saving.annual)} all&rsquo;anno</h2>
+      <div class="eyebrow eyebrow-match">Esito HURKA &middot; Possibile risparmio</div>
+      <h2 class="esito-headline">${escapeHtml(opportunity.headline || 'La bolletta mostra un possibile margine di risparmio.')}</h2>
 
       <div class="esito-saving-row">
-        <span class="esito-saving-big">${formatCurrencyRound(saving.annual)}<small>/anno</small></span>
-        <span class="esito-saving-sub">${formatCurrencyRound(saving.monthly)}/mese &middot; ${saving.percent}% sulla spesa materia</span>
+        <span class="esito-saving-big">${formatCurrencyRound(range.min)}-${formatCurrencyRound(range.max)}<small>/anno</small></span>
+        <span class="esito-saving-sub">range prudente da confermare con verifica gratuita</span>
       </div>
 
       <div class="esito-meta-grid">
         <div class="esito-meta-item">
-          <strong>${formatCurrencyRound(saving.currentAnnualVendorCost)}</strong>
-          <span>spesa attuale/anno</span>
+          <strong>${Math.round(Number(opportunity.confidence || 0) * 100)}%</strong>
+          <span>confidenza lettura</span>
         </div>
         <div class="esito-meta-item">
-          <strong>${formatCurrencyRound(saving.hurkaAnnualCost)}</strong>
-          <span>con HURKA/anno</span>
+          <strong>CTE</strong>
+          <span>base confronto</span>
         </div>
         <div class="esito-meta-item">
-          <strong>${escapeHtml(offer.name)}</strong>
-          <span>${escapeHtml(offer.provider)}${offer.greenEnergy ? ' &middot; verde' : ''}</span>
+          <strong>Consulente</strong>
+          <span>chiusura assistita</span>
         </div>
       </div>
 
-      ${caveatsHtml}
-      ${altHtml}
+      <p class="esito-body-text">${escapeHtml(opportunity.summary || '')}</p>
 
       <p class="esito-calc-note">
-        Calcolo basato su: ${escapeHtml(basisNote)} &middot;
-        ${Math.round(basis.annualConsumptionKwh)} kWh/anno annualizzati da ${basis.billingDays}&thinsp;gg &middot;
-        fonte spesa materia: ${escapeHtml(basis.spesaMateriaSource)}
+        Non mostriamo una lista di offerte generiche: il range e basato su ${escapeHtml(sourceLabel)}.
+        L'offerta finale viene proposta solo dopo controllo umano dei dati.
       </p>
 
       <div class="esito-cta-row">
         <a class="esito-cta-primary"
-           href="https://wa.me/393888668837?text=Ciao%20HURKA!%2C%20ho%20visto%20l%27offerta%20${encodeURIComponent(offer.name)}%20e%20voglio%20attivarla."
+           href="https://wa.me/393888668837?text=Ciao%20HURKA!%2C%20ho%20visto%20un%20possibile%20risparmio%20sulla%20bolletta%20e%20voglio%20verificarlo."
            target="_blank" rel="noopener" data-whatsapp-link>
-          Attiva con HURKA &rarr;
+          Verifica il risparmio &rarr;
         </a>
         <a class="esito-cta-soft" href="../contatti.html">Richiedi richiamata</a>
         <a class="esito-cta-soft"
@@ -117,19 +106,21 @@ function buildEsitoMatchCard(offerMatch) {
 
 // ── Esito B: nessuna convenienza ─────────────────────────────────────────────
 
-function buildEsitoNoMatchCard(offerMatch) {
+function buildEsitoNoMatchCard(analysis) {
+  const opportunity = analysis?.salesOpportunity || {};
   const reason = escapeHtml(
-    offerMatch?.noMatchReason ||
+    opportunity.summary ||
+    analysis?.offerMatch?.noMatchReason ||
     'Il profilo attuale non mostra un risparmio credibile con le offerte HURKA disponibili.',
   );
 
   return `
     <article class="esito-card esito-no-match">
       <div class="eyebrow eyebrow-no-match">Esito HURKA &middot; Profilo gi&agrave; competitivo</div>
-      <h2 class="esito-headline">Al momento non emerge una convenienza sufficiente</h2>
+      <h2 class="esito-headline">${escapeHtml(opportunity.headline || 'Al momento non emerge una convenienza sufficiente')}</h2>
       <p class="esito-body-text">${reason}</p>
       <p class="esito-body-text" style="margin-top:.5rem">
-        Non ti proponiamo un&rsquo;offerta se non ne vale la pena.
+        Non ti mostriamo un&rsquo;offerta se il margine non e abbastanza solido.
         Possiamo comunque fare un check gratuito su potenza, contratto e clausole.
       </p>
       <div class="esito-cta-row">
@@ -151,8 +142,10 @@ function buildEsitoNoMatchCard(offerMatch) {
 // ── Esito C: bassa confidenza / review assistita ──────────────────────────────
 
 function buildEsitoLowConfCard(analysis, offerMatch) {
+  const opportunity = analysis?.salesOpportunity || {};
   const confidence = analysis?.extraction?.extraction_confidence ?? 0;
   const reason = escapeHtml(
+    opportunity.summary ||
     offerMatch?.noMatchReason ||
     'I dati estratti non sono sufficienti per un confronto affidabile.',
   );
@@ -160,7 +153,7 @@ function buildEsitoLowConfCard(analysis, offerMatch) {
   return `
     <article class="esito-card esito-low-conf">
       <div class="eyebrow eyebrow-low-conf">Esito HURKA &middot; Verifica assistita necessaria</div>
-      <h2 class="esito-headline">Serve una verifica assistita</h2>
+      <h2 class="esito-headline">${escapeHtml(opportunity.headline || 'Serve una verifica assistita')}</h2>
       <p class="esito-body-text">${reason}</p>
       <p class="esito-body-text" style="margin-top:.5rem">
         Confidenza di lettura: <strong>${Math.round(confidence * 100)}%</strong>.
@@ -246,7 +239,7 @@ function buildFooterNote(analysis, fallback) {
 
   return `
     <div class="result-note">
-      <strong>${fallback ? 'Fallback beta attivo.' : 'Analisi reale completata.'}</strong>
+      <strong>${fallback ? 'Esempio dimostrativo.' : 'Analisi AI reale completata.'}</strong>
       ${confidenceNote ? `<span>${confidenceNote}</span>` : ''}
     </div>`;
 }
@@ -259,11 +252,11 @@ export function buildAnalysisMarkup(analysis, { fallback = false } = {}) {
 
   let esitoCard = '';
   if (outcome === 'match') {
-    esitoCard = buildEsitoMatchCard(offerMatch);
+    esitoCard = buildEsitoMatchCard(analysis);
   } else if (outcome === 'low-confidence') {
     esitoCard = buildEsitoLowConfCard(analysis, offerMatch);
   } else {
-    esitoCard = buildEsitoNoMatchCard(offerMatch);
+    esitoCard = buildEsitoNoMatchCard(analysis);
   }
 
   const detailCards = buildDetailCards(analysis, outcome);

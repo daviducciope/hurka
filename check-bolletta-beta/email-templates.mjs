@@ -36,21 +36,31 @@ function tableRow(label, value) {
  * Builds the confirmation email sent to the customer.
  * Only sent when the customer provides an email address.
  *
- * @param {{ nome: string, email: string, commodity: string, offerMatch: object|null, consentMarketing: boolean }} data
+ * @param {{ nome: string, email: string, commodity: string, salesOpportunity?: object|null, offerMatch?: object|null, consentMarketing: boolean }} data
  * @returns {{ subject: string, text: string, html: string }}
  */
-export function buildCustomerEmail({ nome, commodity, offerMatch, consentMarketing }) {
+export function buildCustomerEmail({ nome, commodity, salesOpportunity, offerMatch, consentMarketing }) {
   const firstName = String(nome || 'Cliente').split(' ')[0];
   const commodityLabel = commodity === 'gas' ? 'gas' : commodity === 'dual' ? 'luce e gas' : 'luce';
+  const opportunity = salesOpportunity || (
+    offerMatch?.hasMatch && offerMatch.topOffer
+      ? {
+          hasSavingOpportunity: true,
+          savingsRange: {
+            min: Math.max(30, Math.floor((offerMatch.topOffer.savings.annual || 0) * 0.72 / 10) * 10),
+            max: Math.ceil((offerMatch.topOffer.savings.annual || 0) / 10) * 10,
+          },
+        }
+      : null
+  );
 
-  const matchSection = offerMatch?.hasMatch && offerMatch.topOffer
+  const matchSection = opportunity?.hasSavingOpportunity && opportunity.savingsRange
     ? `<div style="margin:20px 0;padding:18px 20px;background:#f0f4f9;border-left:4px solid ${YELLOW};border-radius:6px;">
         <p style="margin:0 0 6px;font-size:13px;font-weight:bold;color:${BRAND_COLOR};font-family:sans-serif;">Abbiamo trovato qualcosa di interessante</p>
         <p style="margin:0;font-size:13px;color:#444;font-family:sans-serif;">
-          La bolletta analizzata suggerisce un possibile risparmio stimato di circa
-          <strong>${eur(offerMatch.topOffer.savings.annual)}/anno</strong>
-          con l'offerta HURKA <strong>${escapeHtml(offerMatch.topOffer.name)}</strong>.
-          Ti ricontatteremo per confermare i dettagli e spiegarti come funziona.
+          La bolletta analizzata suggerisce un possibile risparmio prudente tra
+          <strong>${eur(opportunity.savingsRange.min)} e ${eur(opportunity.savingsRange.max)}/anno</strong>.
+          Ti ricontatteremo per confermare i dettagli prima di proporti qualsiasi soluzione.
         </p>
       </div>`
     : `<div style="margin:20px 0;padding:18px 20px;background:#f8f7f4;border-radius:6px;">
@@ -95,8 +105,8 @@ export function buildCustomerEmail({ nome, commodity, offerMatch, consentMarketi
     `Ciao ${firstName},`,
     '',
     `abbiamo ricevuto la bolletta ${commodityLabel}.`,
-    offerMatch?.hasMatch && offerMatch.topOffer
-      ? `Risparmio stimato: circa ${eur(offerMatch.topOffer.savings.annual)}/anno con l'offerta ${offerMatch.topOffer.name}. Ti ricontatteremo.`
+    opportunity?.hasSavingOpportunity && opportunity.savingsRange
+      ? `Risparmio stimato: tra ${eur(opportunity.savingsRange.min)} e ${eur(opportunity.savingsRange.max)}/anno. Ti ricontatteremo per confermare i dettagli.`
       : `Stiamo verificando il profilo. Ti contatteremo se emerge un'opportunita concreta.`,
     '',
     'WhatsApp: wa.me/393888668837',

@@ -57,6 +57,14 @@ const offerMatchNone = {
   noMatchReason: 'Profilo gia competitivo con offerta attuale.',
 };
 
+const salesOpportunityPositive = {
+  status: 'high-saving',
+  hasSavingOpportunity: true,
+  savingsRange: { min: 280, max: 400 },
+  benchmarkSource: 'cte_hurka',
+  confidence: 0.93,
+};
+
 const leadScore = {
   total: 82,
   scoreA: 48,
@@ -66,18 +74,21 @@ const leadScore = {
 
 // ── buildCustomerEmail ───────────────────────────────────────
 
-test('customer email with offer match contains saving amount and offer name', () => {
+test('customer email with saving opportunity contains range but no offer name', () => {
   const { subject, text, html } = buildCustomerEmail({
     nome: 'Mario Rossi',
     commodity: 'luce',
+    salesOpportunity: salesOpportunityPositive,
     offerMatch: offerMatchPositive,
     consentMarketing: false,
   });
 
   assert.match(subject, /bolletta.*analisi/i);
-  assert.match(text, /Biennale Luce Casa/i);
-  assert.match(text, /398/);
-  assert.match(html, /Biennale Luce Casa/);
+  assert.match(text, /280|400/);
+  assert.match(html, /280|400/);
+  assert.ok(!text.includes('Biennale Luce Casa'));
+  assert.ok(!html.includes('Biennale Luce Casa'));
+  assert.ok(!html.includes('Sinergas'));
   // No aggressive sales language
   assert.ok(!text.includes('miglior fornitore assoluto'));
 });

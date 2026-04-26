@@ -85,12 +85,15 @@ test('frontend renders a complete analysis payload (mock full-success)', async (
 
     await page.locator('button[type="submit"]').click();
 
-    // Wait for results to appear (real xAI or intercepted mock — both emit this note)
+    // Wait for results to appear (xAI path intercepted by the local test server).
     const resultContent = page.locator('[data-result-content]');
-    await expect(resultContent).toContainText('Analisi reale completata.', { timeout: 60_000 });
+    await expect(resultContent).toContainText('Analisi AI reale completata.', { timeout: 60_000 });
 
     // The detail section always shows provider name and CTA links
     await expect(resultContent).toContainText('Duferco Energia');
+    await expect(resultContent).toContainText(/possibile risparmio|risparmio/i);
+    await expect(resultContent).not.toContainText('Sinergas');
+    await expect(resultContent).not.toContainText('Biennale Luce Casa');
 
     // At least one WhatsApp / contact CTA must be present regardless of outcome
     await expect(page.locator('[data-result-content] a[href*="wa.me"], [data-result-content] a[href*="contatti"]').first()).toBeVisible({ timeout: 5_000 });
@@ -102,7 +105,7 @@ test('frontend renders a complete analysis payload (mock full-success)', async (
   }
 });
 
-test('frontend renders fallback when xAI fails (mock xai-5xx)', async ({ page }) => {
+test('frontend shows an error instead of fake results when xAI fails (mock xai-5xx)', async ({ page }) => {
   const server = await startServer({ port: 4174, mockMode: 'xai-5xx' });
 
   try {
@@ -117,14 +120,14 @@ test('frontend renders fallback when xAI fails (mock xai-5xx)', async ({ page })
 
     await page.locator('button[type="submit"]').click();
 
-    // Feedback bar warns about fallback (two feedback nodes exist, one per wizard step)
+    // Feedback bar warns about the real AI failure and no fake result is rendered.
     await expect(page.locator('[data-form-feedback]').first()).toContainText(
-      'Analisi reale non disponibile',
+      'Analisi AI reale non disponibile',
       { timeout: 30_000 },
     );
 
-    // Footer shows fallback note
-    await expect(page.locator('[data-result-content]')).toContainText('Fallback beta attivo.');
+    await expect(page.locator('[data-wizard]')).toHaveAttribute('data-step', '1');
+    await expect(page.locator('[data-result-content]')).toBeEmpty();
   } finally {
     await server.stop();
   }
@@ -148,11 +151,11 @@ test('frontend live path renders a real xAI payload when enabled', async ({ page
     await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('[data-result-content]')).toContainText(
-      'Analisi reale completata.',
+      'Analisi AI reale completata.',
       { timeout: 240_000 },
     );
     await expect(page.locator('[data-result-content]')).not.toContainText(
-      'Fallback beta attivo.',
+      'Esempio dimostrativo.',
       { timeout: 240_000 },
     );
   } finally {

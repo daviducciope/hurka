@@ -53,6 +53,7 @@ const mockStructuredAnalysis = {
   fascia_f1: 90,
   fascia_f2: 70,
   fascia_f3: 69,
+  spesa_materia_eur: 58.83,
   quota_consumi_eur: 44.35,
   quota_fissa_eur: 14.48,
   quota_potenza_eur: 0,

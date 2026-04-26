@@ -72,8 +72,10 @@ function buildApiCandidates() {
   if (configuredBase) candidates.push(`${configuredBase}/api/bill-analysis/upload`);
 
   if (typeof window !== 'undefined') {
-    candidates.push(new URL('/api/bill-analysis/upload', window.location.origin).toString());
     const isLocalhost = ['127.0.0.1', 'localhost'].includes(window.location.hostname);
+    if (!configuredBase || isLocalhost) {
+      candidates.push(new URL('/api/bill-analysis/upload', window.location.origin).toString());
+    }
     const isStaticDevPort = window.location.port && window.location.port !== LOCAL_API_PORT;
     if (isLocalhost && isStaticDevPort) {
       candidates.push(`http://127.0.0.1:${LOCAL_API_PORT}/api/bill-analysis/upload`);
@@ -94,10 +96,20 @@ async function postBillAnalysis(body) {
     try {
       const response = await fetch(endpoint, { method: 'POST', body });
       const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(`${endpoint} -> ${payload.error || `HTTP ${response.status}`}`);
+      if (!response.ok) {
+        const error = new Error(payload.error || `HTTP ${response.status}`);
+        error.endpoint = endpoint;
+        error.status = response.status;
+        error.apiResponse = true;
+        throw error;
+      }
       return { endpoint, payload };
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
+      // Stop only on definitive client errors (bad request, auth, validation).
+      // For 404/405/5xx the endpoint itself is broken — keep trying other candidates.
+      const definitiveClientError = lastError.apiResponse && [400, 401, 403, 422].includes(lastError.status);
+      if (definitiveClientError) throw lastError;
     }
   }
   throw lastError || new Error('Analisi non disponibile.');
@@ -207,21 +219,23 @@ async function submitAnalysis(event) {
     const { payload } = await postBillAnalysis(body);
     analysis = payload.analysis;
     fallback = Boolean(payload.meta?.usedFallback);
-    if (fallback) setFeedback('Analisi reale non disponibile. Dati di esempio mostrati.', 'warning');
   } catch (error) {
-    analysis = createMockAnalysis({ fileName: file.name, fileSize: file.size, fields });
-    fallback = true;
     const isPortMismatch = typeof window !== 'undefined'
       && ['127.0.0.1', 'localhost'].includes(window.location.hostname)
       && window.location.port
       && window.location.port !== LOCAL_API_PORT;
+    const message = error instanceof Error ? error.message : '';
     setFeedback(
-      isPortMismatch
+      message || (isPortMismatch
         ? `Backend non raggiungibile. Avvia il server sulla porta ${LOCAL_API_PORT}.`
-        : 'Analisi reale non raggiungibile. Dati di esempio mostrati.',
-      'warning',
+        : 'Analisi AI reale non disponibile ora. Riprova tra poco o contatta HURKA su WhatsApp.'),
+      'error',
     );
     console.warn('Bill analysis request failed:', error);
+    setSubmitting(false);
+    setWizardStep('1');
+    trackEvent('analysis_failed', { reason: error instanceof Error ? error.message : String(error) });
+    return;
   }
 
   renderAnalysis(analysis, { fallback });
@@ -232,7 +246,8 @@ async function submitAnalysis(event) {
     fallback_used: fallback,
     lead_tier: analysis.leadTier,
     confidence: analysis.extraction.extraction_confidence,
-    has_offer_match: Boolean(analysis.offerMatch?.hasMatch),
+    opportunity_status: analysis.salesOpportunity?.status || 'unknown',
+    has_saving_opportunity: Boolean(analysis.salesOpportunity?.hasSavingOpportunity),
   });
   trackEvent('lead_submitted', {
     comune: fields.comune,
