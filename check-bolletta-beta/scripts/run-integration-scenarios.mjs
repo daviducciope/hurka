@@ -20,6 +20,9 @@ if (runLive && !runSendgridLive) {
 if (!runLive && !process.env.XAI_API_KEY) {
   process.env.XAI_API_KEY = 'xai-mock-test';
 }
+if (!process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT) {
+  process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT = '0';
+}
 if ((!runLive || runSendgridLive) && !process.env.SENDGRID_API_KEY) {
   process.env.SENDGRID_API_KEY = 'SG.mock-test';
 }

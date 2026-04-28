@@ -13,6 +13,7 @@ import {
 import { rankHurkaOffersForBill } from '../check-bolletta-beta/offer-matcher.mjs';
 import { computeLeadScore } from '../check-bolletta-beta/lead-scoring.mjs';
 import { buildCustomerEmail, buildInternalLeadEmail } from '../check-bolletta-beta/email-templates.mjs';
+import { createHash, createHmac } from 'node:crypto';
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const TO_EMAIL = process.env.TO_EMAIL || 'info@smartconitalia.com';
@@ -21,11 +22,21 @@ const FROM_NAME = process.env.FROM_NAME || 'HURKA!';
 const INBOUND_WEBHOOK_TOKEN = process.env.INBOUND_WEBHOOK_TOKEN || '';
 const XAI_API_KEY = process.env.XAI_API_KEY || '';
 const BILL_ANALYSIS_PROVIDER = XAI_API_KEY ? 'xai' : 'mock';
+const DAILY_FREE_ANALYSIS_LIMIT = Number.parseInt(process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT || '3', 10);
+const BILL_ANALYSIS_QUOTA_TABLE = process.env.BILL_ANALYSIS_QUOTA_TABLE || '';
+const BILL_ANALYSIS_QUOTA_SALT = process.env.BILL_ANALYSIS_QUOTA_SALT || 'hurka-bill-analysis';
+const BILL_ANALYSIS_SUBSCRIPTION_URL = process.env.BILL_ANALYSIS_SUBSCRIPTION_URL || 'https://hurka.it/contatti.html';
+const PREMIUM_ACCESS_TOKENS = new Set(
+  String(process.env.BILL_ANALYSIS_PREMIUM_TOKENS || '')
+    .split(',')
+    .map((token) => token.trim())
+    .filter(Boolean),
+);
+const localQuotaStore = new Map();
 
+// CORS headers are managed at API Gateway level.
+// Only Content-Type is needed here; ACAO headers come from the gateway.
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Content-Type': 'application/json',
 };
 
@@ -50,6 +61,187 @@ function getHeader(headers, name) {
     }
   }
   return '';
+}
+
+function sha256(value, encoding = 'hex') {
+  return createHash('sha256').update(String(value)).digest(encoding);
+}
+
+function hmac(key, value, encoding) {
+  return createHmac('sha256', key).update(value).digest(encoding);
+}
+
+function getRomeDay(date = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Rome',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const lookup = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${lookup.year}-${lookup.month}-${lookup.day}`;
+}
+
+function getSourceIp(event) {
+  const forwarded = getHeader(event.headers, 'x-forwarded-for').split(',')[0]?.trim();
+  return forwarded || event?.requestContext?.http?.sourceIp || event?.requestContext?.identity?.sourceIp || '';
+}
+
+function getQuotaIdentifier({ fields, event }) {
+  const email = String(fields.email || '').trim().toLowerCase();
+  const phone = String(fields.telefono || '').replace(/[^\d+]/g, '');
+  const ip = getSourceIp(event);
+  return email || phone || ip || 'anonymous';
+}
+
+function getAccessToken(fields = {}) {
+  return String(fields.subscriptionToken || fields.accessToken || fields.premiumToken || '').trim();
+}
+
+function hasPremiumAccess(fields = {}) {
+  const token = getAccessToken(fields);
+  return Boolean(token && PREMIUM_ACCESS_TOKENS.has(token));
+}
+
+function buildQuotaKey({ fields, event, day = getRomeDay() }) {
+  const identifier = getQuotaIdentifier({ fields, event });
+  const digest = sha256(`${BILL_ANALYSIS_QUOTA_SALT}:${identifier}`);
+  return {
+    pk: `bill-analysis#${digest}`,
+    day,
+  };
+}
+
+function checkLocalQuota({ fields, event, limit = DAILY_FREE_ANALYSIS_LIMIT }) {
+  if (hasPremiumAccess(fields) || !Number.isFinite(limit) || limit <= 0) {
+    return { allowed: true, limit, remaining: null, premium: hasPremiumAccess(fields), backend: 'disabled' };
+  }
+
+  const { pk, day } = buildQuotaKey({ fields, event });
+  const key = `${pk}:${day}`;
+  const current = localQuotaStore.get(key) || 0;
+  if (current >= limit) {
+    return { allowed: false, limit, remaining: 0, count: current, premium: false, backend: 'memory' };
+  }
+  const next = current + 1;
+  localQuotaStore.set(key, next);
+  return { allowed: true, limit, remaining: Math.max(limit - next, 0), count: next, premium: false, backend: 'memory' };
+}
+
+function getAwsCredentialScope({ dateStamp, region, service }) {
+  return `${dateStamp}/${region}/${service}/aws4_request`;
+}
+
+function getAwsSigningKey({ secretAccessKey, dateStamp, region, service }) {
+  const kDate = hmac(`AWS4${secretAccessKey}`, dateStamp);
+  const kRegion = hmac(kDate, region);
+  const kService = hmac(kRegion, service);
+  return hmac(kService, 'aws4_request');
+}
+
+function signAwsJsonRequest({ method, url, region, service, target, body }) {
+  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+  const sessionToken = process.env.AWS_SESSION_TOKEN;
+  if (!accessKeyId || !secretAccessKey) {
+    throw new Error('Missing AWS credentials for DynamoDB quota');
+  }
+
+  const now = new Date();
+  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, '');
+  const dateStamp = amzDate.slice(0, 8);
+  const host = new URL(url).host;
+  const headers = {
+    'content-type': 'application/x-amz-json-1.0',
+    host,
+    'x-amz-date': amzDate,
+    'x-amz-target': target,
+  };
+  if (sessionToken) headers['x-amz-security-token'] = sessionToken;
+
+  const signedHeaderNames = Object.keys(headers).sort();
+  const canonicalHeaders = signedHeaderNames.map((name) => `${name}:${headers[name]}\n`).join('');
+  const signedHeaders = signedHeaderNames.join(';');
+  const canonicalRequest = [
+    method,
+    '/',
+    '',
+    canonicalHeaders,
+    signedHeaders,
+    sha256(body),
+  ].join('\n');
+  const credentialScope = getAwsCredentialScope({ dateStamp, region, service });
+  const stringToSign = [
+    'AWS4-HMAC-SHA256',
+    amzDate,
+    credentialScope,
+    sha256(canonicalRequest),
+  ].join('\n');
+  const signingKey = getAwsSigningKey({ secretAccessKey, dateStamp, region, service });
+  const signature = hmac(signingKey, stringToSign, 'hex');
+
+  return {
+    ...headers,
+    authorization: `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`,
+  };
+}
+
+async function incrementDynamoQuota({ fields, event, limit = DAILY_FREE_ANALYSIS_LIMIT, fetchImpl = fetch }) {
+  if (hasPremiumAccess(fields) || !Number.isFinite(limit) || limit <= 0) {
+    return { allowed: true, limit, remaining: null, premium: hasPremiumAccess(fields), backend: 'disabled' };
+  }
+
+  const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'eu-central-1';
+  const endpoint = `https://dynamodb.${region}.amazonaws.com/`;
+  const { pk, day } = buildQuotaKey({ fields, event });
+  const now = Math.floor(Date.now() / 1000);
+  const body = JSON.stringify({
+    TableName: BILL_ANALYSIS_QUOTA_TABLE,
+    Key: {
+      pk: { S: pk },
+      day: { S: day },
+    },
+    UpdateExpression: 'SET #count = if_not_exists(#count, :zero) + :one, expiresAt = :ttl, updatedAt = :now',
+    ConditionExpression: 'attribute_not_exists(#count) OR #count < :limit',
+    ExpressionAttributeNames: {
+      '#count': 'count',
+    },
+    ExpressionAttributeValues: {
+      ':zero': { N: '0' },
+      ':one': { N: '1' },
+      ':limit': { N: String(limit) },
+      ':ttl': { N: String(now + 60 * 60 * 48) },
+      ':now': { N: String(now) },
+    },
+    ReturnValues: 'UPDATED_NEW',
+  });
+  const headers = signAwsJsonRequest({
+    method: 'POST',
+    url: endpoint,
+    region,
+    service: 'dynamodb',
+    target: 'DynamoDB_20120810.UpdateItem',
+    body,
+  });
+
+  const response = await fetchImpl(endpoint, { method: 'POST', headers, body });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    if (payload?.__type?.includes('ConditionalCheckFailedException')) {
+      return { allowed: false, limit, remaining: 0, premium: false, backend: 'dynamodb' };
+    }
+    throw new Error(`DynamoDB quota failed (${response.status})`);
+  }
+
+  const count = Number(payload?.Attributes?.count?.N || 0);
+  return { allowed: true, limit, remaining: Math.max(limit - count, 0), count, premium: false, backend: 'dynamodb' };
+}
+
+async function checkDailyQuota({ fields, event, options = {} }) {
+  if (BILL_ANALYSIS_QUOTA_TABLE) {
+    return incrementDynamoQuota({ fields, event, fetchImpl: options.fetchImpl || fetch });
+  }
+  return checkLocalQuota({ fields, event });
 }
 
 function decodeBody(event) {
@@ -515,6 +707,34 @@ async function handleBillAnalysisUpload(event, options = {}) {
     return res(400, { error: 'Upload file mancante o non leggibile.' });
   }
 
+  let quota = null;
+  try {
+    quota = await checkDailyQuota({ fields: validation.fields, event, options });
+  } catch (error) {
+    console.error('Bill analysis quota error:', error);
+    return res(503, {
+      error: 'Controllo limite giornaliero non disponibile. Riprova tra poco.',
+      code: 'quota_unavailable',
+    });
+  }
+
+  if (!quota.allowed) {
+    return res(429, {
+      error: `Hai usato le ${quota.limit} analisi gratuite disponibili oggi.`,
+      code: 'daily_quota_exceeded',
+      quota: {
+        limit: quota.limit,
+        remaining: 0,
+        reset: 'Domani',
+      },
+      subscription: {
+        required: true,
+        url: BILL_ANALYSIS_SUBSCRIPTION_URL,
+        message: 'Sblocca altre comparazioni con un abbonamento HURKA.',
+      },
+    });
+  }
+
   let cleanupMeta = { uploadedFileId: '', xaiFileDeleted: null };
   let pipeline = null;
 
@@ -634,6 +854,12 @@ async function handleBillAnalysisUpload(event, options = {}) {
       emailSent,
       customerEmailSent,
       leadScoreClass: leadScore.class,
+      quota: quota ? {
+        limit: quota.limit,
+        remaining: quota.remaining,
+        premium: quota.premium,
+        backend: quota.backend,
+      } : null,
     },
   });
 }

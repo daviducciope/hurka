@@ -3,7 +3,6 @@ Allow: /
 
 # Exclude duplicate, technical, and non-landing resources from indexing.
 Disallow: /index2.html
-Disallow: /check-bolletta-beta/
 Disallow: /lambda/
 Disallow: /hurka-contact.zip
 Disallow: /manifesto_brand_hurka%20(1)_bozza%202.pdf

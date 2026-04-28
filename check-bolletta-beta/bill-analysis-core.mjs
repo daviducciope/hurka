@@ -33,7 +33,10 @@ export const BILL_ANALYSIS_USER_PROMPT = [
   '3. evidenziare le voci che incidono di piu',
   '4. indicare eventuali criticita dell offerta o della struttura di spesa',
   '5. per estimated_savings_range usa 0/0 se il confronto di mercato non e determinabile con certezza — non inventare',
-  '6. suggerire la CTA finale piu affidabile',
+  '6. produrre una spiegazione dettagliata della fattura comprensibile a un utente non tecnico',
+  '7. indicare i punti critici in modo specifico e verificabile',
+  '8. chiudere con una proposta commerciale HURKA prudente, orientata alla vendita, senza promesse assolute',
+  '9. suggerire la CTA finale piu affidabile',
   '',
   'Campo critico: spesa_materia_eur',
   'Deve contenere ESATTAMENTE la voce "Spesa per la materia energia" (o equivalente: "Consumo fatturato", "Spesa energia") della bolletta.',
@@ -86,6 +89,9 @@ export const BILL_ANALYSIS_JSON_SCHEMA = {
       'estimated_savings_range',
       'confidence_note',
       'cta_recommendation',
+      'detailed_explanation',
+      'critical_points',
+      'sales_recommendation',
     ],
     properties: {
       commodity: { type: 'string', enum: ['luce', 'gas', 'dual', 'unknown'] },
@@ -136,6 +142,12 @@ export const BILL_ANALYSIS_JSON_SCHEMA = {
       },
       confidence_note: { type: 'string' },
       cta_recommendation: { type: 'string' },
+      detailed_explanation: { type: 'string' },
+      critical_points: {
+        type: 'array',
+        items: { type: 'string' },
+      },
+      sales_recommendation: { type: 'string' },
     },
   },
 };
@@ -367,6 +379,12 @@ export function createMockAnalysis({ fileName = 'bolletta.pdf', fileSize = 0, fi
         ? 'Abbiamo letto solo parte dei dati. Meglio una verifica assistita.'
         : `Confidenza estrazione ${Math.round(values.confidence * 100)}%.`,
       cta_recommendation: values.cta,
+      detailed_explanation: `${values.headline} Il totale della fattura e composto da materia energia, costi regolati, imposte e possibili altre partite. La parte piu utile per il confronto commerciale e la spesa materia, da verificare insieme ai consumi del periodo.`,
+      critical_points: [
+        values.note,
+        ...(scenario === 'high-savings' ? ['La spesa materia merita un confronto con condizioni alternative HURKA.'] : []),
+      ],
+      sales_recommendation: 'HURKA puo verificare gratuitamente i numeri e proporti il cambio solo se emerge una convenienza reale.',
     },
     meta: {
       fileName,
@@ -424,6 +442,9 @@ export function sanitizeAnalysisData(rawAnalysis = {}) {
     },
     confidence_note: sanitizeText(rawAnalysis.confidence_note, 'Verifica assistita consigliata per confermare i dati.'),
     cta_recommendation: sanitizeText(rawAnalysis.cta_recommendation, 'Parla con un consulente per verificare la bolletta.'),
+    detailed_explanation: sanitizeText(rawAnalysis.detailed_explanation, rawAnalysis.summary || 'La fattura e stata letta dall AI HURKA e va verificata sulle voci principali prima di scegliere una nuova offerta.'),
+    critical_points: sanitizeStringList(rawAnalysis.critical_points || rawAnalysis.possible_issues),
+    sales_recommendation: sanitizeText(rawAnalysis.sales_recommendation, rawAnalysis.cta_recommendation || 'HURKA puo verificare la bolletta e proporti una soluzione solo se il confronto e realmente conveniente.'),
   };
 }
 
@@ -514,6 +535,9 @@ export function createAnalysisResult({ rawAnalysis = {}, meta = {} } = {}) {
     estimated_savings_range: sanitized.estimated_savings_range,
     confidence_note: sanitized.confidence_note,
     cta_recommendation: sanitized.cta_recommendation,
+    detailed_explanation: sanitized.detailed_explanation,
+    critical_points: sanitized.critical_points,
+    sales_recommendation: sanitized.sales_recommendation,
   };
 
   return {

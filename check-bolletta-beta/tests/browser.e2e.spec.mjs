@@ -98,8 +98,8 @@ test('frontend renders a complete analysis payload (mock full-success)', async (
     // At least one WhatsApp / contact CTA must be present regardless of outcome
     await expect(page.locator('[data-result-content] a[href*="wa.me"], [data-result-content] a[href*="contatti"]').first()).toBeVisible({ timeout: 5_000 });
 
-    // "Cosa stai pagando" detail section is always rendered
-    await expect(resultContent).toContainText('Cosa stai pagando');
+    // The AI explanation detail section is always rendered
+    await expect(resultContent).toContainText('Spiegazione AI della fattura');
   } finally {
     await server.stop();
   }

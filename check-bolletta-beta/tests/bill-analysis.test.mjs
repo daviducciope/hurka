@@ -48,6 +48,8 @@ async function loadLambdaModule({ env = {}, fetchImpl } = {}) {
   const originalEnv = {
     XAI_API_KEY: process.env.XAI_API_KEY,
     SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+    BILL_ANALYSIS_DAILY_FREE_LIMIT: process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT,
+    BILL_ANALYSIS_QUOTA_TABLE: process.env.BILL_ANALYSIS_QUOTA_TABLE,
   };
   const originalFetch = globalThis.fetch;
 
@@ -61,6 +63,18 @@ async function loadLambdaModule({ env = {}, fetchImpl } = {}) {
     process.env.SENDGRID_API_KEY = env.SENDGRID_API_KEY;
   } else {
     delete process.env.SENDGRID_API_KEY;
+  }
+
+  if ('BILL_ANALYSIS_DAILY_FREE_LIMIT' in env) {
+    process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT = env.BILL_ANALYSIS_DAILY_FREE_LIMIT;
+  } else {
+    process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT = '0';
+  }
+
+  if ('BILL_ANALYSIS_QUOTA_TABLE' in env) {
+    process.env.BILL_ANALYSIS_QUOTA_TABLE = env.BILL_ANALYSIS_QUOTA_TABLE;
+  } else {
+    delete process.env.BILL_ANALYSIS_QUOTA_TABLE;
   }
 
   if (fetchImpl) {
@@ -77,6 +91,12 @@ async function loadLambdaModule({ env = {}, fetchImpl } = {}) {
 
       if (originalEnv.SENDGRID_API_KEY == null) delete process.env.SENDGRID_API_KEY;
       else process.env.SENDGRID_API_KEY = originalEnv.SENDGRID_API_KEY;
+
+      if (originalEnv.BILL_ANALYSIS_DAILY_FREE_LIMIT == null) delete process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT;
+      else process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT = originalEnv.BILL_ANALYSIS_DAILY_FREE_LIMIT;
+
+      if (originalEnv.BILL_ANALYSIS_QUOTA_TABLE == null) delete process.env.BILL_ANALYSIS_QUOTA_TABLE;
+      else process.env.BILL_ANALYSIS_QUOTA_TABLE = originalEnv.BILL_ANALYSIS_QUOTA_TABLE;
 
       if (fetchImpl) {
         globalThis.fetch = originalFetch;
@@ -121,6 +141,9 @@ function createStructuredAnalysis() {
     estimated_savings_range: { min: 90, max: 180 },
     confidence_note: 'Documento leggibile e dati principali coerenti.',
     cta_recommendation: 'Richiedi una verifica gratuita per confrontare l offerta attuale.',
+    detailed_explanation: 'La fattura mostra una spesa concentrata sulla materia energia, con costi regolati e imposte in seconda battuta.',
+    critical_points: ['Prezzo energia sopra media per il profilo stimato'],
+    sales_recommendation: 'HURKA puo verificare la convenienza e proporti un cambio solo se i numeri restano favorevoli.',
   };
 }
 
@@ -371,6 +394,77 @@ test('bill-analysis endpoint runs the real xAI pipeline, accepts file_id, and de
     assert.equal(payload.analysis.meta.xaiFileDeleted, true);
     assert.equal(payload.meta.emailSent, false);
     assert.equal(calls.length, 3);
+  } finally {
+    loaded.restore();
+  }
+});
+
+test('bill-analysis endpoint blocks the fourth free analysis in the same day', async () => {
+  let uploadCalls = 0;
+  const structured = createStructuredAnalysis();
+  const fetchMock = async (url, init = {}) => {
+    if (url.endsWith('/files') && init.method === 'POST') {
+      uploadCalls += 1;
+      return new Response(JSON.stringify({ file_id: `file_quota_${uploadCalls}` }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+
+    if (url.endsWith('/responses') && init.method === 'POST') {
+      return new Response(JSON.stringify({ output_text: JSON.stringify(structured) }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+
+    if (/\/files\/file_quota_\d+$/.test(url) && init.method === 'DELETE') {
+      return new Response(null, { status: 204 });
+    }
+
+    throw new Error(`Unexpected fetch call: ${url}`);
+  };
+
+  const loaded = await loadLambdaModule({
+    env: {
+      XAI_API_KEY: 'xai-test-key',
+      BILL_ANALYSIS_DAILY_FREE_LIMIT: '3',
+    },
+    fetchImpl: fetchMock,
+  });
+
+  try {
+    const event = () => buildMultipartEvent({
+      fields: {
+        nome: 'Quota Test',
+        telefono: '+393330000001',
+        email: 'quota@example.com',
+        comune: 'Pescara',
+        commodityHint: 'luce',
+        consentAnalysis: 'true',
+        consentMarketing: 'false',
+      },
+      file: {
+        name: 'quota.pdf',
+        type: 'application/pdf',
+        content: '%PDF-1.4 quota',
+      },
+    });
+
+    for (let i = 0; i < 3; i += 1) {
+      const response = await loaded.module.handler(event());
+      assert.equal(response.statusCode, 200);
+      const payload = JSON.parse(response.body);
+      assert.equal(payload.meta.quota.limit, 3);
+      assert.equal(payload.meta.quota.remaining, 2 - i);
+    }
+
+    const blocked = await loaded.module.handler(event());
+    const payload = JSON.parse(blocked.body);
+    assert.equal(blocked.statusCode, 429);
+    assert.equal(payload.code, 'daily_quota_exceeded');
+    assert.equal(payload.quota.remaining, 0);
+    assert.equal(uploadCalls, 3);
   } finally {
     loaded.restore();
   }

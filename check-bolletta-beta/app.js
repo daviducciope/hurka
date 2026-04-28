@@ -101,6 +101,8 @@ async function postBillAnalysis(body) {
         error.endpoint = endpoint;
         error.status = response.status;
         error.apiResponse = true;
+        error.payload = payload;
+        error.publicCode = payload.code || '';
         throw error;
       }
       return { endpoint, payload };
@@ -108,7 +110,9 @@ async function postBillAnalysis(body) {
       lastError = error instanceof Error ? error : new Error(String(error));
       // Stop only on definitive client errors (bad request, auth, validation).
       // For 404/405/5xx the endpoint itself is broken — keep trying other candidates.
-      const definitiveClientError = lastError.apiResponse && [400, 401, 403, 422].includes(lastError.status);
+      const definitiveClientError = lastError.apiResponse && [400, 401, 403, 422, 429].includes(lastError.status);
+      const definitiveApiError = lastError.apiResponse && ['xai_error', 'missing_xai_config', 'daily_quota_exceeded', 'quota_unavailable'].includes(lastError.publicCode);
+      if (definitiveApiError) throw lastError;
       if (definitiveClientError) throw lastError;
     }
   }
@@ -225,15 +229,32 @@ async function submitAnalysis(event) {
       && window.location.port
       && window.location.port !== LOCAL_API_PORT;
     const message = error instanceof Error ? error.message : '';
+    const quotaPayload = error?.payload?.code === 'daily_quota_exceeded' ? error.payload : null;
     setFeedback(
-      message || (isPortMismatch
+      quotaPayload
+        ? `${quotaPayload.error} ${quotaPayload.subscription?.message || ''}`.trim()
+        : message || (isPortMismatch
         ? `Backend non raggiungibile. Avvia il server sulla porta ${LOCAL_API_PORT}.`
         : 'Analisi AI reale non disponibile ora. Riprova tra poco o contatta HURKA su WhatsApp.'),
       'error',
     );
+    if (quotaPayload?.subscription?.url) {
+      setWizardStep('3');
+      resultContent.hidden = false;
+      resultContent.innerHTML = `
+        <article class="esito-card esito-low-conf">
+          <div class="eyebrow eyebrow-low-conf">Limite gratuito raggiunto</div>
+          <h2 class="esito-headline">Hai usato le ${quotaPayload.quota?.limit || 3} analisi gratuite di oggi.</h2>
+          <p class="esito-body-text">Con l'abbonamento HURKA puoi continuare a confrontare bollette con l'AI e ricevere una verifica assistita sulle opportunita migliori.</p>
+          <div class="esito-cta-row">
+            <a class="esito-cta-primary" href="${quotaPayload.subscription.url}">Sblocca altre comparazioni</a>
+            <a class="esito-cta-soft" href="https://wa.me/393888668837?text=Ciao%20HURKA!%2C%20ho%20raggiunto%20il%20limite%20di%20analisi%20bolletta%20AI." target="_blank" rel="noopener">Parla con HURKA</a>
+          </div>
+        </article>`;
+    }
     console.warn('Bill analysis request failed:', error);
     setSubmitting(false);
-    setWizardStep('1');
+    if (!quotaPayload) setWizardStep('1');
     trackEvent('analysis_failed', { reason: error instanceof Error ? error.message : String(error) });
     return;
   }
@@ -305,7 +326,7 @@ function syncFileToForm() {
 
 if (doc) {
   doc.addEventListener('DOMContentLoaded', () => {
-    trackEvent('page_view', { page_name: 'check-bolletta-beta' });
+    trackEvent('page_view', { page_name: 'compara-bolletta-ai' });
     setWizardStep('0');
     initChoiceButtons();
   });

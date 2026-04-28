@@ -183,6 +183,9 @@ function buildDetailCards(analysis, outcome) {
   const narrative = analysis?.narrative || {};
   const topDrivers = Array.isArray(narrative.topDrivers) ? narrative.topDrivers : [];
   const possibleIssues = Array.isArray(explanation.possible_issues) ? explanation.possible_issues : [];
+  const criticalPoints = Array.isArray(explanation.critical_points) && explanation.critical_points.length
+    ? explanation.critical_points
+    : possibleIssues;
 
   // Skip detail section when data is very thin (very low confidence + no consumption data)
   const hasMinimalData = extraction.total_amount_eur > 0 || extraction.provider_name;
@@ -192,18 +195,20 @@ function buildDetailCards(analysis, outcome) {
     .map((item) => `<li><span>${escapeHtml(item.label)}</span><strong>${formatCurrency(item.amount)}</strong></li>`)
     .join('');
 
-  const possibleIssuesMarkup = possibleIssues.length
-    ? `<ul class="result-list compact">${possibleIssues.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+  const possibleIssuesMarkup = criticalPoints.length
+    ? `<ul class="result-list compact">${criticalPoints.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
     : '<p style="margin:.5rem 0 0;color:rgba(16,26,44,.65)">Nessuna criticit&agrave; evidente dai dati letti.</p>';
 
   const ctaRecommendation = escapeHtml(explanation.cta_recommendation || '');
+  const detailedExplanation = escapeHtml(explanation.detailed_explanation || narrative.whyYouPayThis || explanation.summary || '');
+  const salesRecommendation = escapeHtml(explanation.sales_recommendation || explanation.cta_recommendation || '');
 
   return `
     <div class="result-grid" style="margin-top:0">
       <article class="result-card result-card-primary">
-        <div class="eyebrow">Cosa stai pagando</div>
+        <div class="eyebrow">Spiegazione AI della fattura</div>
         <h3>${escapeHtml(explanation.summary || 'Analisi completata')}</h3>
-        <p>${escapeHtml(narrative.whyYouPayThis || explanation.summary || '')}</p>
+        <p>${detailedExplanation}</p>
         <div class="inline-metrics">
           <div>
             <span>Totale bolletta</span>
@@ -221,10 +226,13 @@ function buildDetailCards(analysis, outcome) {
       </article>
 
       <article class="result-card">
-        <div class="eyebrow">Perch&eacute; lo stai pagando</div>
+        <div class="eyebrow">Voci che pesano di pi&ugrave;</div>
         <ul class="result-list">${topDriversMarkup}</ul>
         <div class="eyebrow" style="margin-top:1rem">Possibili criticit&agrave;</div>
         ${possibleIssuesMarkup}
+        ${salesRecommendation ? `
+          <div class="eyebrow" style="margin-top:1rem">Proposta HURKA</div>
+          <p style="margin:.6rem 0 0;color:rgba(16,26,44,.72)">${salesRecommendation}</p>` : ''}
         ${ctaRecommendation ? `
           <div class="eyebrow" style="margin-top:1rem">Prossimo passo</div>
           <p style="margin:.6rem 0 0;color:rgba(16,26,44,.72)">${ctaRecommendation}</p>` : ''}
