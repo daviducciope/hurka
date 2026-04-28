@@ -1,7 +1,11 @@
 export const SUPPORTED_MIME_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 export const XAI_BASE_URL = 'https://api.x.ai/v1';
-export const XAI_MODEL = 'grok-4.20-reasoning';
+export const XAI_MODEL = (
+  typeof process !== 'undefined' && process.env?.XAI_MODEL
+    ? process.env.XAI_MODEL
+    : 'grok-4-1-fast-non-reasoning'
+);
 export const XAI_FILE_PURPOSE = 'assistants';
 export const XAI_TIMEOUT_MS = 180_000;
 

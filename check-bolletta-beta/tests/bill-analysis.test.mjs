@@ -339,7 +339,7 @@ test('bill-analysis endpoint runs the real xAI pipeline, accepts file_id, and de
 
     if (url.endsWith('/responses') && init.method === 'POST') {
       const requestBody = JSON.parse(init.body);
-      assert.equal(requestBody.model, 'grok-4.20-reasoning');
+      assert.equal(requestBody.model, 'grok-4-1-fast-non-reasoning');
       assert.equal(requestBody.store, false);
       assert.equal(requestBody.text.format.type, 'json_schema');
       assert.equal(requestBody.input[1].content[1].file_id, 'file_123');
