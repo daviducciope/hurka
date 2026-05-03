@@ -119,6 +119,28 @@ async function postBillAnalysis(body) {
   throw lastError || new Error('Analisi non disponibile.');
 }
 
+function getPublicSubmitErrorMessage(error) {
+  const payload = error?.payload || {};
+  if (payload.code === 'daily_quota_exceeded') {
+    return `${payload.error} ${payload.subscription?.message || ''}`.trim();
+  }
+  if (payload.error) return payload.error;
+
+  const status = Number(error?.status || 0);
+  if (status >= 500) {
+    return 'Analisi AI reale non disponibile in questo momento. Riprova tra poco o contatta HURKA su WhatsApp.';
+  }
+  if (status === 429) {
+    return 'Limite di analisi gratuite raggiunto. Riprova domani o contatta HURKA.';
+  }
+
+  const message = error instanceof Error ? error.message : '';
+  if (/^HTTP\s+\d+$/i.test(message)) {
+    return 'Analisi AI reale non disponibile in questo momento. Riprova tra poco o contatta HURKA su WhatsApp.';
+  }
+  return message;
+}
+
 function updateStep3Header(analysis) {
   const h2 = doc?.querySelector('[data-step-panel="3"] .wizard-header h2');
   if (!h2) return;
@@ -232,8 +254,8 @@ async function submitAnalysis(event) {
     const quotaPayload = error?.payload?.code === 'daily_quota_exceeded' ? error.payload : null;
     setFeedback(
       quotaPayload
-        ? `${quotaPayload.error} ${quotaPayload.subscription?.message || ''}`.trim()
-        : message || (isPortMismatch
+        ? getPublicSubmitErrorMessage(error)
+        : getPublicSubmitErrorMessage(error) || (isPortMismatch
         ? `Backend non raggiungibile. Avvia il server sulla porta ${LOCAL_API_PORT}.`
         : 'Analisi AI reale non disponibile ora. Riprova tra poco o contatta HURKA su WhatsApp.'),
       'error',
