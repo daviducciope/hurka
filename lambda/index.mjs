@@ -4,6 +4,7 @@ import {
   BILL_ANALYSIS_USER_PROMPT,
   XAI_BASE_URL,
   XAI_FILE_PURPOSE,
+  XAI_MAX_OUTPUT_TOKENS,
   XAI_MODEL,
   XAI_TIMEOUT_MS,
   createAnalysisResult,
@@ -527,6 +528,9 @@ export async function analyzeBillWithGrok({ fileId, originalFields }, options = 
       },
     },
   };
+  if (Number.isFinite(XAI_MAX_OUTPUT_TOKENS) && XAI_MAX_OUTPUT_TOKENS > 0) {
+    body.max_output_tokens = XAI_MAX_OUTPUT_TOKENS;
+  }
 
   const { signal, clear } = createAbortSignal(options.timeoutMs);
   try {
@@ -811,58 +815,56 @@ async function handleBillAnalysisUpload(event, options = {}) {
     callbackRequested: false,
   });
 
-  let emailSent = false;
-  let customerEmailSent = false;
+  const emailTasks = [];
 
-  try {
-    // Internal notification with full lead data
-    const internal = buildInternalLeadEmail({
-      fields: validation.fields,
-      file,
-      analysis: pipeline.analysis,
-      leadScore,
-      offerMatch,
-    });
-    await sendEmail({
-      personalizations: [{ to: [{ email: TO_EMAIL }] }],
-      from: { email: FROM_EMAIL, name: FROM_NAME },
-      reply_to: validation.fields.email ? { email: validation.fields.email, name: validation.fields.nome } : undefined,
-      subject: internal.subject,
-      content: [
-        { type: 'text/plain', value: internal.text },
-        { type: 'text/html', value: internal.html },
-      ],
-    });
-    emailSent = true;
-  } catch {
-    console.warn('Internal lead notification failed');
-  }
+  // Run SendGrid calls in parallel: after the AI has completed, sequential
+  // email sends can push the HTTP API request past its 30s timeout.
+  const internal = buildInternalLeadEmail({
+    fields: validation.fields,
+    file,
+    analysis: pipeline.analysis,
+    leadScore,
+    offerMatch,
+  });
+  emailTasks.push(sendEmail({
+    personalizations: [{ to: [{ email: TO_EMAIL }] }],
+    from: { email: FROM_EMAIL, name: FROM_NAME },
+    reply_to: validation.fields.email ? { email: validation.fields.email, name: validation.fields.nome } : undefined,
+    subject: internal.subject,
+    content: [
+      { type: 'text/plain', value: internal.text },
+      { type: 'text/html', value: internal.html },
+    ],
+  }));
 
-  // Customer confirmation email (only if email was provided)
   if (validation.fields.email) {
-    try {
-      const customer = buildCustomerEmail({
-        nome: validation.fields.nome,
-        commodity: pipeline.analysis.extraction?.commodity || validation.fields.commodityHint,
-        salesOpportunity: pipeline.analysis.salesOpportunity,
-        offerMatch,
-        consentMarketing: validation.fields.consentMarketing,
-      });
-      await sendEmail({
-        personalizations: [{ to: [{ email: validation.fields.email, name: validation.fields.nome }] }],
-        from: { email: FROM_EMAIL, name: FROM_NAME },
-        reply_to: { email: TO_EMAIL, name: FROM_NAME },
-        subject: customer.subject,
-        content: [
-          { type: 'text/plain', value: customer.text },
-          { type: 'text/html', value: customer.html },
-        ],
-      });
-      customerEmailSent = true;
-    } catch {
-      console.warn('Customer confirmation email failed');
-    }
+    const customer = buildCustomerEmail({
+      nome: validation.fields.nome,
+      commodity: pipeline.analysis.extraction?.commodity || validation.fields.commodityHint,
+      salesOpportunity: pipeline.analysis.salesOpportunity,
+      offerMatch,
+      consentMarketing: validation.fields.consentMarketing,
+    });
+    emailTasks.push(sendEmail({
+      personalizations: [{ to: [{ email: validation.fields.email, name: validation.fields.nome }] }],
+      from: { email: FROM_EMAIL, name: FROM_NAME },
+      reply_to: { email: TO_EMAIL, name: FROM_NAME },
+      subject: customer.subject,
+      content: [
+        { type: 'text/plain', value: customer.text },
+        { type: 'text/html', value: customer.html },
+      ],
+    }));
   }
+
+  const emailResults = await Promise.allSettled(emailTasks);
+  const emailSent = emailResults[0]?.status === 'fulfilled';
+  const customerEmailSent = validation.fields.email
+    ? emailResults[1]?.status === 'fulfilled'
+    : false;
+
+  if (!emailSent) console.warn('Internal lead notification failed');
+  if (validation.fields.email && !customerEmailSent) console.warn('Customer confirmation email failed');
 
   return res(200, {
     message: 'Analisi completata',

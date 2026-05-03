@@ -6,6 +6,12 @@ export const XAI_MODEL = (
     ? process.env.XAI_MODEL
     : 'grok-4-1-fast-non-reasoning'
 );
+export const XAI_MAX_OUTPUT_TOKENS = Number.parseInt(
+  typeof process !== 'undefined' && process.env?.XAI_MAX_OUTPUT_TOKENS
+    ? process.env.XAI_MAX_OUTPUT_TOKENS
+    : '1400',
+  10,
+);
 export const XAI_FILE_PURPOSE = 'assistants';
 export const XAI_TIMEOUT_MS = 180_000;
 
@@ -41,6 +47,7 @@ export const BILL_ANALYSIS_USER_PROMPT = [
   '7. indicare i punti critici in modo specifico e verificabile',
   '8. chiudere con una proposta commerciale HURKA prudente, orientata alla vendita, senza promesse assolute',
   '9. suggerire la CTA finale piu affidabile',
+  '10. mantieni i testi sintetici: summary max 160 caratteri, detailed_explanation max 650 caratteri, massimo 3 elementi per lista',
   '',
   'Campo critico: spesa_materia_eur',
   'Deve contenere ESATTAMENTE la voce "Spesa per la materia energia" (o equivalente: "Consumo fatturato", "Spesa energia") della bolletta.',
