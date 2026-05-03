@@ -44,6 +44,30 @@ function buildMultipartEvent({ fields, file, path = '/api/bill-analysis/upload' 
   };
 }
 
+function buildContactMultipartEvent(fields, path = '/contact') {
+  const boundary = '----hurka-contact-boundary';
+  const segments = [];
+
+  for (const [name, value] of Object.entries(fields)) {
+    segments.push(
+      `--${boundary}\r\n` +
+      `Content-Disposition: form-data; name="${name}"\r\n\r\n` +
+      `${value}\r\n`,
+    );
+  }
+
+  segments.push(`--${boundary}--\r\n`);
+  const rawBody = segments.join('');
+  return {
+    rawPath: path,
+    path,
+    requestContext: { http: { method: 'POST', path } },
+    headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
+    body: Buffer.from(rawBody, 'latin1').toString('base64'),
+    isBase64Encoded: true,
+  };
+}
+
 async function loadLambdaModule({ env = {}, fetchImpl } = {}) {
   const originalEnv = {
     XAI_API_KEY: process.env.XAI_API_KEY,
@@ -161,6 +185,79 @@ function attachSalesOpportunity(analysis, overrides = {}) {
   };
   return analysis;
 }
+
+test('contact endpoint accepts JSON and sends internal plus confirmation emails', async () => {
+  const sentEmails = [];
+  const fetchMock = async (url, init = {}) => {
+    assert.match(String(url), /api\.sendgrid\.com/);
+    sentEmails.push(JSON.parse(init.body));
+    return new Response(null, { status: 202 });
+  };
+
+  const loaded = await loadLambdaModule({
+    env: { SENDGRID_API_KEY: 'SG.test-key' },
+    fetchImpl: fetchMock,
+  });
+
+  try {
+    const response = await loaded.module.handler({
+      rawPath: '/contact',
+      path: '/contact',
+      requestContext: { http: { method: 'POST', path: '/contact' } },
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        servizio: 'Luce e gas',
+        nome: 'Mario Rossi',
+        email: 'mario@example.com',
+        telefono: '+393331112233',
+        luogo: 'Pescara',
+        messaggio: 'Vorrei una consulenza.',
+      }),
+    });
+    const payload = JSON.parse(response.body);
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(payload.success, true);
+    assert.equal(sentEmails.length, 2);
+    assert.equal(sentEmails[0].personalizations[0].to[0].email, 'info@smartconitalia.com');
+    assert.equal(sentEmails[1].personalizations[0].to[0].email, 'mario@example.com');
+  } finally {
+    loaded.restore();
+  }
+});
+
+test('contact endpoint accepts multipart forms from static pages', async () => {
+  const sentEmails = [];
+  const fetchMock = async (url, init = {}) => {
+    assert.match(String(url), /api\.sendgrid\.com/);
+    sentEmails.push(JSON.parse(init.body));
+    return new Response(null, { status: 202 });
+  };
+
+  const loaded = await loadLambdaModule({
+    env: { SENDGRID_API_KEY: 'SG.test-key' },
+    fetchImpl: fetchMock,
+  });
+
+  try {
+    const response = await loaded.module.handler(buildContactMultipartEvent({
+      servizio: 'Fotovoltaico',
+      nome: 'Anna Verdi',
+      email: 'anna@example.com',
+      telefono: '+393331112244',
+      luogo: 'Montesilvano',
+      messaggio: 'Vorrei informazioni.\n\n[Pagina: Fotovoltaico]',
+    }));
+    const payload = JSON.parse(response.body);
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(payload.success, true);
+    assert.equal(sentEmails.length, 2);
+    assert.match(sentEmails[0].content[0].value, /Luogo: Montesilvano/);
+  } finally {
+    loaded.restore();
+  }
+});
 
 test('validateUploadInput rejects missing consent and unsupported mime type', () => {
   const result = validateUploadInput({

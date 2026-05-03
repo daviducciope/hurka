@@ -171,7 +171,7 @@ const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url || '/', `http://${req.headers.host}`);
 
-    if (url.pathname === '/api/bill-analysis/upload') {
+    if (url.pathname === '/api/bill-analysis/upload' || url.pathname === '/contact') {
       const chunks = [];
       for await (const chunk of req) {
         chunks.push(chunk);

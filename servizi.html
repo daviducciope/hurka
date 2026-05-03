@@ -1140,7 +1140,7 @@
         body.append('telefono', document.getElementById('cf-telefono').value);
         body.append('messaggio', document.getElementById('cf-messaggio').value + '\n\n[Pagina: Servizi]');
         try {
-          const res = await fetch('https://formsubmit.co/ajax/info@hurka.it', { method: 'POST', headers: { 'Accept': 'application/json' }, body });
+          const res = await fetch('https://dewas95a1m.execute-api.eu-central-1.amazonaws.com/contact', { method: 'POST', headers: { 'Accept': 'application/json' }, body });
           const data = await res.json();
           if (data.success === 'true' || data.success === true) {
             feedback.className = 'rounded-xl bg-green-900/40 border border-green-500/30 px-4 py-3 text-sm font-medium text-green-300';

@@ -660,7 +660,7 @@
         body.append('messaggio', document.getElementById('cf-messaggio').value + '\n\n[Pagina: Contatti]');
 
         try {
-          const response = await fetch('https://formsubmit.co/ajax/info@hurka.it', {
+          const response = await fetch('https://dewas95a1m.execute-api.eu-central-1.amazonaws.com/contact', {
             method: 'POST',
             headers: { 'Accept': 'application/json' },
             body,

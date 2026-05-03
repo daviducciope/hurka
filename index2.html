@@ -2030,10 +2030,12 @@
   })();
 
   /* ── Form submit handler ── */
-  document.getElementById('contact-form').addEventListener('submit', function(e) {
+  document.getElementById('contact-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const form = this;
     const btn  = form.querySelector('.form-submit');
+    const originalBtnHtml = btn.innerHTML;
+    const API_URL = 'https://dewas95a1m.execute-api.eu-central-1.amazonaws.com/contact';
 
     /* Basic validation */
     const nome  = form.nome.value.trim();
@@ -2049,14 +2051,30 @@
       return;
     }
 
-    /* Simulate send */
     btn.disabled = true;
     btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Invio in corso…';
 
-    setTimeout(function() {
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          servizio: form.servizio.value,
+          nome,
+          email,
+          telefono: form.telefono.value.trim(),
+          messaggio: msg + '\n\n[Pagina: Home alternativa]',
+        }),
+      });
+      const data = await response.json().catch(function() { return {}; });
+      if (!response.ok || data.success === false) throw new Error(data.error || 'Invio non riuscito');
       form.style.display = 'none';
       document.getElementById('form-success').classList.add('visible');
-    }, 1200);
+    } catch (error) {
+      btn.disabled = false;
+      btn.innerHTML = originalBtnHtml;
+      alert('Qualcosa non ha funzionato. Scrivici direttamente a info@hurka.it');
+    }
   });
 
 </script>
