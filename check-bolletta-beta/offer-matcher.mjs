@@ -10,6 +10,12 @@ const MAX_PLAUSIBLE_EUR_KWH = 0.60;    // implausibly high (likely arrears/una-t
 const MAX_FIXED_ANNUAL_EUR = 250;      // cap on annualized fixed quota to avoid inflating one-off charges
 const MAX_CREDIBLE_SAVING_PERCENT = 50; // above this, ask for human verification instead of promising
 
+// Anomaly guardrail — arrears/one-off charges (insoluti, solleciti, conguagli, una-tantum)
+// make a single-bill saving estimate misleading: route to assisted review instead of promising.
+const ANOMALY_ALTRE_PARTITE_RATIO = 0.30;   // altre partite above this share of the total bill
+const ANOMALY_ALTRE_PARTITE_MIN_EUR = 60;   // absolute floor so small adjustments don't trigger
+const ANOMALY_KEYWORD_REGEX = /insolut|sollecit|morosit|arretrat|distacc|messa in mora|rateizz|partite pregress|importi? pregress/i;
+
 // Business detection: domestic offers must not be matched to business supplies.
 const BUSINESS_ANNUAL_KWH = 10000;
 const BUSINESS_NAME_REGEX = /(\bs\.?r\.?l\.?s?\b|\bs\.?p\.?a\.?\b|\bs\.?n\.?c\.?\b|\bs\.?a\.?s\.?\b|societa|ristorante|osteria|trattoria|pizzeria|\bbar\b|\bhotel\b|albergo|\bb&b\b|azienda|\bditta\b|impresa|officina|\bnegozio\b|stabilimento|capannone)/i;
@@ -83,6 +89,32 @@ function detectBusiness(extraction, annualKwh) {
 }
 
 /**
+ * Detects arrears/one-off anomalies (insoluti, solleciti, conguagli, una-tantum) that make an
+ * automated saving estimate from a single bill unreliable. Returns a reason string or null.
+ */
+function detectBillAnomaly(extraction, explanation) {
+  const total = extraction.total_amount_eur || 0;
+  const altrePartite = extraction.altre_partite_eur || 0;
+  if (altrePartite >= ANOMALY_ALTRE_PARTITE_MIN_EUR
+    && total > 0
+    && (altrePartite / total) > ANOMALY_ALTRE_PARTITE_RATIO) {
+    return `La bolletta contiene "altre partite" rilevanti (${Math.round(altrePartite)}€ su ${Math.round(total)}€ totali): probabili conguagli, insoluti o una-tantum che falserebbero una stima di risparmio automatica.`;
+  }
+
+  const text = [
+    explanation.summary,
+    explanation.detailed_explanation,
+    ...(Array.isArray(explanation.possible_issues) ? explanation.possible_issues : []),
+    ...(Array.isArray(explanation.critical_points) ? explanation.critical_points : []),
+  ].filter(Boolean).join(' ');
+  if (ANOMALY_KEYWORD_REGEX.test(text)) {
+    return 'La bolletta segnala insoluti, solleciti o importi arretrati: serve una verifica assistita prima di stimare un risparmio.';
+  }
+
+  return null;
+}
+
+/**
  * Builds a match result for a single offer.
  */
 function buildMatchResult(offer, annualSpesaMateria, annualKwh, profile) {
@@ -127,6 +159,7 @@ function buildMatchResult(offer, annualSpesaMateria, annualKwh, profile) {
  */
 export function rankHurkaOffersForBill(analysis, options = {}) {
   const extraction = analysis?.extraction || {};
+  const explanation = analysis?.explanation || {};
   const confidence = extraction.extraction_confidence || 0;
   const commodity = options.commodityOverride || extraction.commodity || 'luce';
   const preferenceType = options.preferenceType || 'risparmio';
@@ -163,6 +196,19 @@ export function rankHurkaOffersForBill(analysis, options = {}) {
       alternativeOffer: null,
       noMatchReason: 'Dati insufficienti estratti dalla bolletta (consumo o spesa materia non leggibili).',
       noMatchType: 'insufficient-data',
+      calculatedAt: new Date().toISOString(),
+    };
+  }
+
+  // Guardrail: arrears/one-off anomalies (insoluti, solleciti, conguagli) → assisted review, not a promise.
+  const anomalyReason = detectBillAnomaly(extraction, explanation);
+  if (anomalyReason) {
+    return {
+      hasMatch: false,
+      topOffer: null,
+      alternativeOffer: null,
+      noMatchReason: anomalyReason,
+      noMatchType: 'manual_check',
       calculatedAt: new Date().toISOString(),
     };
   }

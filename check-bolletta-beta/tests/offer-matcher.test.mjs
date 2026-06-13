@@ -293,3 +293,95 @@ test('Saving falls back to derived from quota fields when spesa_materia_eur is 0
     result.topOffer?.calculationBasis?.spesaMateriaSource ?? 'derived',
   ));
 });
+
+test('Bill with large altre_partite (arrears/conguaglio): routes to assisted review (manual_check)', () => {
+  const analysis = createAnalysisResult({
+    rawAnalysis: {
+      commodity: 'luce',
+      provider_name: 'Test',
+      customer_name: 'Mario Rossi',
+      supply_address: 'Roma',
+      pod_or_pdr: 'IT001E00000099',
+      offer_code: '',
+      market_type: 'libero',
+      billing_period_start: '2026-01-01',
+      billing_period_end: '2026-02-28',
+      invoice_date: '2026-03-10',
+      due_date: '2026-03-30',
+      total_amount_eur: 400,
+      consumption_total: 700,
+      consumption_unit: 'kWh',
+      fascia_f1: 0,
+      fascia_f2: 0,
+      fascia_f3: 0,
+      spesa_materia_eur: 150,
+      quota_consumi_eur: 0,
+      quota_fissa_eur: 0,
+      quota_potenza_eur: 0,
+      trasporto_e_oneri_eur: 40,
+      imposte_iva_eur: 30,
+      altre_partite_eur: 180, // 45% del totale → anomalia
+      price_formula_text: '',
+      estimated_monthly_cost: 200,
+      estimated_annual_cost: 2400,
+      extraction_confidence: 0.9,
+      summary: 'Bolletta con conguaglio rilevante',
+      main_cost_drivers: [],
+      possible_issues: [],
+      estimated_savings_range: { min: 0, max: 0 },
+      confidence_note: '',
+      cta_recommendation: '',
+    },
+    meta: { mode: 'live', provider: 'xai', usedFallback: false },
+  });
+
+  const result = rankHurkaOffersForBill(analysis, { preferenceType: 'risparmio' });
+  assert.equal(result.hasMatch, false);
+  assert.equal(result.noMatchType, 'manual_check');
+});
+
+test('Bill flagged with insoluti/solleciti in possible_issues: manual_check', () => {
+  const analysis = createAnalysisResult({
+    rawAnalysis: {
+      commodity: 'luce',
+      provider_name: 'Test',
+      customer_name: 'Anna Bianchi',
+      supply_address: 'Milano',
+      pod_or_pdr: 'IT001E00000098',
+      offer_code: '',
+      market_type: 'libero',
+      billing_period_start: '2026-01-01',
+      billing_period_end: '2026-01-31',
+      invoice_date: '2026-02-05',
+      due_date: '2026-02-25',
+      total_amount_eur: 210,
+      consumption_total: 300,
+      consumption_unit: 'kWh',
+      fascia_f1: 0,
+      fascia_f2: 0,
+      fascia_f3: 0,
+      spesa_materia_eur: 110,
+      quota_consumi_eur: 0,
+      quota_fissa_eur: 0,
+      quota_potenza_eur: 0,
+      trasporto_e_oneri_eur: 60,
+      imposte_iva_eur: 40,
+      altre_partite_eur: 0,
+      price_formula_text: '',
+      estimated_monthly_cost: 210,
+      estimated_annual_cost: 2520,
+      extraction_confidence: 0.9,
+      summary: 'Presenza di sollecito di pagamento',
+      main_cost_drivers: [],
+      possible_issues: ['Fattura con insoluti pregressi non saldati'],
+      estimated_savings_range: { min: 0, max: 0 },
+      confidence_note: '',
+      cta_recommendation: '',
+    },
+    meta: { mode: 'live', provider: 'xai', usedFallback: false },
+  });
+
+  const result = rankHurkaOffersForBill(analysis, { preferenceType: 'risparmio' });
+  assert.equal(result.hasMatch, false);
+  assert.equal(result.noMatchType, 'manual_check');
+});

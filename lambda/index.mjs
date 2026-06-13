@@ -684,7 +684,7 @@ function buildSalesOpportunity({ analysis, offerMatch }) {
   }
 
   const assistedTypes = new Set([
-    'low-confidence', 'insufficient-data', 'low-consumption', 'implausible-rate', 'too-good',
+    'low-confidence', 'insufficient-data', 'low-consumption', 'implausible-rate', 'too-good', 'manual_check',
   ]);
   const lowConfidence = assistedTypes.has(noMatchType)
     || confidence < 0.60
