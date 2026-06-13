@@ -170,16 +170,19 @@ export const HURKA_OFFERS = [
 
 /**
  * Returns offers compatible with the given bill profile.
- * @param {{ commodity?: string, annualConsumptionKwh?: number, preferenceType?: 'risparmio'|'stabilita' }} filters
+ * @param {{ commodity?: string, annualConsumptionKwh?: number, preferenceType?: 'risparmio'|'stabilita', segment?: string }} filters
  * @returns {HurkaOffer[]}
  */
 export function getEligibleOffers(filters = {}) {
   const commodity = filters.commodity || 'luce';
   const consumption = filters.annualConsumptionKwh || 0;
+  const segment = filters.segment || 'domestico';
 
   let offers = HURKA_OFFERS.filter((o) => {
     if (o.commodity !== commodity && commodity !== 'dual') return false;
     if (o.maxConsumptionKwh !== null && consumption > o.maxConsumptionKwh) return false;
+    // Business supplies must not be served domestic offers.
+    if (segment === 'business' && o.targetSegment === 'domestico') return false;
     return true;
   });
 

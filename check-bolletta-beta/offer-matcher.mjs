@@ -3,6 +3,17 @@ import { getEligibleOffers, projectOfferCost, PUN_REFERENCE_MONO_EUR_KWH } from 
 const MIN_ANNUAL_SAVING_EUR = 30;   // below this threshold, don't recommend
 const MIN_CONFIDENCE_FOR_MATCH = 0.60;
 
+// Credibility guardrails — keep projected savings realistic.
+const MIN_ANNUAL_KWH = 600;            // below this the annualization from a single bill is unreliable
+const MIN_PLAUSIBLE_EUR_KWH = 0.05;    // implausibly low vendor energy rate
+const MAX_PLAUSIBLE_EUR_KWH = 0.60;    // implausibly high (likely arrears/una-tantum inside spesa materia)
+const MAX_FIXED_ANNUAL_EUR = 250;      // cap on annualized fixed quota to avoid inflating one-off charges
+const MAX_CREDIBLE_SAVING_PERCENT = 50; // above this, ask for human verification instead of promising
+
+// Business detection: domestic offers must not be matched to business supplies.
+const BUSINESS_ANNUAL_KWH = 10000;
+const BUSINESS_NAME_REGEX = /(\bs\.?r\.?l\.?s?\b|\bs\.?p\.?a\.?\b|\bs\.?n\.?c\.?\b|\bs\.?a\.?s\.?\b|societa|ristorante|osteria|trattoria|pizzeria|\bbar\b|\bhotel\b|albergo|\bb&b\b|azienda|\bditta\b|impresa|officina|\bnegozio\b|stabilimento|capannone)/i;
+
 /**
  * Derives billing period in days from ISO date strings.
  * Returns null if dates are invalid.
@@ -46,8 +57,29 @@ function extractBillProfile(extraction) {
     }
   }
 
+  // Separate the recurring fixed quota from the variable energy inside spesa materia.
+  // Annualizing the whole spesa materia inflates savings when it embeds one-off charges.
+  let fixedComponent = Math.max(0, (extraction.quota_fissa_eur || 0) + (extraction.quota_potenza_eur || 0));
+  let energyComponent = spesaMateria - fixedComponent;
+  if (energyComponent < 0) {
+    // Inconsistent extraction (fixed > materia): treat everything as energy, no separate fixed.
+    energyComponent = spesaMateria;
+    fixedComponent = 0;
+  }
+
   const consumption = extraction.consumption_total || 0;
-  return { spesaMateria, consumption, days, source };
+  return { spesaMateria, energyComponent, fixedComponent, consumption, days, source };
+}
+
+/**
+ * Detects whether the supply is a business profile, which must not be matched
+ * to HURKA domestic offers.
+ */
+function detectBusiness(extraction, annualKwh) {
+  const name = String(extraction.customer_name || '');
+  if (BUSINESS_NAME_REGEX.test(name)) return true;
+  if (annualKwh >= BUSINESS_ANNUAL_KWH) return true;
+  return false;
 }
 
 /**
@@ -89,6 +121,7 @@ function buildMatchResult(offer, annualSpesaMateria, annualKwh, profile) {
  *   topOffer: object|null,
  *   alternativeOffer: object|null,
  *   noMatchReason: string|null,
+ *   noMatchType: string|null,
  *   calculatedAt: string,
  * }}
  */
@@ -106,6 +139,7 @@ export function rankHurkaOffersForBill(analysis, options = {}) {
       noMatchReason: commodity === 'gas'
         ? 'Le offerte HURKA attuali coprono solo la luce. Per il gas ti ricontatteremo separatamente.'
         : 'Commodity non identificata dalla bolletta — non e possibile fare un confronto affidabile.',
+      noMatchType: commodity === 'gas' ? 'gas' : 'unknown-commodity',
       calculatedAt: new Date().toISOString(),
     };
   }
@@ -116,6 +150,7 @@ export function rankHurkaOffersForBill(analysis, options = {}) {
       topOffer: null,
       alternativeOffer: null,
       noMatchReason: `Confidenza di estrazione troppo bassa (${Math.round(confidence * 100)}%) per un confronto affidabile. Verifica assistita consigliata.`,
+      noMatchType: 'low-confidence',
       calculatedAt: new Date().toISOString(),
     };
   }
@@ -127,18 +162,59 @@ export function rankHurkaOffersForBill(analysis, options = {}) {
       topOffer: null,
       alternativeOffer: null,
       noMatchReason: 'Dati insufficienti estratti dalla bolletta (consumo o spesa materia non leggibili).',
+      noMatchType: 'insufficient-data',
       calculatedAt: new Date().toISOString(),
     };
   }
 
-  // Annualize
+  // Annualize: energy follows consumption; fixed quota is capped to avoid inflating one-off charges.
   const annualKwh = (profile.consumption / profile.days) * 365;
-  const annualSpesaMateria = (profile.spesaMateria / profile.days) * 365;
+  const annualEnergy = (profile.energyComponent / profile.days) * 365;
+  const annualFixed = Math.min((profile.fixedComponent / profile.days) * 365, MAX_FIXED_ANNUAL_EUR);
+  const annualSpesaMateria = annualEnergy + annualFixed;
+
+  // Guardrail: business supplies must not be matched to domestic offers.
+  if (detectBusiness(extraction, annualKwh)) {
+    return {
+      hasMatch: false,
+      topOffer: null,
+      alternativeOffer: null,
+      noMatchReason: 'La fornitura risulta di tipo business (consumo elevato o ragione sociale). Le offerte domestiche HURKA non sono adatte: un consulente business ti propone condizioni dedicate.',
+      noMatchType: 'business',
+      calculatedAt: new Date().toISOString(),
+    };
+  }
+
+  // Guardrail: too little consumption to annualize a single bill reliably.
+  if (annualKwh < MIN_ANNUAL_KWH) {
+    return {
+      hasMatch: false,
+      topOffer: null,
+      alternativeOffer: null,
+      noMatchReason: `Consumo annuo stimato troppo basso (${Math.round(annualKwh)} kWh) per un confronto affidabile da una sola bolletta. Meglio una verifica assistita su piu periodi.`,
+      noMatchType: 'low-consumption',
+      calculatedAt: new Date().toISOString(),
+    };
+  }
+
+  // Guardrail: implausible effective €/kWh (often arrears/una-tantum inside spesa materia).
+  const effectiveVendorPerKwh = annualKwh > 0 ? annualEnergy / annualKwh : 0;
+  if (effectiveVendorPerKwh < MIN_PLAUSIBLE_EUR_KWH || effectiveVendorPerKwh > MAX_PLAUSIBLE_EUR_KWH) {
+    return {
+      hasMatch: false,
+      topOffer: null,
+      alternativeOffer: null,
+      noMatchReason: `La spesa materia letta (${effectiveVendorPerKwh.toFixed(3)} €/kWh) sembra includere voci una-tantum o conguagli: serve una verifica assistita prima di stimare un risparmio.`,
+      noMatchType: 'implausible-rate',
+      calculatedAt: new Date().toISOString(),
+    };
+  }
 
   const eligibleOffers = getEligibleOffers({
     commodity,
     annualConsumptionKwh: annualKwh,
     preferenceType,
+    segment: 'domestico',
   });
 
   const sortFn = preferenceType === 'stabilita'
@@ -161,11 +237,25 @@ export function rankHurkaOffersForBill(analysis, options = {}) {
       topOffer: null,
       alternativeOffer: null,
       noMatchReason: 'Il profilo attuale non mostra un risparmio credibile con le offerte HURKA disponibili. Potremmo comunque verificare clausole o potenza contrattuale.',
+      noMatchType: 'limited',
       calculatedAt: new Date().toISOString(),
     };
   }
 
-  const topOffer = formatMatchOutput(results[0]);
+  // Guardrail: a saving that is too high to be true needs human verification, not a promise.
+  const topResult = results[0];
+  if (topResult.savingPercent > MAX_CREDIBLE_SAVING_PERCENT) {
+    return {
+      hasMatch: false,
+      topOffer: null,
+      alternativeOffer: null,
+      noMatchReason: `Il risparmio stimato (${topResult.savingPercent}%) e troppo alto per essere confermato in automatico: probabile anomalia nei dati. Ti proponiamo una verifica assistita.`,
+      noMatchType: 'too-good',
+      calculatedAt: new Date().toISOString(),
+    };
+  }
+
+  const topOffer = formatMatchOutput(topResult);
   const alternativeOffer = results[1] ? formatMatchOutput(results[1]) : null;
 
   return {
@@ -173,6 +263,7 @@ export function rankHurkaOffersForBill(analysis, options = {}) {
     topOffer,
     alternativeOffer,
     noMatchReason: null,
+    noMatchType: null,
     calculatedAt: new Date().toISOString(),
   };
 }

@@ -668,7 +668,27 @@ function buildSalesOpportunity({ analysis, offerMatch }) {
   }
 
   const reason = String(offerMatch?.noMatchReason || '');
-  const lowConfidence = confidence < 0.60 || /confidenza|insufficien|non identificat|dati insufficien/i.test(reason);
+  const noMatchType = String(offerMatch?.noMatchType || '');
+
+  if (noMatchType === 'business') {
+    return {
+      status: 'assisted-review',
+      hasSavingOpportunity: false,
+      savingsRange: { min: 0, max: 0 },
+      benchmarkSource: 'assisted_review',
+      confidence,
+      headline: 'Profilo business: serve una verifica dedicata.',
+      summary: reason || 'La fornitura sembra di tipo business: le offerte domestiche non sono adatte.',
+      nextStep: 'Un consulente HURKA business ti ricontatta per costruire una proposta su misura.',
+    };
+  }
+
+  const assistedTypes = new Set([
+    'low-confidence', 'insufficient-data', 'low-consumption', 'implausible-rate', 'too-good',
+  ]);
+  const lowConfidence = assistedTypes.has(noMatchType)
+    || confidence < 0.60
+    || /confidenza|insufficien|non identificat|dati insufficien/i.test(reason);
 
   if (lowConfidence) {
     return {

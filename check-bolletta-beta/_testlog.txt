@@ -1,0 +1,294 @@
+1781384984520998669
+TAP version 13
+# Bill analysis AI error: Error: Servizio AI reale non configurato.
+#     at makePublicError (file:///home/davide/Sviluppo/Progetti/hurka/lambda/index.mjs?ts=1781384984792-0.7468841215974369:45:17)
+#     at runBillAnalysisPipeline (file:///home/davide/Sviluppo/Progetti/hurka/lambda/index.mjs?ts=1781384984792-0.7468841215974369:585:11)
+#     at handleBillAnalysisUpload (file:///home/davide/Sviluppo/Progetti/hurka/lambda/index.mjs?ts=1781384984792-0.7468841215974369:787:22)
+#     at async Module.handler (file:///home/davide/Sviluppo/Progetti/hurka/lambda/index.mjs?ts=1781384984792-0.7468841215974369:1083:14)
+#     at async TestContext.<anonymous> (file:///home/davide/Sviluppo/Progetti/hurka/check-bolletta-beta/tests/bill-analysis.test.mjs:397:22)
+#     at async Test.run (node:internal/test_runner/test:1054:7)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+#   statusCode: 503,
+#   publicCode: 'missing_xai_config'
+# }
+# Internal lead notification failed
+# Customer confirmation email failed
+# Internal lead notification failed
+# Customer confirmation email failed
+# Internal lead notification failed
+# Customer confirmation email failed
+# Internal lead notification failed
+# Customer confirmation email failed
+# Bill analysis AI error: Error: xAI analysis failed (502): {"error":"bad gateway"}
+#     at analyzeBillWithGrok (file:///home/davide/Sviluppo/Progetti/hurka/lambda/index.mjs?ts=1781384984821-0.4551757164086834:549:13)
+#     at async runBillAnalysisPipeline (file:///home/davide/Sviluppo/Progetti/hurka/lambda/index.mjs?ts=1781384984821-0.4551757164086834:598:24)
+#     at async handleBillAnalysisUpload (file:///home/davide/Sviluppo/Progetti/hurka/lambda/index.mjs?ts=1781384984821-0.4551757164086834:787:16)
+#     at async Module.handler (file:///home/davide/Sviluppo/Progetti/hurka/lambda/index.mjs?ts=1781384984821-0.4551757164086834:1083:14)
+#     at async TestContext.<anonymous> (file:///home/davide/Sviluppo/Progetti/hurka/check-bolletta-beta/tests/bill-analysis.test.mjs:599:22)
+#     at async Test.run (node:internal/test_runner/test:1054:7)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+# Internal lead notification failed
+# Internal lead notification failed
+# Customer confirmation email failed
+# Subtest: contact endpoint accepts JSON and sends internal plus confirmation emails
+ok 1 - contact endpoint accepts JSON and sends internal plus confirmation emails
+  ---
+  duration_ms: 42.702999
+  type: 'test'
+  ...
+# Subtest: contact endpoint accepts multipart forms from static pages
+ok 2 - contact endpoint accepts multipart forms from static pages
+  ---
+  duration_ms: 3.832937
+  type: 'test'
+  ...
+# Subtest: validateUploadInput rejects missing consent and unsupported mime type
+ok 3 - validateUploadInput rejects missing consent and unsupported mime type
+  ---
+  duration_ms: 0.383063
+  type: 'test'
+  ...
+# Subtest: createMockAnalysis marks dual expensive files as hot leads
+ok 4 - createMockAnalysis marks dual expensive files as hot leads
+  ---
+  duration_ms: 1.18818
+  type: 'test'
+  ...
+# Subtest: createAnalysisResult coerces malformed structured data defensively
+ok 5 - createAnalysisResult coerces malformed structured data defensively
+  ---
+  duration_ms: 1.311266
+  type: 'test'
+  ...
+# Subtest: buildLeadEmailText keeps marketing consent separated from analysis consent
+ok 6 - buildLeadEmailText keeps marketing consent separated from analysis consent
+  ---
+  duration_ms: 0.364323
+  type: 'test'
+  ...
+# Subtest: buildAnalysisMarkup renders the real payload coherently
+ok 7 - buildAnalysisMarkup renders the real payload coherently
+  ---
+  duration_ms: 12.500646
+  type: 'test'
+  ...
+# Subtest: bill-analysis endpoint returns 400 when required contact data is missing
+ok 8 - bill-analysis endpoint returns 400 when required contact data is missing
+  ---
+  duration_ms: 2.209211
+  type: 'test'
+  ...
+# Subtest: bill-analysis endpoint rejects real submission when xAI is not configured
+ok 9 - bill-analysis endpoint rejects real submission when xAI is not configured
+  ---
+  duration_ms: 4.952593
+  type: 'test'
+  ...
+# Subtest: bill-analysis endpoint runs the real xAI pipeline, accepts file_id, and deletes the remote file
+ok 10 - bill-analysis endpoint runs the real xAI pipeline, accepts file_id, and deletes the remote file
+  ---
+  duration_ms: 9.340885
+  type: 'test'
+  ...
+# Subtest: bill-analysis endpoint blocks the fourth free analysis in the same day
+ok 11 - bill-analysis endpoint blocks the fourth free analysis in the same day
+  ---
+  duration_ms: 14.502863
+  type: 'test'
+  ...
+# Subtest: bill-analysis endpoint returns a real AI error and still cleans up the uploaded file
+ok 12 - bill-analysis endpoint returns a real AI error and still cleans up the uploaded file
+  ---
+  duration_ms: 4.348348
+  type: 'test'
+  ...
+# Subtest: bill-analysis endpoint reports delete failure without downgrading a successful xAI analysis
+ok 13 - bill-analysis endpoint reports delete failure without downgrading a successful xAI analysis
+  ---
+  duration_ms: 4.910426
+  type: 'test'
+  ...
+# Subtest: bill-analysis endpoint preserves successful analysis when SendGrid fails
+ok 14 - bill-analysis endpoint preserves successful analysis when SendGrid fails
+  ---
+  duration_ms: 5.461922
+  type: 'test'
+  ...
+# Subtest: buildAnalysisMarkup esito A (match forte): mostra risparmio e CTA forte
+ok 15 - buildAnalysisMarkup esito A (match forte): mostra risparmio e CTA forte
+  ---
+  duration_ms: 0.673048
+  type: 'test'
+  ...
+# Subtest: buildAnalysisMarkup esito B (nessuna convenienza): messaggio onesto, nessuna offerta
+ok 16 - buildAnalysisMarkup esito B (nessuna convenienza): messaggio onesto, nessuna offerta
+  ---
+  duration_ms: 0.575173
+  type: 'test'
+  ...
+# Subtest: buildAnalysisMarkup esito C (bassa confidenza): verifica assistita, nessuna offerta
+ok 17 - buildAnalysisMarkup esito C (bassa confidenza): verifica assistita, nessuna offerta
+  ---
+  duration_ms: 0.474494
+  type: 'test'
+  ...
+# Subtest: getEsitoOutcome restituisce no-match quando offerMatch è assente
+ok 18 - getEsitoOutcome restituisce no-match quando offerMatch è assente
+  ---
+  duration_ms: 0.122627
+  type: 'test'
+  ...
+# Subtest: buildAnalysisMarkup example mode shows demo note
+ok 19 - buildAnalysisMarkup example mode shows demo note
+  ---
+  duration_ms: 0.314653
+  type: 'test'
+  ...
+# Subtest: analyzeBillWithGrok parses structured JSON returned in output content blocks
+ok 20 - analyzeBillWithGrok parses structured JSON returned in output content blocks
+  ---
+  duration_ms: 2.353151
+  type: 'test'
+  ...
+# Subtest: customer email with saving opportunity contains range but no offer name
+ok 21 - customer email with saving opportunity contains range but no offer name
+  ---
+  duration_ms: 15.791742
+  type: 'test'
+  ...
+# Subtest: customer email without offer match is reassuring and contains no sales promise
+ok 22 - customer email without offer match is reassuring and contains no sales promise
+  ---
+  duration_ms: 0.36091
+  type: 'test'
+  ...
+# Subtest: customer email with marketing consent mentions it
+ok 23 - customer email with marketing consent mentions it
+  ---
+  duration_ms: 0.181205
+  type: 'test'
+  ...
+# Subtest: customer email without marketing consent does NOT mention it
+ok 24 - customer email without marketing consent does NOT mention it
+  ---
+  duration_ms: 0.124548
+  type: 'test'
+  ...
+# Subtest: internal email subject contains score class and total
+ok 25 - internal email subject contains score class and total
+  ---
+  duration_ms: 1.036851
+  type: 'test'
+  ...
+# Subtest: internal email body shows offer match details when present
+ok 26 - internal email body shows offer match details when present
+  ---
+  duration_ms: 0.609751
+  type: 'test'
+  ...
+# Subtest: internal email body shows no-match reason when no offer found
+ok 27 - internal email body shows no-match reason when no offer found
+  ---
+  duration_ms: 0.391946
+  type: 'test'
+  ...
+# Subtest: internal email correctly shows separated marketing consent
+ok 28 - internal email correctly shows separated marketing consent
+  ---
+  duration_ms: 0.61804
+  type: 'test'
+  ...
+# Subtest: classifyScore returns correct class for each band
+ok 29 - classifyScore returns correct class for each band
+  ---
+  duration_ms: 1.187736
+  type: 'test'
+  ...
+# Subtest: high saving + high spend + dual + full intent = caldo
+ok 30 - high saving + high spend + dual + full intent = caldo
+  ---
+  duration_ms: 0.352401
+  type: 'test'
+  ...
+# Subtest: no saving + no phone + no email = freddo
+ok 31 - no saving + no phone + no email = freddo
+  ---
+  duration_ms: 0.117858
+  type: 'test'
+  ...
+# Subtest: medium saving + phone + email = at least nurture
+ok 32 - medium saving + phone + email = at least nurture
+  ---
+  duration_ms: 0.101972
+  type: 'test'
+  ...
+# Subtest: whatsapp click pushes score up
+ok 33 - whatsapp click pushes score up
+  ---
+  duration_ms: 0.183484
+  type: 'test'
+  ...
+# Subtest: score A and B are always non-negative and within bounds
+ok 34 - score A and B are always non-negative and within bounds
+  ---
+  duration_ms: 0.101314
+  type: 'test'
+  ...
+# Subtest: breakdown contains both components with expected keys
+ok 35 - breakdown contains both components with expected keys
+  ---
+  duration_ms: 0.146823
+  type: 'test'
+  ...
+# Subtest: Edison high-cost bill: should find a credible HURKA saving (Sinergas BIENNALE)
+ok 36 - Edison high-cost bill: should find a credible HURKA saving (Sinergas BIENNALE)
+  ---
+  duration_ms: 3.776434
+  type: 'test'
+  ...
+# Subtest: Edison: stabilita preference should prefer fixed-price offer
+ok 37 - Edison: stabilita preference should prefer fixed-price offer
+  ---
+  duration_ms: 0.604007
+  type: 'test'
+  ...
+# Subtest: Duferco cheap bill: no credible saving — hasMatch false
+ok 38 - Duferco cheap bill: no credible saving — hasMatch false
+  ---
+  duration_ms: 0.450086
+  type: 'test'
+  ...
+# Subtest: Low confidence extraction: no match returned
+ok 39 - Low confidence extraction: no match returned
+  ---
+  duration_ms: 0.347999
+  type: 'test'
+  ...
+# Subtest: Gas commodity: no match with current offers (luce only)
+ok 40 - Gas commodity: no match with current offers (luce only)
+  ---
+  duration_ms: 0.220972
+  type: 'test'
+  ...
+# Subtest: Offer match output has all required fields
+ok 41 - Offer match output has all required fields
+  ---
+  duration_ms: 0.301543
+  type: 'test'
+  ...
+# Subtest: Saving falls back to derived from quota fields when spesa_materia_eur is 0
+ok 42 - Saving falls back to derived from quota fields when spesa_materia_eur is 0
+  ---
+  duration_ms: 0.278108
+  type: 'test'
+  ...
+1..42
+# tests 42
+# suites 0
+# pass 42
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 258.249486
+EXIT=0

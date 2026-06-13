@@ -37,7 +37,10 @@ export function getEsitoOutcome(analysis) {
   if (offerMatch.hasMatch && offerMatch.topOffer) return 'match';
 
   const reason = offerMatch.noMatchReason || '';
+  const noMatchType = offerMatch.noMatchType || '';
+  const assistedTypes = ['low-confidence', 'insufficient-data', 'low-consumption', 'implausible-rate', 'too-good', 'business'];
   if (
+    assistedTypes.includes(noMatchType) ||
     confidence < 0.60 ||
     /confidenza|insufficien|non identificat|dati insufficien/i.test(reason)
   ) {
@@ -63,7 +66,7 @@ function buildEsitoMatchCard(analysis) {
 
       <div class="esito-saving-row">
         <span class="esito-saving-big">${formatCurrencyRound(range.min)}-${formatCurrencyRound(range.max)}<small>/anno</small></span>
-        <span class="esito-saving-sub">range prudente da confermare con verifica gratuita</span>
+        <span class="esito-saving-sub">stima prudente: minimo&ndash;massimo gi&agrave; arrotondati per difetto, da confermare con la verifica gratuita</span>
       </div>
 
       <div class="esito-meta-grid">
@@ -84,22 +87,19 @@ function buildEsitoMatchCard(analysis) {
       <p class="esito-body-text">${escapeHtml(opportunity.summary || '')}</p>
 
       <p class="esito-calc-note">
-        Non mostriamo una lista di offerte generiche: il range e basato su ${escapeHtml(sourceLabel)}.
+        Non mostriamo una lista di offerte generiche: il range &egrave; basato su ${escapeHtml(sourceLabel)}.
         L'offerta finale viene proposta solo dopo controllo umano dei dati.
       </p>
+
+      ${opportunity.nextStep ? `<p class="esito-next-step"><strong>Prossimo passo:</strong> ${escapeHtml(opportunity.nextStep)}</p>` : ''}
 
       <div class="esito-cta-row">
         <a class="esito-cta-primary"
            href="https://wa.me/393888668837?text=Ciao%20HURKA!%2C%20ho%20visto%20un%20possibile%20risparmio%20sulla%20bolletta%20e%20voglio%20verificarlo."
            target="_blank" rel="noopener" data-whatsapp-link>
-          Verifica il risparmio &rarr;
+          Verifica gratis il risparmio &rarr;
         </a>
         <a class="esito-cta-soft" href="../contatti.html">Richiedi richiamata</a>
-        <a class="esito-cta-soft"
-           href="https://wa.me/393888668837?text=Vorrei%20parlare%20con%20un%20consulente%20HURKA."
-           target="_blank" rel="noopener" data-whatsapp-link>
-          Parla con un consulente
-        </a>
       </div>
     </article>`;
 }
@@ -120,21 +120,17 @@ function buildEsitoNoMatchCard(analysis) {
       <h2 class="esito-headline">${escapeHtml(opportunity.headline || 'Al momento non emerge una convenienza sufficiente')}</h2>
       <p class="esito-body-text">${reason}</p>
       <p class="esito-body-text" style="margin-top:.5rem">
-        Non ti mostriamo un&rsquo;offerta se il margine non e abbastanza solido.
+        Non ti mostriamo un&rsquo;offerta se il margine non &egrave; abbastanza solido.
         Possiamo comunque fare un check gratuito su potenza, contratto e clausole.
       </p>
+      ${opportunity.nextStep ? `<p class="esito-next-step"><strong>Prossimo passo:</strong> ${escapeHtml(opportunity.nextStep)}</p>` : ''}
       <div class="esito-cta-row">
-        <a class="esito-cta-soft"
+        <a class="esito-cta-primary"
            href="https://wa.me/393888668837?text=Ciao%20HURKA!%2C%20vorrei%20una%20verifica%20gratuita%20anche%20senza%20risparmio%20immediato."
            target="_blank" rel="noopener" data-whatsapp-link>
-          Verifica gratuita comunque
+          Check gratuito comunque &rarr;
         </a>
         <a class="esito-cta-soft" href="../contatti.html">Richiedi richiamata</a>
-        <a class="esito-cta-soft"
-           href="https://wa.me/393888668837"
-           target="_blank" rel="noopener" data-whatsapp-link>
-          WhatsApp
-        </a>
       </div>
     </article>`;
 }
@@ -159,17 +155,13 @@ function buildEsitoLowConfCard(analysis, offerMatch) {
         Confidenza di lettura: <strong>${Math.round(confidence * 100)}%</strong>.
         Un consulente HURKA pu&ograve; leggere il documento insieme a te e fare un check preciso.
       </p>
+      ${opportunity.nextStep ? `<p class="esito-next-step"><strong>Prossimo passo:</strong> ${escapeHtml(opportunity.nextStep)}</p>` : ''}
       <div class="esito-cta-row">
         <a class="esito-cta-primary" href="../contatti.html">Richiedi richiamata</a>
         <a class="esito-cta-soft"
            href="https://wa.me/393888668837?text=Ciao%20HURKA!%2C%20vorrei%20una%20verifica%20assistita%20sulla%20bolletta."
            target="_blank" rel="noopener" data-whatsapp-link>
           Invia via WhatsApp
-        </a>
-        <a class="esito-cta-soft"
-           href="https://wa.me/393888668837?text=Vorrei%20un%27analisi%20completa%20con%20consulente%20HURKA."
-           target="_blank" rel="noopener" data-whatsapp-link>
-          Analisi completa con consulente
         </a>
       </div>
     </article>`;

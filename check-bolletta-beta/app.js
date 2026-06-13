@@ -51,6 +51,30 @@ function setSubmitting(isSubmitting) {
   submitButton.textContent = isSubmitting ? 'Analisi in corso...' : 'Analizza la bolletta →';
 }
 
+let loadingTimer = null;
+
+function stopLoadingProgress() {
+  if (loadingTimer) {
+    clearInterval(loadingTimer);
+    loadingTimer = null;
+  }
+}
+
+function startLoadingProgress() {
+  const steps = doc ? [...doc.querySelectorAll('[data-loading-step]')] : [];
+  if (!steps.length) return;
+  stopLoadingProgress();
+  steps.forEach((step) => { step.dataset.state = 'pending'; });
+  let index = 0;
+  steps[0].dataset.state = 'active';
+  loadingTimer = setInterval(() => {
+    if (index >= steps.length - 1) return; // keep the last step active until results arrive
+    steps[index].dataset.state = 'done';
+    index += 1;
+    steps[index].dataset.state = 'active';
+  }, 1400);
+}
+
 function normalizeApiBase(value) {
   return String(value || '').trim().replace(/\/+$/, '') || '';
 }
@@ -231,6 +255,7 @@ async function submitAnalysis(event) {
   setSubmitting(true);
   setFeedback('');
   setWizardStep('2');
+  startLoadingProgress();
   trackEvent('upload_completed', { mime_type: file.type, file_size: file.size });
 
   // Build FormData from form fields + file from the dropzone input (outside the form)
@@ -246,6 +271,7 @@ async function submitAnalysis(event) {
     analysis = payload.analysis;
     fallback = Boolean(payload.meta?.usedFallback);
   } catch (error) {
+    stopLoadingProgress();
     const isPortMismatch = typeof window !== 'undefined'
       && ['127.0.0.1', 'localhost'].includes(window.location.hostname)
       && window.location.port
@@ -281,6 +307,7 @@ async function submitAnalysis(event) {
     return;
   }
 
+  stopLoadingProgress();
   renderAnalysis(analysis, { fallback });
   setSubmitting(false);
   setWizardStep('3');
@@ -359,5 +386,6 @@ if (doc) {
   uploadDropzone?.addEventListener('dragleave', handleDragLeave);
   uploadDropzone?.addEventListener('drop', handleDrop);
   form?.addEventListener('submit', submitAnalysis);
+  doc.querySelector('[data-back-to-upload]')?.addEventListener('click', () => setWizardStep('0'));
   exampleButton?.addEventListener('click', showExample);
 }

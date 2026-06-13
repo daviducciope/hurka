@@ -10,6 +10,21 @@ function eur(amount) {
 
 const BRAND_COLOR = '#203863';
 const YELLOW = '#fae04a';
+const WHATSAPP_NUMBER = '393888668837';
+
+function whatsappLink(message) {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+function phoneDigits(value) {
+  return String(value || '').replace(/[^0-9]/g, '');
+}
+
+function ctaButton(href, label, { solid = true } = {}) {
+  const bg = solid ? YELLOW : '#ffffff';
+  const border = solid ? YELLOW : '#c9d3e0';
+  return `<a href="${href}" target="_blank" rel="noopener" style="display:inline-block;background:${bg};color:${BRAND_COLOR};font-weight:bold;font-size:14px;text-decoration:none;padding:12px 24px;border-radius:6px;border:1px solid ${border};font-family:sans-serif;margin:4px 6px 4px 0;">${escapeHtml(label)}</a>`;
+}
 
 function headerBlock(title) {
   return `<div style="background:${BRAND_COLOR};padding:24px 32px;">
@@ -54,20 +69,31 @@ export function buildCustomerEmail({ nome, commodity, salesOpportunity, offerMat
       : null
   );
 
-  const matchSection = opportunity?.hasSavingOpportunity && opportunity.savingsRange
+  const hasSaving = Boolean(opportunity?.hasSavingOpportunity && opportunity.savingsRange && opportunity.savingsRange.max > 0);
+  const nextStep = opportunity?.nextStep ? String(opportunity.nextStep) : '';
+
+  const waMessage = hasSaving
+    ? "Ciao HURKA! Ho ricevuto l'analisi della mia bolletta e vorrei verificare il risparmio."
+    : "Ciao HURKA! Ho inviato la mia bolletta per l'analisi e vorrei parlarne con un consulente.";
+  const waHref = whatsappLink(waMessage);
+  const ctaLabel = hasSaving ? 'Verifica il risparmio su WhatsApp' : 'Parla con un consulente';
+
+  const resultSection = hasSaving
     ? `<div style="margin:20px 0;padding:18px 20px;background:#f0f4f9;border-left:4px solid ${YELLOW};border-radius:6px;">
-        <p style="margin:0 0 6px;font-size:13px;font-weight:bold;color:${BRAND_COLOR};font-family:sans-serif;">Abbiamo trovato qualcosa di interessante</p>
-        <p style="margin:0;font-size:13px;color:#444;font-family:sans-serif;">
-          La bolletta analizzata suggerisce un possibile risparmio prudente tra
+        <p style="margin:0 0 6px;font-size:13px;font-weight:bold;color:${BRAND_COLOR};font-family:sans-serif;">Abbiamo trovato un possibile risparmio</p>
+        <p style="margin:0;font-size:13px;color:#444;font-family:sans-serif;line-height:1.6;">
+          La bolletta analizzata suggerisce un risparmio prudente tra
           <strong>${eur(opportunity.savingsRange.min)} e ${eur(opportunity.savingsRange.max)}/anno</strong>.
-          Ti ricontatteremo per confermare i dettagli prima di proporti qualsiasi soluzione.
+          È una stima minima da confermare: un consulente verifica i numeri prima di proporti qualsiasi soluzione.
         </p>
+        ${nextStep ? `<p style="margin:10px 0 0;font-size:13px;color:${BRAND_COLOR};font-family:sans-serif;"><strong>Prossimo passo:</strong> ${escapeHtml(nextStep)}</p>` : ''}
       </div>`
     : `<div style="margin:20px 0;padding:18px 20px;background:#f8f7f4;border-radius:6px;">
-        <p style="margin:0;font-size:13px;color:#555;font-family:sans-serif;">
-          Stiamo analizzando il profilo della tua fornitura ${commodityLabel}.
-          Se emerge un'opportunita concreta, ti contatteremo direttamente.
+        <p style="margin:0;font-size:13px;color:#555;font-family:sans-serif;line-height:1.6;">
+          Un consulente HURKA sta verificando il profilo della tua fornitura ${commodityLabel}.
+          Ti contatteremo direttamente solo se emerge un'opportunità concreta.
         </p>
+        ${nextStep ? `<p style="margin:10px 0 0;font-size:13px;color:${BRAND_COLOR};font-family:sans-serif;"><strong>Prossimo passo:</strong> ${escapeHtml(nextStep)}</p>` : ''}
       </div>`;
 
   const marketingNote = consentMarketing
@@ -81,18 +107,21 @@ export function buildCustomerEmail({ nome, commodity, salesOpportunity, offerMat
       <p style="font-size:15px;color:#333;">Ciao <strong>${escapeHtml(firstName)}</strong>,</p>
       <p style="font-size:14px;color:#444;line-height:1.65;">
         abbiamo ricevuto la bolletta ${commodityLabel} che ci hai inviato.
-        Il nostro sistema ha completato la lettura iniziale e un consulente HURKA sta verificando i dati.
+        Il nostro sistema ha completato la lettura iniziale e un consulente HURKA ti ricontatta entro 1 giorno lavorativo.
       </p>
-      ${matchSection}
+      ${resultSection}
+      <div style="margin:22px 0;text-align:center;">
+        ${ctaButton(waHref, ctaLabel)}
+        <p style="margin:8px 0 0;font-size:12px;color:#999;font-family:sans-serif;">Oppure scrivici su WhatsApp: <a href="https://wa.me/${WHATSAPP_NUMBER}" style="color:${BRAND_COLOR};font-weight:bold;">wa.me/${WHATSAPP_NUMBER}</a></p>
+      </div>
       <p style="font-size:14px;color:#444;line-height:1.65;">
-        Se non emergono opportunita reali, non ti disturberemo con proposte generiche.
+        Se non emergono opportunità reali, non ti disturberemo con proposte generiche.
         Il nostro principio: <strong>ti contattiamo solo se ha senso per te</strong>.
       </p>
-      <p style="font-size:14px;color:#444;">
-        Nel frattempo, puoi scriverci su WhatsApp per qualsiasi domanda:<br/>
-        <a href="https://wa.me/393888668837" style="color:${BRAND_COLOR};font-weight:bold;">wa.me/393888668837</a>
+      <p style="font-size:12px;color:#999;font-family:sans-serif;line-height:1.6;">
+        I tuoi dati sono trattati in modo riservato e usati solo per questa analisi.
       </p>
-      <p style="font-size:14px;color:#444;margin-top:24px;">
+      <p style="font-size:14px;color:#444;margin-top:20px;">
         A presto,<br/><strong style="color:${BRAND_COLOR};">Il team HURKA!</strong>
       </p>
       ${marketingNote}
@@ -101,22 +130,29 @@ export function buildCustomerEmail({ nome, commodity, salesOpportunity, offerMat
   </div>
 </body></html>`;
 
-  const text = [
+  const textLines = [
     `Ciao ${firstName},`,
     '',
-    `abbiamo ricevuto la bolletta ${commodityLabel}.`,
-    opportunity?.hasSavingOpportunity && opportunity.savingsRange
-      ? `Risparmio stimato: tra ${eur(opportunity.savingsRange.min)} e ${eur(opportunity.savingsRange.max)}/anno. Ti ricontatteremo per confermare i dettagli.`
-      : `Stiamo verificando il profilo. Ti contatteremo se emerge un'opportunita concreta.`,
+    `abbiamo ricevuto la bolletta ${commodityLabel}. Un consulente HURKA ti ricontatta entro 1 giorno lavorativo.`,
+    hasSaving
+      ? `Risparmio prudente stimato: tra ${eur(opportunity.savingsRange.min)} e ${eur(opportunity.savingsRange.max)}/anno (stima minima da confermare).`
+      : `Stiamo verificando il profilo. Ti contatteremo solo se emerge un'opportunità concreta.`,
+    nextStep ? `Prossimo passo: ${nextStep}` : '',
     '',
-    'WhatsApp: wa.me/393888668837',
+    `Vuoi accelerare? Scrivici su WhatsApp: ${waHref}`,
+    `Numero diretto: wa.me/${WHATSAPP_NUMBER}`,
+    '',
+    'I tuoi dati sono trattati in modo riservato e usati solo per questa analisi.',
     '',
     'A presto,',
     'Il team HURKA! — hurka.it',
-  ].join('\n');
+  ];
+  const text = textLines.join('\n');
 
   return {
-    subject: `La tua bolletta è in analisi – HURKA!`,
+    subject: hasSaving
+      ? 'La tua bolletta è in analisi – possibile risparmio individuato'
+      : 'La tua bolletta è in analisi – HURKA!',
     text,
     html,
   };
@@ -143,6 +179,10 @@ export function buildInternalLeadEmail({ fields, file, analysis, leadScore, offe
   const scoreClass = leadScore?.class || '—';
   const scoreTotal = leadScore?.total ?? '—';
   const fileName = file?.name || analysis?.meta?.fileName || '—';
+  const salesOpportunity = analysis?.salesOpportunity || null;
+  const leadFirstName = String(nome).split(' ')[0];
+  const leadPhoneDigits = phoneDigits(telefono);
+  const waLeadMessage = `Ciao ${leadFirstName}, siamo HURKA: abbiamo analizzato la tua bolletta e vorremmo verificare insieme i numeri. Quando sei disponibile?`;
 
   const priorityColor = {
     caldo: '#c0392b',
@@ -169,11 +209,30 @@ export function buildInternalLeadEmail({ fields, file, analysis, leadScore, offe
       </table>`
     : `<p style="font-family:sans-serif;font-size:13px;color:#666;">${escapeHtml(offerMatch?.noMatchReason || 'Nessun match trovato.')}</p>`;
 
+  const quickActions = (leadPhoneDigits || (email && email !== '—'))
+    ? `<div style="margin:0 0 18px;">
+        ${leadPhoneDigits ? ctaButton(`https://wa.me/${leadPhoneDigits}?text=${encodeURIComponent(waLeadMessage)}`, 'WhatsApp al cliente') : ''}
+        ${leadPhoneDigits ? ctaButton(`tel:${escapeHtml(telefono)}`, 'Chiama', { solid: false }) : ''}
+        ${(email && email !== '—') ? ctaButton(`mailto:${escapeHtml(email)}`, 'Email', { solid: false }) : ''}
+      </div>`
+    : '';
+
+  const customerView = salesOpportunity
+    ? `<h3 style="margin:20px 0 8px;font-size:14px;color:${BRAND_COLOR};font-family:sans-serif;">Cosa ha visto il cliente</h3>
+      <table style="border-collapse:collapse;width:100%;font-family:sans-serif;">
+        ${tableRow('Esito mostrato', salesOpportunity.headline || '—')}
+        ${tableRow('Range comunicato', salesOpportunity.hasSavingOpportunity && salesOpportunity.savingsRange ? `${eur(salesOpportunity.savingsRange.min)}–${eur(salesOpportunity.savingsRange.max)}/anno` : 'Nessun risparmio mostrato')}
+        ${tableRow('Prossimo passo', salesOpportunity.nextStep || '—')}
+      </table>
+      <p style="font-size:12px;color:#999;font-family:sans-serif;margin:6px 0 0;">Usa lo stesso range mostrato al cliente, per coerenza.</p>`
+    : '';
+
   const html = `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f4f4f4;">
   <div style="max-width:700px;margin:24px auto;background:white;border-radius:8px;overflow:hidden;font-family:sans-serif;">
     ${headerBlock(`[HURKA Lead] ${nome} — check bolletta beta`)}
     <div style="padding:24px 32px;">
-      <div style="margin-bottom:16px;">${priorityBadge}</div>
+      <div style="margin-bottom:12px;">${priorityBadge}</div>
+      ${quickActions}
 
       <h3 style="margin:0 0 8px;font-size:14px;color:${BRAND_COLOR};">Dati contatto</h3>
       <table style="border-collapse:collapse;width:100%;">
@@ -202,6 +261,8 @@ export function buildInternalLeadEmail({ fields, file, analysis, leadScore, offe
 
       ${offerSection}
 
+      ${customerView}
+
       <h3 style="margin:20px 0 8px;font-size:14px;color:${BRAND_COLOR};">Score lead</h3>
       <table style="border-collapse:collapse;width:100%;">
         ${tableRow('Score totale', `${leadScore?.total ?? '—'}/100`)}
@@ -229,6 +290,8 @@ export function buildInternalLeadEmail({ fields, file, analysis, leadScore, offe
     `Commodity: ${commodityHint}`,
     `Preferenza: ${preferenza}`,
     `Marketing: ${consentMarketing}`,
+    leadPhoneDigits ? `WhatsApp cliente: https://wa.me/${leadPhoneDigits}` : '',
+    salesOpportunity ? `Range mostrato al cliente: ${salesOpportunity.hasSavingOpportunity && salesOpportunity.savingsRange ? `${eur(salesOpportunity.savingsRange.min)}–${eur(salesOpportunity.savingsRange.max)}/anno` : 'nessun risparmio mostrato'}` : '',
     '',
     `File: ${fileName}`,
     `Fornitore: ${extraction.provider_name || '—'}`,

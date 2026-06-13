@@ -447,6 +447,30 @@
       color: var(--navy);
     }
 
+    .loading-step {
+      transition: border-color .25s ease, background .25s ease, opacity .25s ease;
+    }
+
+    .loading-step[data-state="active"] {
+      border-color: rgba(250, 224, 74, 0.75);
+      background: rgba(250, 224, 74, 0.14);
+    }
+
+    .loading-step[data-state="active"] strong::after {
+      content: " \2026";
+      color: var(--teal);
+    }
+
+    .loading-step[data-state="done"] {
+      opacity: .62;
+    }
+
+    .loading-step[data-state="done"] strong::after {
+      content: " \2713";
+      color: var(--teal);
+      font-weight: 700;
+    }
+
     .result-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       margin-top: 1rem;
@@ -563,6 +587,26 @@
 
     .wizard-body {
       padding: 2rem 2.5rem;
+    }
+
+    .wizard-back {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      margin-bottom: 1.1rem;
+      padding: .45rem .9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(32, 56, 99, 0.16);
+      background: transparent;
+      color: var(--navy);
+      font: 600 .88rem/1 'Barlow', sans-serif;
+      cursor: pointer;
+      transition: background .16s ease, border-color .16s ease;
+    }
+
+    .wizard-back:hover {
+      background: rgba(32, 56, 99, 0.06);
+      border-color: var(--navy);
     }
 
     /* Step panels */
@@ -906,6 +950,19 @@
     .esito-match .esito-body-text { color: rgba(255,255,255,.82); }
     .esito-no-match .esito-body-text, .esito-low-conf .esito-body-text { color: rgba(16,26,44,.72); }
 
+    .esito-next-step {
+      margin-top: 1rem;
+      padding: .8rem 1rem;
+      border-radius: 12px;
+      font-size: .95rem;
+      line-height: 1.6;
+    }
+
+    .esito-match .esito-next-step { background: rgba(255,255,255,.08); color: rgba(255,255,255,.9); }
+    .esito-no-match .esito-next-step, .esito-low-conf .esito-next-step {
+      background: rgba(32,56,99,.06); color: rgba(16,26,44,.82);
+    }
+
     .esito-cta-row {
       display: flex;
       flex-wrap: wrap;
@@ -1068,7 +1125,7 @@
                 <div class="step-dot"></div>
                 <div class="step-dot"></div>
               </div>
-              <span class="eyebrow">Passo 1 di 3</span>
+              <span class="eyebrow">Passo 1 di 3 &middot; Carica</span>
               <h2>Carica la bolletta</h2>
             </div>
             <div class="wizard-body">
@@ -1095,10 +1152,11 @@
                 <div class="step-dot"></div>
                 <div class="step-dot"></div>
               </div>
-              <span class="eyebrow">Passo 2 di 3</span>
+              <span class="eyebrow">Passo 2 di 3 &middot; I tuoi dati</span>
               <h2>Due domande veloci</h2>
             </div>
             <div class="wizard-body">
+              <button type="button" class="wizard-back" data-back-to-upload>&larr; Carica un&rsquo;altra bolletta</button>
               <form data-bill-form novalidate>
                 <!-- file hidden (già selezionato) -->
                 <input id="bill-file-hidden" name="billFile" type="file" accept=".pdf,image/jpeg,image/png,application/pdf" style="display:none" tabindex="-1" />
@@ -1169,17 +1227,17 @@
                 <div class="step-dot"></div>
                 <div class="step-dot"></div>
               </div>
-              <span class="eyebrow">Passo 3 di 3</span>
+              <span class="eyebrow">Passo 3 di 3 &middot; Analisi AI</span>
               <h2>Lettura in corso…</h2>
             </div>
             <div class="wizard-body" data-loading-state>
               <div style="text-align:center;padding:1.5rem 0">
                 <div class="ai-badge" style="margin-bottom:1.2rem"><span class="ai-spinner" aria-hidden="true"></span>AI HURKA in elaborazione</div>
                 <div class="loading-steps" style="max-width:440px;margin:0 auto">
-                  <div class="loading-step"><strong>Ricezione bolletta</strong>Il documento è arrivato al motore di analisi.</div>
-                  <div class="loading-step"><strong>Lettura AI in corso</strong>Estraiamo totale, consumi, fornitore e voci di costo.</div>
-                  <div class="loading-step"><strong>Spiegazione fattura</strong>L'AI prepara sintesi, punti critici e proposta finale.</div>
-                  <div class="loading-step"><strong>Stima risparmio</strong>Calcoliamo un range prudente sulla base delle condizioni economiche disponibili.</div>
+                  <div class="loading-step" data-loading-step="0"><strong>Ricezione bolletta</strong>Il documento è arrivato al motore di analisi.</div>
+                  <div class="loading-step" data-loading-step="1"><strong>Lettura AI in corso</strong>Estraiamo totale, consumi, fornitore e voci di costo.</div>
+                  <div class="loading-step" data-loading-step="2"><strong>Spiegazione fattura</strong>L'AI prepara sintesi, punti critici e proposta finale.</div>
+                  <div class="loading-step" data-loading-step="3"><strong>Stima risparmio</strong>Calcoliamo un range prudente sulla base delle condizioni economiche disponibili.</div>
                 </div>
               </div>
             </div>
