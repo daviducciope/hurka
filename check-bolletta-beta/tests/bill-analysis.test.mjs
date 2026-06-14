@@ -72,6 +72,8 @@ async function loadLambdaModule({ env = {}, fetchImpl } = {}) {
   const originalEnv = {
     XAI_API_KEY: process.env.XAI_API_KEY,
     SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+    TO_EMAIL: process.env.TO_EMAIL,
+    INTERNAL_LEAD_CC_EMAILS: process.env.INTERNAL_LEAD_CC_EMAILS,
     BILL_ANALYSIS_DAILY_FREE_LIMIT: process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT,
     BILL_ANALYSIS_QUOTA_TABLE: process.env.BILL_ANALYSIS_QUOTA_TABLE,
   };
@@ -87,6 +89,18 @@ async function loadLambdaModule({ env = {}, fetchImpl } = {}) {
     process.env.SENDGRID_API_KEY = env.SENDGRID_API_KEY;
   } else {
     delete process.env.SENDGRID_API_KEY;
+  }
+
+  if ('TO_EMAIL' in env) {
+    process.env.TO_EMAIL = env.TO_EMAIL;
+  } else {
+    delete process.env.TO_EMAIL;
+  }
+
+  if ('INTERNAL_LEAD_CC_EMAILS' in env) {
+    process.env.INTERNAL_LEAD_CC_EMAILS = env.INTERNAL_LEAD_CC_EMAILS;
+  } else {
+    delete process.env.INTERNAL_LEAD_CC_EMAILS;
   }
 
   if ('BILL_ANALYSIS_DAILY_FREE_LIMIT' in env) {
@@ -115,6 +129,12 @@ async function loadLambdaModule({ env = {}, fetchImpl } = {}) {
 
       if (originalEnv.SENDGRID_API_KEY == null) delete process.env.SENDGRID_API_KEY;
       else process.env.SENDGRID_API_KEY = originalEnv.SENDGRID_API_KEY;
+
+      if (originalEnv.TO_EMAIL == null) delete process.env.TO_EMAIL;
+      else process.env.TO_EMAIL = originalEnv.TO_EMAIL;
+
+      if (originalEnv.INTERNAL_LEAD_CC_EMAILS == null) delete process.env.INTERNAL_LEAD_CC_EMAILS;
+      else process.env.INTERNAL_LEAD_CC_EMAILS = originalEnv.INTERNAL_LEAD_CC_EMAILS;
 
       if (originalEnv.BILL_ANALYSIS_DAILY_FREE_LIMIT == null) delete process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT;
       else process.env.BILL_ANALYSIS_DAILY_FREE_LIMIT = originalEnv.BILL_ANALYSIS_DAILY_FREE_LIMIT;
@@ -219,7 +239,7 @@ test('contact endpoint accepts JSON and sends internal plus confirmation emails'
     assert.equal(response.statusCode, 200);
     assert.equal(payload.success, true);
     assert.equal(sentEmails.length, 2);
-    assert.equal(sentEmails[0].personalizations[0].to[0].email, 'info@smartconitalia.com');
+    assert.equal(sentEmails[0].personalizations[0].to[0].email, 'diegodecicco.ddc@gmail.com');
     assert.equal(sentEmails[1].personalizations[0].to[0].email, 'mario@example.com');
   } finally {
     loaded.restore();
@@ -491,6 +511,88 @@ test('bill-analysis endpoint runs the real xAI pipeline, accepts file_id, and de
     assert.equal(payload.analysis.meta.xaiFileDeleted, true);
     assert.equal(payload.meta.emailSent, false);
     assert.equal(calls.length, 3);
+  } finally {
+    loaded.restore();
+  }
+});
+
+test('bill-analysis endpoint sends the uploaded bill as an internal attachment with cc copy', async () => {
+  const sentEmails = [];
+  const structured = createStructuredAnalysis();
+  const fileContent = '%PDF-1.4 attachment test content';
+  const fetchMock = async (url, init = {}) => {
+    if (url.endsWith('/files') && init.method === 'POST') {
+      return new Response(JSON.stringify({ file_id: 'file_attachment' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+
+    if (url.endsWith('/responses') && init.method === 'POST') {
+      return new Response(JSON.stringify({ output_text: JSON.stringify(structured) }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+
+    if (url.endsWith('/files/file_attachment') && init.method === 'DELETE') {
+      return new Response(null, { status: 204 });
+    }
+
+    if (url.includes('api.sendgrid.com')) {
+      sentEmails.push(JSON.parse(init.body));
+      return new Response(null, { status: 202 });
+    }
+
+    throw new Error(`Unexpected fetch call: ${url}`);
+  };
+
+  const loaded = await loadLambdaModule({
+    env: {
+      XAI_API_KEY: 'xai-test-key',
+      SENDGRID_API_KEY: 'SG.test-key',
+    },
+    fetchImpl: fetchMock,
+  });
+
+  try {
+    const response = await loaded.module.handler(buildMultipartEvent({
+      fields: {
+        nome: 'Lucia Gialla',
+        telefono: '+393331234567',
+        email: 'lucia@example.com',
+        comune: 'Pescara',
+        commodityHint: 'luce',
+        consentAnalysis: 'true',
+        consentMarketing: 'false',
+      },
+      file: {
+        name: 'bolletta-lucia.pdf',
+        type: 'application/pdf',
+        content: fileContent,
+      },
+    }));
+    const payload = JSON.parse(response.body);
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(payload.meta.emailSent, true);
+    assert.equal(payload.meta.customerEmailSent, true);
+    assert.equal(sentEmails.length, 2);
+
+    const internalEmail = sentEmails.find((email) => email.subject.includes('[HURKA Lead]'));
+    const customerEmail = sentEmails.find((email) => email.personalizations[0].to[0].email === 'lucia@example.com');
+
+    assert.equal(internalEmail.personalizations[0].to[0].email, 'diegodecicco.ddc@gmail.com');
+    assert.equal(internalEmail.personalizations[0].cc[0].email, 'aidroidreal@gmail.com');
+    assert.equal(internalEmail.attachments.length, 1);
+    assert.equal(internalEmail.attachments[0].filename, 'bolletta-lucia.pdf');
+    assert.equal(internalEmail.attachments[0].type, 'application/pdf');
+    assert.equal(internalEmail.attachments[0].disposition, 'attachment');
+    assert.equal(
+      Buffer.from(internalEmail.attachments[0].content, 'base64').toString('latin1'),
+      fileContent,
+    );
+    assert.equal(customerEmail.attachments, undefined);
   } finally {
     loaded.restore();
   }

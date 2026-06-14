@@ -17,7 +17,11 @@ import { buildCustomerEmail, buildInternalLeadEmail } from '../check-bolletta-be
 import { createHash, createHmac } from 'node:crypto';
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const TO_EMAIL = process.env.TO_EMAIL || 'info@smartconitalia.com';
+const TO_EMAIL = process.env.TO_EMAIL || 'diegodecicco.ddc@gmail.com';
+const INTERNAL_LEAD_CC_EMAILS = String(process.env.INTERNAL_LEAD_CC_EMAILS || 'aidroidreal@gmail.com')
+  .split(',')
+  .map((email) => email.trim())
+  .filter(Boolean);
 const FROM_EMAIL = process.env.FROM_EMAIL || 'info@hurka.it';
 const FROM_NAME = process.env.FROM_NAME || 'HURKA!';
 const INBOUND_WEBHOOK_TOKEN = process.env.INBOUND_WEBHOOK_TOKEN || '';
@@ -275,6 +279,45 @@ function stripHtml(value) {
     .replace(/&nbsp;/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function uniqueEmailRecipients(emails, exclude = []) {
+  const excluded = new Set(exclude.map((email) => String(email || '').trim().toLowerCase()).filter(Boolean));
+  const seen = new Set();
+  return emails
+    .map((email) => String(email || '').trim())
+    .filter((email) => {
+      const key = email.toLowerCase();
+      if (!key || excluded.has(key) || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .map((email) => ({ email }));
+}
+
+function buildLeadPersonalization() {
+  const personalization = { to: [{ email: TO_EMAIL }] };
+  const cc = uniqueEmailRecipients(INTERNAL_LEAD_CC_EMAILS, [TO_EMAIL]);
+  if (cc.length) personalization.cc = cc;
+  return personalization;
+}
+
+function safeAttachmentFileName(fileName) {
+  const name = String(fileName || 'bolletta')
+    .replace(/[\r\n/\\]/g, '_')
+    .trim()
+    .slice(0, 180);
+  return name || 'bolletta';
+}
+
+function buildSendGridAttachment({ file, fileBuffer }) {
+  if (!file || !fileBuffer) return null;
+  return {
+    content: Buffer.from(fileBuffer).toString('base64'),
+    filename: safeAttachmentFileName(file.name),
+    type: file.type || 'application/octet-stream',
+    disposition: 'attachment',
+  };
 }
 
 function extractEmailAddress(value) {
@@ -846,8 +889,9 @@ async function handleBillAnalysisUpload(event, options = {}) {
     leadScore,
     offerMatch,
   });
-  emailTasks.push(sendEmail({
-    personalizations: [{ to: [{ email: TO_EMAIL }] }],
+  const leadAttachment = buildSendGridAttachment({ file, fileBuffer });
+  const internalEmailPayload = {
+    personalizations: [buildLeadPersonalization()],
     from: { email: FROM_EMAIL, name: FROM_NAME },
     reply_to: validation.fields.email ? { email: validation.fields.email, name: validation.fields.nome } : undefined,
     subject: internal.subject,
@@ -855,7 +899,11 @@ async function handleBillAnalysisUpload(event, options = {}) {
       { type: 'text/plain', value: internal.text },
       { type: 'text/html', value: internal.html },
     ],
-  }));
+  };
+  if (leadAttachment) {
+    internalEmailPayload.attachments = [leadAttachment];
+  }
+  emailTasks.push(sendEmail(internalEmailPayload));
 
   if (validation.fields.email) {
     const customer = buildCustomerEmail({

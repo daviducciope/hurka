@@ -1,4 +1,4 @@
-il calcn  import {
+import {
   MAX_FILE_SIZE_BYTES,
   SUPPORTED_MIME_TYPES,
   createMockAnalysis,
@@ -210,6 +210,12 @@ function handleDropzoneClick() {
   uploadInput?.click();
 }
 
+function handleDropzoneKeydown(e) {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  e.preventDefault();
+  uploadInput?.click();
+}
+
 function handleDragOver(e) {
   e.preventDefault();
   uploadDropzone?.classList.add('drag-over');
@@ -382,6 +388,7 @@ if (doc) {
 
   uploadInput?.addEventListener('change', handleFileSelection);
   uploadDropzone?.addEventListener('click', handleDropzoneClick);
+  uploadDropzone?.addEventListener('keydown', handleDropzoneKeydown);
   uploadDropzone?.addEventListener('dragover', handleDragOver);
   uploadDropzone?.addEventListener('dragleave', handleDragLeave);
   uploadDropzone?.addEventListener('drop', handleDrop);
